@@ -1,39 +1,42 @@
 # BoloVerse progress tracker
 
-Last updated: 2026-11-12 (Asia/Kolkata).
+Updated 2026-11-12 (Asia/Kolkata).
 
-## Current phase: XR Phase 1 — Foundation
+## Current scope: functional browser XR studio
 
-The newer [XR implementation specification](docs/XR_IMPLEMENTATION_SPEC.md) supersedes the original M1–M9 roadmap. Phase 1 is implemented and locally verified: 164 unit/PostgreSQL tests, nine production Chromium tests, lint, types, formatting, build and schema consistency passed. Live Clerk/Neon and physical-headset acceptance remain unverified.
+The latest [master specification](docs/XR_BROWSER_STUDIO_SPEC.md) supersedes the earlier Phase 1 boundary. Work follows the [repository audit and plan](docs/superpowers/plans/2026-11-12-functional-xr-studio.md). Historical [M0](docs/M0_IMPLEMENTATION_STATUS.md) and [Phase 1](docs/XR_PHASE1_IMPLEMENTATION_STATUS.md) evidence is preserved.
 
-- [x] Read the attached master XR prompt and save a repository copy.
-- [x] Preserve the existing Next.js/Clerk/Neon/Drizzle foundation and local recorder.
-- [x] Adopt pnpm, pin A-Frame 1.8.0, add scoped Prettier and GitHub Actions checks.
-- [x] Implement authorized create/list/open/edit project metadata with strict validation and a durable creation limit.
-- [x] Add private `/xr/[projectId]` and clearly labeled public `/xr/preview` routes.
-- [x] Render a real desktop A-Frame scene in an owned, disposable iframe.
-- [x] Add sample selection, accessible companion controls, reset and seated/standing views.
-- [x] Implement capability detection and explicit WebXR entry/exit with session cleanup.
-- [x] Pass 164 unit/PostgreSQL tests, development Chromium tests, lint, typecheck, formatting, production build and schema-drift check.
-- [x] Inspect desktop/mobile XR screenshots and decoded recording pixels.
-- [x] Independent code review: no remaining Critical/Important findings.
-- [x] Complete final production Chromium verification and prepare the local implementation commit.
-
-## Current phase sequence
-
-| Phase | Status |
+| Milestone | Implementation and evidence |
 | --- | --- |
-| Phase 1 Foundation | Implemented and locally verified; live account/headset acceptance open |
-| Phase 2 Spatial workspace | Not started: manipulation, saved scene state, recovery |
-| Phase 3 Creative tools | Not started |
-| Phase 4 AI assistant | Not started |
-| Phase 5 Client review | Not started |
-| Phase 6 Collaboration and polish | Not started |
+| 1. Foundation | Authenticated studio routes, client-only A-Frame and reusable capability detection implemented; real desktop rendering verified |
+| 2. Spatial workspace | Selection, move/rotate/scale, focus/reset and accessible companion controls implemented; browser editing verified |
+| 3. Immersive VR | Explicit session lifecycle, controller transform controls and recenter implemented; simulated rejection/cleanup verified; physical headset acceptance open |
+| 4. Project integration | Authorized content/assets, versioned layouts/reset and migration implemented; PostgreSQL tests and browser save/reload fixtures verified; live accounts/storage unverified |
+| 5. AI integration | Gemini/Sarvam adapters, restricted command proposals, microphone consent, STT/TTS and labeled local text mock implemented; live providers unverified |
+| 6. Polish and validation | Resource bounds, recovery, strict XR CSP and documentation implemented; locally verified with 306 unit/PostgreSQL tests and 24 production-browser checks; live services/hardware remain unverified |
 
-## Preserved M0 baseline
+## Verification checklist
 
-- Initial commit: `a1b8dc02b01244623916fa3c5493955eb762afce` on `main`, pushed to `origin/main` in the prior handoff.
-- Original M0 recording experiment and privacy/tenant boundaries remain intact.
-- [Historical M0 evidence](docs/M0_IMPLEMENTATION_STATUS.md) records 93 tests and five browser checks at that milestone; the current suite includes those regressions.
+- [x] Preserve original project management and portrait recorder.
+- [x] Authorize every private project, layout, assistant and asset operation.
+- [x] Keep local edits after failed saves/conflicts and confirm reset/discard.
+- [x] Recheck asset access after storage loading; reject remote model dependencies and excessive decoded resources.
+- [x] Pass frozen/offline install, peer check and 20-table schema consistency check.
+- [x] Pass 306 unit/PostgreSQL tests across 22 files.
+- [x] Pass all 24 production-browser checks, including full-screen desktop/mobile, actual image/video/GLB/glTF previews, save/reload, conflicts, roles, PNG export and original recording regressions.
+- [x] Complete final formatting/lint/types, production build and screenshot/decoded-media inspection.
+- [x] Complete independent review, resolve identified issues and commit validated implementation locally.
+- [ ] Verify configured Clerk/Neon/R2/Gemini/Sarvam accounts.
+- [ ] Verify physical headsets and target browsers on HTTPS.
 
-Detailed current evidence and open hardware/provider checks: [implementation status](docs/IMPLEMENTATION_STATUS.md).
+## Repository history
+
+- Initial M0 commit: `a1b8dc02b01244623916fa3c5493955eb762afce`, already pushed to `origin/main` in the earlier handoff.
+- Previous foundation: `b5652f1`, local branch `feat/xr-foundation`.
+- Functional commits: `2d75490` persistence/assets, `72620dc` assistant/voice, `960d9b8` combined studio/UI/tests. These commits remain local.
+
+Detailed evidence and open acceptance: [implementation status](docs/IMPLEMENTATION_STATUS.md). Setup and hardware procedures: [XR documentation](docs/xr/architecture.md).
+
+## Reference-led dashboard and creative canvas
+
+The supplied dashboard/editor references are implemented as a shared BoloVerse glass/lavender shell, authorized dashboard and local image canvas. Existing XR and recording flows remain available. New image edits export real PNG pixels locally without changing source assets; image generation is explicitly unconfigured. No database/API changes were needed for this UI extension. Validation: lint/types/build pass, 302 unit/integration tests pass, and all 24 production browser tests pass. Live providers and physical hardware remain unverified. See [delivery details](docs/superpowers/specs/2026-11-12-reference-studio-status.md).

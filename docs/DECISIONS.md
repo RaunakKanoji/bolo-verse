@@ -1,5 +1,17 @@
 # Architecture decisions
 
+## Functional XR studio amendment — 2026-11-12
+
+The latest [browser studio specification](XR_BROWSER_STUDIO_SPEC.md) authorizes the full functional milestone sequence and supersedes the earlier Phase 1 stop boundary. The original application and isolated A-Frame engine remain intact.
+
+- **Project layout:** add one `xr_workspaces` table to the existing database. JSONB stores bounded, versioned IDs and transforms; project membership provides ownership. Atomic compare-and-swap writes reject concurrent updates with HTTP 409. Existing session `scene_state` remains separate.
+- **Real content:** authorized briefs, artifacts, ready assets and review records map to spatial panels. Saved references remain in the bounded catalog; reset deliberately rebuilds from current content. Private projects never receive sample data.
+- **Asset delivery:** a read-only R2 adapter backs an authenticated same-origin endpoint. Validate MIME, bytes, size and self-contained model resources before decoding; recheck authorization after storage latency. Stream the validated response, keeping storage keys and credentials server-side. Models use a conservative bounded static subset; no arbitrary external model dependencies or decoder plugins.
+- **Interaction:** React owns the document and accessible controls; the scene adapter mirrors changes without recreating the realm. Desktop and controller transform actions use the same bounded reducer. Failed saves keep local edits; confirmed reload/reset makes discarding them explicit.
+- **AI and voice:** Gemini proposes strict, authorized commands. The user applies proposals; reset asks for confirmation. Sarvam receives audio only after disclosed consent and explicit capture. Voice has duration/body limits, cancellation and cleanup. Development text mocks are unmistakable and unavailable on deployed production paths.
+- **Security and platform:** strict CSP lives inside the dedicated XR realm; the parent gains baseline frame/object/form restrictions without global script relaxation. Browser feature detection controls optional VR/AR; AR stays gated and native visionOS remains future work.
+- **Evidence:** PostgreSQL tests exercise real repository/route SQL with mocked identity/network boundaries. A standalone browser harness exercises the actual client with HTTP fixtures and cannot bypass production authentication. Hardware, live provider and remote deployment acceptance remain separate from local test results.
+
 ## XR Phase 1 amendment — 2026-11-12
 
 The user's newer [XR specification](XR_IMPLEMENTATION_SPEC.md) supersedes the original engine, package manager and roadmap. Start with Phase 1; retain working M0 behavior and tenant/privacy invariants.

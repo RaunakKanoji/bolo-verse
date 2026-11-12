@@ -1,6 +1,6 @@
 # BoloVerse engineering guidance
 
-Read `docs/XR_IMPLEMENTATION_SPEC.md` and `docs/BUILD_SPEC.md` before implementation. The newer XR specification supersedes the original engine, package manager and roadmap choices: start with Phase 1 A-Frame/WebXR foundation. Preserve working M0 features and security/privacy invariants. Work one phase at a time; update `progress-tracker.md` and `docs/IMPLEMENTATION_STATUS.md`, report checks and physical-device steps, then wait for `next`.
+Read `docs/XR_BROWSER_STUDIO_SPEC.md` first, then the historical XR/build specifications as needed. The latest browser-studio brief supersedes the older phase boundary: implement its milestones in order, preserving the working application and security/privacy invariants. Update the tracker/status with implemented, tested and externally unverified behavior; do not claim hardware compatibility from desktop tests.
 
 - Use Next.js App Router, strict TypeScript, Tailwind/shadcn, A-Frame/WebXR, Clerk, Neon/Drizzle, private R2 and pnpm. Keep the original direct Three.js recording lab isolated; use AFRAME.THREE within the XR runtime to avoid mixing engine versions.
 - Keep credentials, identity verification, tenant authorization, database access and signing server-only. Every private read/mutation checks authorization; never introduce a public test-auth bypass.
