@@ -1,6 +1,6 @@
 # Domain model
 
-Phase 1 preserves the existing modular backend and 22-table schema. The source of truth is [Drizzle schema](../../apps/web/src/server/db/schema.ts), with checked-in migrations `0000–0005`. Workspace packaging does not require a new database migration.
+The modular backend now has 24 tables. The original [Drizzle schema](../../apps/web/src/server/db/schema.ts) is extended by [creation tables](../../apps/web/src/server/db/creation-schema.ts), with checked-in migrations `0000–0008`. The initial connected creative milestone adds upload sessions and image request metadata to existing assets/jobs; it does not introduce parallel asset or job tables.
 
 | Responsibility | Implemented tables |
 | --- | --- |
@@ -16,6 +16,8 @@ Phase 1 preserves the existing modular backend and 22-table schema. The source o
 | Scoped access grants | `access_grants` |
 | Command records and claim checks | `command_logs`, `claim_checks` |
 | Processing lifecycle and upload events | `processing_jobs`, `upload_events` |
+| Private image upload reservations and cleanup state | `asset_upload_sessions` |
+| Private image request provenance and cleanup state | `image_generation_requests` |
 | Durable request budgets | `rate_limit_buckets` |
 
 Clerk owns account identity; persisted subjects are text, while application resources generally use UUIDs. There is no local `users` or Clerk Organizations administration table. A personal workspace has one `personal_owner_clerk_id`; it must not be relabelled as a full organization model.
@@ -26,7 +28,7 @@ Project-scoped composite foreign keys prevent cross-project references between b
 
 Canonical scenes use revision-checked writes and ready assets from the same project. Their schema version is independent of the database revision. See [scene format](scene-format.md) for the distinction from existing browser and recording layouts.
 
-Schema presence is not feature completion. Processing-job and review records do not establish a media-generation worker, a complete client portal or upload-finalization workflow. The current functional repositories are under `apps/web/src/server/db`; application orchestration is extracted into focused services where needed, such as `apps/web/src/server/xr-assistant/service.ts`.
+Schema presence is not feature completion. Image jobs now have a real authorized provider/storage worker and image uploads have verified immutable finalization. These additions do not implement video/audio/3D generation, billing reconciliation, content-version publication or a complete client portal. See the [connected creative status](../development/creative-foundation-status.md). The current functional repositories are under `apps/web/src/server/db`; application orchestration is extracted into focused services where needed, such as `apps/web/src/server/xr-assistant/service.ts`.
 
 The development [seed command](../../scripts/seed.ts) explicitly resolves an existing Clerk account before creating a labelled fictional project, proposed brief and draft artifacts. Normal startup does not insert synthetic client approvals, generated assets or sample projects.
 

@@ -36,7 +36,7 @@
 - [x] **Initial web studio (studio agent):** approved visual system, real project upload/reference selection, prompt/model/aspect controls, job submission/polling/history/cancel/retry, selected-result preview and actual download. Preserve local adjustment/export/draft behavior; add `/create` and `/studio/image` compatibility destinations.
 - [x] **Integration review:** inspect the combined trust/lifecycle boundaries and fix material findings. Review actual diff and migration; no live migration or deployment.
 - [x] **Verification:** `pnpm check`, relevant production Chromium flows, Swift contract fixtures, native artifact drift and native tests/build if native source/artifacts change. Record commands, revision, results and explicit live/device limitations.
-- [ ] **Delivery:** update context and implementation status; commit planning, connected functionality and verification as reviewable Conventional Commits.
+- [x] **Delivery:** update context and implementation status; commit planning, connected functionality and verification as reviewable Conventional Commits.
 
 ## Provider decision
 

@@ -1,6 +1,6 @@
 # Unified spatial creator platform
 
-This document is the current architecture entry point. The [master prompt](../product/UNIFIED_PLATFORM_SPEC.md) describes the full product; the [Phase 0 audit and Phase 1 plan](../superpowers/plans/2026-11-12-unified-monorepo-foundation.md) scopes this increment. The product remains Shape Studio.
+This document is the current architecture entry point. The [master prompt](../product/UNIFIED_PLATFORM_SPEC.md) describes the full product; the [Phase 0 audit and Phase 1 plan](../superpowers/plans/2026-11-12-unified-monorepo-foundation.md) scopes this increment. The product remains Shape Studio. The subsequent [cross-platform master](../product/CROSS_PLATFORM_IMPLEMENTATION_SPEC.md), [audit](../development/cross-platform-audit.md) and [initial creative plan](../superpowers/plans/2026-11-12-cross-platform-creative-foundation.md) extend this established foundation. See [current creative delivery](../development/creative-foundation-status.md) for image uploads/jobs/cleanup and verification.
 
 ## Current application and package graph
 
@@ -38,7 +38,7 @@ Root `dev/start` starts and tears down both browser servers, `build` builds both
 
 ## Domain and interface boundaries
 
-- [Domain model](domain-model.md): actual 22 tables, repositories and planned domains.
+- [Domain model](domain-model.md): actual 24 tables, repositories and planned domains.
 - [Authentication](authentication.md): Clerk cookie/native bearer identity and project authorization.
 - [Scene format](scene-format.md): strict canonical v1, legacy layouts and future version migration.
 - [Voice commands](voice-commands.md): existing deterministic proposals and the future shared command registry.

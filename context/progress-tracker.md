@@ -1,6 +1,16 @@
 # Shape Studio progress tracker
 
-Updated 12 November 2026 (Asia/Kolkata). Current scope: integration of the completed web, browser spatial and native increments into local `main`, following the Phase 0 audit and Phase 1 monorepo foundation from the [unified platform prompt](../docs/product/UNIFIED_PLATFORM_SPEC.md). See the [system overview](../docs/architecture/system-overview.md) and [committed plan](../docs/superpowers/plans/2026-11-12-unified-monorepo-foundation.md).
+Updated 13 November 2026 (Asia/Kolkata). Current scope: the initial connected creative milestone following integration of web, browser spatial and native into local `main`, following the Phase 0 audit and Phase 1 monorepo foundation from the [unified platform prompt](../docs/product/UNIFIED_PLATFORM_SPEC.md). See the [system overview](../docs/architecture/system-overview.md) and [committed plan](../docs/superpowers/plans/2026-11-12-unified-monorepo-foundation.md).
+
+## Initial connected creative milestone — 13 November 2026
+
+The [cross-platform master](../docs/product/CROSS_PLATFORM_IMPLEMENTATION_SPEC.md) explicitly limits the first increment to audit/foundation/initial web creative studio. The [baseline audit](../docs/development/cross-platform-audit.md), [plan](../docs/superpowers/plans/2026-11-12-cross-platform-creative-foundation.md) and [delivery status](../docs/development/creative-foundation-status.md) document this slice; all 18 screens are not claimed complete.
+
+Implemented private image reservations/finalization, full-codec validation, immutable R2 writes, durable actor-private image jobs/history, a genuine Gemini image HTTP adapter, SQL leases/dispatch-once semantics, explicit cancellation/retry and bounded worker/cleanup commands. The web canvas connects these services with model/aspect/reference controls, result selection/download and account/access-loss teardown. Generated OpenAPI/TypeScript/Swift additions preserve old v1 contracts and canonical scenes. Migrations 0006–0008 extend the existing schema to 24 tables.
+
+Final local verification passed: all 14 `pnpm check` tasks, 523 tests across 54 files and both production builds; all 50 Chromium cases (production routes and isolated HTTP component fixtures); 17 Swift bidirectional fixtures and nine invalid payloads; all 48 Swift core tests in nine suites; checked-in Xcode project compilation for the generic visionOS Simulator with signing disabled. Frozen offline installation and whitespace checks passed. Independent review findings on access loss, corrupt images, reference eligibility and orphan cleanup were fixed and rechecked.
+
+No live account/provider/storage calls, billed requests, cloud deletions, live migrations, deployment or physical-device verification occurred. Native source behavior is retained; the native image-generation UI remains later work. The new worker and cleanup commands must be scheduled/configured before rollout. Existing native accessibility/live/device gates stay open. Concept images under `output/` and unrelated local files are excluded from these commits.
 
 ## Main integration — 12 November 2026
 
