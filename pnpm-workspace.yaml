@@ -1,3 +1,8 @@
+packages:
+  - packages/scene-schema
+  - packages/typescript-config
+  - packages/eslint-config
+
 # A-Frame 1.8's published bundles include bmfont text, but its package manifest
 # also pins this Git dependency. Declare the identical pin at the application
 # root so pnpm can review it explicitly without allowing arbitrary Git subdeps.
@@ -11,3 +16,10 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - prettier@3.10.1
   - react-hook-form@7.92.0
+  - '@turbo/darwin-64@2.11.11'
+  - '@turbo/darwin-arm64@2.11.11'
+  - '@turbo/linux-64@2.11.11'
+  - '@turbo/linux-arm64@2.11.11'
+  - '@turbo/windows-64@2.11.11'
+  - '@turbo/windows-arm64@2.11.11'
+  - turbo@2.11.11

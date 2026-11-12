@@ -1,0 +1,9 @@
+{
+  "name": "@shape/eslint-config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { "./next": "./next.mjs", "./typescript": "./typescript.mjs" },
+  "dependencies": { "eslint-config-next": "16.4.6" },
+  "peerDependencies": { "eslint": "^9.0.0", "typescript": ">=5.9.0 <6" }
+}
