@@ -54,7 +54,7 @@ export async function readMutationJson<T extends z.ZodType>(request: Request, sc
   }
   const parsed = schema.safeParse(input);
   if (!parsed.success) {
-    throw new BoundaryError(400, "INVALID_INPUT", "Provide a valid project name and objective, without extra fields.");
+    throw new BoundaryError(400, "INVALID_INPUT", "Provide valid request fields without extra properties.");
   }
   return parsed.data;
 }

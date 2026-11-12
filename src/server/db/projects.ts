@@ -26,7 +26,7 @@ export async function bootstrapPersonalWorkspace(database: Database, subject: st
   });
 }
 
-function projectVisibility(database: Database, subject: string) {
+export function projectVisibility(database: Database, subject: string) {
   return or(
     exists(database.select({ one: sql`1` }).from(projectMembers).where(and(
       eq(projectMembers.projectId, projects.id), eq(projectMembers.clerkUserId, subject),
@@ -38,7 +38,7 @@ function projectVisibility(database: Database, subject: string) {
   );
 }
 
-function projectEditability(database: Database, subject: string) {
+export function projectEditability(database: Database, subject: string) {
   return or(
     exists(database.select({ one: sql`1` }).from(projectMembers).where(and(
       eq(projectMembers.projectId, projects.id), eq(projectMembers.clerkUserId, subject),

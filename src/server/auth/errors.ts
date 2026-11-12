@@ -4,7 +4,7 @@ import type { ApiResult } from "@/lib/contracts";
 export class BoundaryError extends Error {
   constructor(
     readonly status: number,
-    readonly code: "UNAUTHORIZED" | "FORBIDDEN" | "INVALID_INPUT" | "RATE_LIMITED" | "PROVIDER_UNCONFIGURED" | "SERVICE_UNAVAILABLE",
+    readonly code: "UNAUTHORIZED" | "FORBIDDEN" | "INVALID_INPUT" | "RATE_LIMITED" | "CONFLICT" | "PROVIDER_UNCONFIGURED" | "SERVICE_UNAVAILABLE",
     message: string,
   ) {
     super(message);

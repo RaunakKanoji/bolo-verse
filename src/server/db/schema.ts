@@ -8,6 +8,7 @@ import type {
   ArtifactPayload, BriefPayload, ClaimIssue, OutputMetadata,
   OutputSourceSnapshot, SceneDocument,
 } from "@/lib/contracts";
+import type { XRLayout } from "@/lib/contracts/xr-workspace";
 
 // UUIDs identify application resources; Clerk subjects deliberately remain text.
 const id = () => uuid("id").defaultRandom().primaryKey();
@@ -158,6 +159,20 @@ export const sceneState = pgTable("scene_state", {
   foreignKey({ columns: [table.sessionId, table.projectId], foreignColumns: [studioSessions.id, studioSessions.projectId] }),
   index("scene_state_project_idx").on(table.projectId),
   check("scene_revision_nonnegative", sql`${table.revision} >= 0`),
+]);
+
+// Shared project layouts are independent of session-specific recording documents.
+// Ownership is inherited through projects.workspace_id and checked on every operation.
+export const xrWorkspaces = pgTable("xr_workspaces", {
+  id: id(),
+  projectId: uuid("project_id").notNull().unique().references(() => projects.id, { onDelete: "restrict" }),
+  version: integer("version").notNull(),
+  layout: jsonb("layout").$type<XRLayout>().notNull(),
+  createdAt: createdAt(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  check("xr_workspace_version_positive", sql`${table.version} > 0`),
+  check("xr_workspace_layout_version", sql`COALESCE(${table.layout}->>'schemaVersion' = '1', false)`),
 ]);
 
 export const contentVersions = pgTable("content_versions", {

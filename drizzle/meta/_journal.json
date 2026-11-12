@@ -22,6 +22,13 @@
       "when": 1794468293372,
       "tag": "0002_scope_and_operation_ids",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794473949647,
+      "tag": "0003_xr_workspaces",
+      "breakpoints": true
     }
   ]
 }
