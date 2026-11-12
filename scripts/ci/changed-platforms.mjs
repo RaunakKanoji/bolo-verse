@@ -8,6 +8,7 @@ const sharedPrefixes = [
   "packages/api-contract/",
   "packages/design-tokens/",
   "src/lib/contracts/",
+  "apps/web/src/lib/contracts/",
   "scripts/ci/",
   ".github/workflows/",
 ];

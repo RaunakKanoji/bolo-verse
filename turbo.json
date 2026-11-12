@@ -2,35 +2,107 @@
   "$schema": "https://turborepo.dev/schema.json",
   "cacheDir": ".turbo/cache",
   "globalDependencies": [
-    "tsconfig.json", "eslint.config.mjs",
-    "packages/typescript-config/**", "packages/eslint-config/**"
+    "tsconfig.json",
+    "eslint.config.mjs",
+    "packages/typescript-config/**",
+    "packages/eslint-config/**"
   ],
   "globalPassThroughEnv": [
-    "APP_MODE", "NEXT_PUBLIC_*", "CLERK_*", "DATABASE_URL", "DATABASE_MIGRATION_URL",
-    "ALLOWED_ORIGINS", "R2_*", "GEMINI_*", "SARVAM_*", "SHOTSTACK_*",
-    "ENABLE_EXTERNAL_EDITOR", "ENABLE_BACKGROUND_REMOVAL", "COMMAND_LOG_RETENTION_DAYS",
-    "VERCEL", "VERCEL_*", "NODE_ENV", "PLAYWRIGHT_*", "CI"
+    "APP_MODE",
+    "NEXT_PUBLIC_*",
+    "CLERK_*",
+    "DATABASE_URL",
+    "DATABASE_MIGRATION_URL",
+    "ALLOWED_ORIGINS",
+    "R2_*",
+    "GEMINI_*",
+    "SARVAM_*",
+    "SHOTSTACK_*",
+    "ENABLE_EXTERNAL_EDITOR",
+    "ENABLE_BACKGROUND_REMOVAL",
+    "COMMAND_LOG_RETENTION_DAYS",
+    "VERCEL",
+    "VERCEL_*",
+    "NODE_ENV",
+    "PLAYWRIGHT_*",
+    "CI",
+    "SPATIAL_WEB_ORIGIN",
+    "WEB_INTERNAL_ORIGIN"
   ],
   "tasks": {
-    "lint": { "dependsOn": ["^lint"], "outputs": [] },
-    "typecheck": { "dependsOn": ["^typecheck"], "outputs": [] },
-    "//#lint": { "dependsOn": ["@shape/scene-schema#lint"], "cache": false },
-    "//#typecheck": { "dependsOn": ["@shape/scene-schema#typecheck"], "cache": false },
-    "//#test": {
-      "dependsOn": ["//#lint", "//#typecheck", "//#format:check", "//#env:check", "//#contracts:check", "//#tokens:check", "//#native:check"],
+    "lint": {
+      "dependsOn": [
+        "^lint"
+      ],
+      "outputs": []
+    },
+    "typecheck": {
+      "dependsOn": [
+        "^typecheck"
+      ],
+      "outputs": []
+    },
+    "//#lint": {
+      "dependsOn": [
+        "@shape/scene-schema#lint"
+      ],
       "cache": false
     },
-    "//#format:check": { "cache": false },
-    "//#env:check": { "cache": false },
-    "//#contracts:check": { "cache": false },
-    "//#tokens:check": { "cache": false },
-    "//#native:check": { "cache": false },
-    "//#build": {
-      "dependsOn": ["//#test"],
-      "cache": false,
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**", "public/vendor/aframe/**"]
+    "//#typecheck": {
+      "dependsOn": [
+        "@shape/scene-schema#typecheck"
+      ],
+      "cache": false
     },
-    "//#dev": { "cache": false, "persistent": true },
-    "//#start": { "cache": false, "persistent": true }
+    "//#test": {
+      "dependsOn": [
+        "//#lint",
+        "//#typecheck",
+        "//#format:check",
+        "//#env:check",
+        "//#contracts:check",
+        "//#tokens:check",
+        "//#native:check",
+        "@shape/web#typecheck",
+        "@shape/spatial-web#typecheck"
+      ],
+      "cache": false
+    },
+    "//#format:check": {
+      "cache": false
+    },
+    "//#env:check": {
+      "cache": false
+    },
+    "//#contracts:check": {
+      "cache": false
+    },
+    "//#tokens:check": {
+      "cache": false
+    },
+    "//#native:check": {
+      "cache": false
+    },
+    "//#dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "//#start": {
+      "cache": false,
+      "persistent": true
+    },
+    "build": {
+      "dependsOn": [
+        "^typecheck",
+        "//#test"
+      ],
+      "cache": false,
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "!.next/dev/**",
+        "public/vendor/aframe/**"
+      ]
+    }
   }
 }

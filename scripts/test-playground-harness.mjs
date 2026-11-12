@@ -12,7 +12,7 @@ const result = await build({
   format: "esm",
   target: "es2022",
   outfile: "test-results/playground-component-harness/entry.js",
-  tsconfig: "tsconfig.json",
+  tsconfig: "apps/web/tsconfig.json",
   jsx: "automatic",
   alias: { "next/link": resolve(root, "tests/browser-fixtures/next-link.tsx") },
   define: { "process.env.NODE_ENV": '"development"' },

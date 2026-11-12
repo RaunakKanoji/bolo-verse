@@ -3,5 +3,7 @@ import next from "@shape/eslint-config/next";
 
 export default defineConfig([
   ...next,
-  globalIgnores([".next/**", "out/**", "next-env.d.ts", "playwright-report/**", "test-results/**", "public/vendor/**", ".turbo/**", "**/node_modules/**"]),
+  { settings: { next: { rootDir: "apps/web/" } } },
+  { files: ["apps/spatial-web/**/*.{ts,tsx}"], settings: { next: { rootDir: "apps/spatial-web/" } } },
+  globalIgnores(["**/.next/**", "**/out/**", "**/next-env.d.ts", "playwright-report/**", "test-results/**", "**/public/vendor/**", ".turbo/**", ".pnpm-store/**", "**/node_modules/**"]),
 ]);

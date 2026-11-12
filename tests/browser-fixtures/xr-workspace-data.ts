@@ -1,4 +1,4 @@
-import { createDefaultXRLayout, type XRWorkspaceData } from "../../src/lib/contracts/xr-workspace";
+import { createDefaultXRLayout, type XRWorkspaceData } from "../../apps/web/src/lib/contracts/xr-workspace";
 
 // Explicit fixture content for the isolated component harness, never application auth/data.
 export const TEST_PROJECT_ID = "b4000000-0000-4000-8000-000000000001";

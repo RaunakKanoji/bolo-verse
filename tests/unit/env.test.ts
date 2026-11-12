@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
-import { parseServerEnv } from "../../src/server/config/env";
+import { parseServerEnv } from "../../apps/web/src/server/config/env";
 
 describe("lazy server configuration", () => {
   it("allows unconfigured M0 without requiring unused credentials", () => {

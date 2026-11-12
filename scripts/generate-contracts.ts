@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { z } from "zod";
-import { ShapeApiOperations, ShapeApiSchemas } from "../src/lib/contracts/shape";
+import { ShapeApiOperations, ShapeApiSchemas } from "../apps/web/src/lib/contracts/shape";
 import { generateClient, generateModels, type Operation, type Schema } from "./lib/contract-generator";
 
 const root = fileURLToPath(new URL("../packages/api-contract/", import.meta.url));

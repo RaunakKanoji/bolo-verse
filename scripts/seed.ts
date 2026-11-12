@@ -1,8 +1,8 @@
 import nextEnv from "@next/env";
 import { createClerkClient } from "@clerk/backend";
-import { getServerEnv } from "../src/server/config/env";
-import { withDatabase } from "../src/server/db/client";
-import { seedSampleProject } from "../src/server/db/seed";
+import { getServerEnv } from "../apps/web/src/server/config/env";
+import { withDatabase } from "../apps/web/src/server/db/client";
+import { seedSampleProject } from "../apps/web/src/server/db/seed";
 
 async function main() {
   nextEnv.loadEnvConfig(process.cwd());

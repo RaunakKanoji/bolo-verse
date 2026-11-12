@@ -3,7 +3,7 @@ import {
   beginLocalRecording,
   chooseRecordingMime,
   type RecorderPort,
-} from "../../src/features/studio/recording/local-recording";
+} from "../../apps/web/src/features/studio/recording/local-recording";
 
 // MediaRecorder is a browser boundary. This adapter lets tests control the
 // documented asynchronous final dataavailable → stop sequence.

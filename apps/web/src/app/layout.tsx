@@ -22,6 +22,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <nav aria-label="Main navigation">
         <Link href="/" aria-label="Home"><House size={17} aria-hidden="true" /><span>Home</span></Link>
         <Link href="/app/projects" aria-label="Projects"><FolderOpen size={17} aria-hidden="true" /><span>Projects</span></Link>
+        <a href="/workspace" aria-label="3D workspace"><Glasses size={17} aria-hidden="true" /><span>3D workspace</span></a>
         <Link href="/xr/preview" aria-label="XR preview"><Glasses size={17} aria-hidden="true" /><span>XR preview</span></Link>
         <Link href="/studio/feasibility" aria-label="Recording lab"><FlaskConical size={17} aria-hidden="true" /><span>Recording lab</span></Link>
       </nav>
