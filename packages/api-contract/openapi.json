@@ -4,9 +4,111 @@
   "info": {
     "title": "Shape Studio shared API",
     "version": "1.0.0",
-    "description": "Implemented v1 JSON operations. Authentication is the existing Clerk web session; native authentication is not implemented. Binary media responses are documented separately."
+    "description": "Implemented v1 JSON operations. Authentication uses Clerk browser sessions or verified native session bearer JWTs; cookie mutations require trusted Origin, and supplied Origin must always be trusted. Binary media responses are documented separately."
   },
   "paths": {
+    "/api/v1/projects/{projectId}/spatial-scene": {
+      "get": {
+        "operationId": "getSpatialScene",
+        "summary": "Read the authorized canonical project scene",
+        "security": [
+          {
+            "ClerkSession": []
+          },
+          {
+            "ClerkBearerSession": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpatialSceneResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Structured failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "saveSpatialScene",
+        "summary": "Save a canonical scene with an expected revision",
+        "security": [
+          {
+            "ClerkSession": []
+          },
+          {
+            "ClerkBearerSession": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveSpatialScene"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpatialSceneResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Structured failure",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/capabilities": {
       "get": {
         "operationId": "getCreativeCapabilities",
@@ -43,6 +145,9 @@
         "security": [
           {
             "ClerkSession": []
+          },
+          {
+            "ClerkBearerSession": []
           }
         ],
         "responses": {
@@ -74,6 +179,9 @@
         "security": [
           {
             "ClerkSession": []
+          },
+          {
+            "ClerkBearerSession": []
           }
         ],
         "requestBody": {
@@ -117,6 +225,9 @@
         "security": [
           {
             "ClerkSession": []
+          },
+          {
+            "ClerkBearerSession": []
           }
         ],
         "parameters": [
@@ -159,6 +270,9 @@
         "security": [
           {
             "ClerkSession": []
+          },
+          {
+            "ClerkBearerSession": []
           }
         ],
         "parameters": [
@@ -213,6 +327,9 @@
         "security": [
           {
             "ClerkSession": []
+          },
+          {
+            "ClerkBearerSession": []
           }
         ],
         "parameters": [
@@ -257,6 +374,9 @@
         "security": [
           {
             "ClerkSession": []
+          },
+          {
+            "ClerkBearerSession": []
           }
         ],
         "parameters": [
@@ -299,6 +419,9 @@
         "security": [
           {
             "ClerkSession": []
+          },
+          {
+            "ClerkBearerSession": []
           }
         ],
         "parameters": [
@@ -354,9 +477,937 @@
         "in": "cookie",
         "name": "__session",
         "description": "Clerk validated session with server authorization; browser writes also require a trusted Origin."
+      },
+      "ClerkBearerSession": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Clerk session JWT for this instance. OAuth/machine tokens are not accepted; native tokens may omit Origin. Any supplied Origin must be trusted."
       }
     },
     "schemas": {
+      "CanonicalSpatialObject": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          "assetId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "position": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number",
+                "minimum": -30,
+                "maximum": 30
+              },
+              {
+                "type": "number",
+                "minimum": -30,
+                "maximum": 30
+              },
+              {
+                "type": "number",
+                "minimum": -30,
+                "maximum": 30
+              }
+            ],
+            "items": false,
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "rotation": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number",
+                "minimum": -1,
+                "maximum": 1
+              },
+              {
+                "type": "number",
+                "minimum": -1,
+                "maximum": 1
+              },
+              {
+                "type": "number",
+                "minimum": -1,
+                "maximum": 1
+              },
+              {
+                "type": "number",
+                "minimum": -1,
+                "maximum": 1
+              }
+            ],
+            "items": false,
+            "minItems": 4,
+            "maxItems": 4
+          },
+          "scale": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 10
+              },
+              {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 10
+              },
+              {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 10
+              }
+            ],
+            "items": false,
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "visible": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "assetId",
+          "position",
+          "rotation",
+          "scale",
+          "visible"
+        ],
+        "additionalProperties": false
+      },
+      "CanonicalSpatialScene": {
+        "type": "object",
+        "properties": {
+          "sceneId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "version": {
+            "type": "number",
+            "const": 1
+          },
+          "objects": {
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "^[a-zA-Z0-9_-]+$"
+                },
+                "assetId": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                },
+                "position": {
+                  "type": "array",
+                  "prefixItems": [
+                    {
+                      "type": "number",
+                      "minimum": -30,
+                      "maximum": 30
+                    },
+                    {
+                      "type": "number",
+                      "minimum": -30,
+                      "maximum": 30
+                    },
+                    {
+                      "type": "number",
+                      "minimum": -30,
+                      "maximum": 30
+                    }
+                  ],
+                  "items": false,
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "rotation": {
+                  "type": "array",
+                  "prefixItems": [
+                    {
+                      "type": "number",
+                      "minimum": -1,
+                      "maximum": 1
+                    },
+                    {
+                      "type": "number",
+                      "minimum": -1,
+                      "maximum": 1
+                    },
+                    {
+                      "type": "number",
+                      "minimum": -1,
+                      "maximum": 1
+                    },
+                    {
+                      "type": "number",
+                      "minimum": -1,
+                      "maximum": 1
+                    }
+                  ],
+                  "items": false,
+                  "minItems": 4,
+                  "maxItems": 4
+                },
+                "scale": {
+                  "type": "array",
+                  "prefixItems": [
+                    {
+                      "type": "number",
+                      "minimum": 0.1,
+                      "maximum": 10
+                    },
+                    {
+                      "type": "number",
+                      "minimum": 0.1,
+                      "maximum": 10
+                    },
+                    {
+                      "type": "number",
+                      "minimum": 0.1,
+                      "maximum": 10
+                    }
+                  ],
+                  "items": false,
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "visible": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "assetId",
+                "position",
+                "rotation",
+                "scale",
+                "visible"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "sceneId",
+          "version",
+          "objects"
+        ],
+        "additionalProperties": false,
+        "description": "Canonical scene schema version 1: metres, right-handed +Y up, -Z forward, local XYZW unit quaternion rotation; scale is dimensionless. This version field is not a save revision."
+      },
+      "SpatialSceneSnapshot": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "sceneId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "document": {
+            "type": "object",
+            "properties": {
+              "sceneId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "version": {
+                "type": "number",
+                "const": 1
+              },
+              "objects": {
+                "maxItems": 50,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80,
+                      "pattern": "^[a-zA-Z0-9_-]+$"
+                    },
+                    "assetId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "position": {
+                      "type": "array",
+                      "prefixItems": [
+                        {
+                          "type": "number",
+                          "minimum": -30,
+                          "maximum": 30
+                        },
+                        {
+                          "type": "number",
+                          "minimum": -30,
+                          "maximum": 30
+                        },
+                        {
+                          "type": "number",
+                          "minimum": -30,
+                          "maximum": 30
+                        }
+                      ],
+                      "items": false,
+                      "minItems": 3,
+                      "maxItems": 3
+                    },
+                    "rotation": {
+                      "type": "array",
+                      "prefixItems": [
+                        {
+                          "type": "number",
+                          "minimum": -1,
+                          "maximum": 1
+                        },
+                        {
+                          "type": "number",
+                          "minimum": -1,
+                          "maximum": 1
+                        },
+                        {
+                          "type": "number",
+                          "minimum": -1,
+                          "maximum": 1
+                        },
+                        {
+                          "type": "number",
+                          "minimum": -1,
+                          "maximum": 1
+                        }
+                      ],
+                      "items": false,
+                      "minItems": 4,
+                      "maxItems": 4
+                    },
+                    "scale": {
+                      "type": "array",
+                      "prefixItems": [
+                        {
+                          "type": "number",
+                          "minimum": 0.1,
+                          "maximum": 10
+                        },
+                        {
+                          "type": "number",
+                          "minimum": 0.1,
+                          "maximum": 10
+                        },
+                        {
+                          "type": "number",
+                          "minimum": 0.1,
+                          "maximum": 10
+                        }
+                      ],
+                      "items": false,
+                      "minItems": 3,
+                      "maxItems": 3
+                    },
+                    "visible": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "assetId",
+                    "position",
+                    "rotation",
+                    "scale",
+                    "visible"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "sceneId",
+              "version",
+              "objects"
+            ],
+            "additionalProperties": false,
+            "description": "Canonical scene schema version 1: metres, right-handed +Y up, -Z forward, local XYZW unit quaternion rotation; scale is dimensionless. This version field is not a save revision."
+          },
+          "updatedAt": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "canEdit": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "projectId",
+          "sceneId",
+          "revision",
+          "document",
+          "updatedAt",
+          "canEdit"
+        ],
+        "additionalProperties": false
+      },
+      "SpatialSceneResult": {
+        "type": "object",
+        "properties": {
+          "scene": {
+            "type": "object",
+            "properties": {
+              "projectId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "sceneId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "revision": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2147483647
+              },
+              "document": {
+                "type": "object",
+                "properties": {
+                  "sceneId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "version": {
+                    "type": "number",
+                    "const": 1
+                  },
+                  "objects": {
+                    "maxItems": 50,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80,
+                          "pattern": "^[a-zA-Z0-9_-]+$"
+                        },
+                        "assetId": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                        },
+                        "position": {
+                          "type": "array",
+                          "prefixItems": [
+                            {
+                              "type": "number",
+                              "minimum": -30,
+                              "maximum": 30
+                            },
+                            {
+                              "type": "number",
+                              "minimum": -30,
+                              "maximum": 30
+                            },
+                            {
+                              "type": "number",
+                              "minimum": -30,
+                              "maximum": 30
+                            }
+                          ],
+                          "items": false,
+                          "minItems": 3,
+                          "maxItems": 3
+                        },
+                        "rotation": {
+                          "type": "array",
+                          "prefixItems": [
+                            {
+                              "type": "number",
+                              "minimum": -1,
+                              "maximum": 1
+                            },
+                            {
+                              "type": "number",
+                              "minimum": -1,
+                              "maximum": 1
+                            },
+                            {
+                              "type": "number",
+                              "minimum": -1,
+                              "maximum": 1
+                            },
+                            {
+                              "type": "number",
+                              "minimum": -1,
+                              "maximum": 1
+                            }
+                          ],
+                          "items": false,
+                          "minItems": 4,
+                          "maxItems": 4
+                        },
+                        "scale": {
+                          "type": "array",
+                          "prefixItems": [
+                            {
+                              "type": "number",
+                              "minimum": 0.1,
+                              "maximum": 10
+                            },
+                            {
+                              "type": "number",
+                              "minimum": 0.1,
+                              "maximum": 10
+                            },
+                            {
+                              "type": "number",
+                              "minimum": 0.1,
+                              "maximum": 10
+                            }
+                          ],
+                          "items": false,
+                          "minItems": 3,
+                          "maxItems": 3
+                        },
+                        "visible": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "assetId",
+                        "position",
+                        "rotation",
+                        "scale",
+                        "visible"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "sceneId",
+                  "version",
+                  "objects"
+                ],
+                "additionalProperties": false,
+                "description": "Canonical scene schema version 1: metres, right-handed +Y up, -Z forward, local XYZW unit quaternion rotation; scale is dimensionless. This version field is not a save revision."
+              },
+              "updatedAt": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "canEdit": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "projectId",
+              "sceneId",
+              "revision",
+              "document",
+              "updatedAt",
+              "canEdit"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "scene"
+        ],
+        "additionalProperties": false
+      },
+      "SaveSpatialScene": {
+        "type": "object",
+        "properties": {
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483646
+          },
+          "document": {
+            "type": "object",
+            "properties": {
+              "sceneId": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "version": {
+                "type": "number",
+                "const": 1
+              },
+              "objects": {
+                "maxItems": 50,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80,
+                      "pattern": "^[a-zA-Z0-9_-]+$"
+                    },
+                    "assetId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "position": {
+                      "type": "array",
+                      "prefixItems": [
+                        {
+                          "type": "number",
+                          "minimum": -30,
+                          "maximum": 30
+                        },
+                        {
+                          "type": "number",
+                          "minimum": -30,
+                          "maximum": 30
+                        },
+                        {
+                          "type": "number",
+                          "minimum": -30,
+                          "maximum": 30
+                        }
+                      ],
+                      "items": false,
+                      "minItems": 3,
+                      "maxItems": 3
+                    },
+                    "rotation": {
+                      "type": "array",
+                      "prefixItems": [
+                        {
+                          "type": "number",
+                          "minimum": -1,
+                          "maximum": 1
+                        },
+                        {
+                          "type": "number",
+                          "minimum": -1,
+                          "maximum": 1
+                        },
+                        {
+                          "type": "number",
+                          "minimum": -1,
+                          "maximum": 1
+                        },
+                        {
+                          "type": "number",
+                          "minimum": -1,
+                          "maximum": 1
+                        }
+                      ],
+                      "items": false,
+                      "minItems": 4,
+                      "maxItems": 4
+                    },
+                    "scale": {
+                      "type": "array",
+                      "prefixItems": [
+                        {
+                          "type": "number",
+                          "minimum": 0.1,
+                          "maximum": 10
+                        },
+                        {
+                          "type": "number",
+                          "minimum": 0.1,
+                          "maximum": 10
+                        },
+                        {
+                          "type": "number",
+                          "minimum": 0.1,
+                          "maximum": 10
+                        }
+                      ],
+                      "items": false,
+                      "minItems": 3,
+                      "maxItems": 3
+                    },
+                    "visible": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "assetId",
+                    "position",
+                    "rotation",
+                    "scale",
+                    "visible"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "sceneId",
+              "version",
+              "objects"
+            ],
+            "additionalProperties": false,
+            "description": "Canonical scene schema version 1: metres, right-handed +Y up, -Z forward, local XYZW unit quaternion rotation; scale is dimensionless. This version field is not a save revision."
+          }
+        },
+        "required": [
+          "expectedRevision",
+          "document"
+        ],
+        "additionalProperties": false
+      },
+      "SpatialSceneResponse": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "const": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "scene": {
+                "type": "object",
+                "properties": {
+                  "projectId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "sceneId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2147483647
+                  },
+                  "document": {
+                    "type": "object",
+                    "properties": {
+                      "sceneId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      "version": {
+                        "type": "number",
+                        "const": 1
+                      },
+                      "objects": {
+                        "maxItems": 50,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80,
+                              "pattern": "^[a-zA-Z0-9_-]+$"
+                            },
+                            "assetId": {
+                              "type": "string",
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                            },
+                            "position": {
+                              "type": "array",
+                              "prefixItems": [
+                                {
+                                  "type": "number",
+                                  "minimum": -30,
+                                  "maximum": 30
+                                },
+                                {
+                                  "type": "number",
+                                  "minimum": -30,
+                                  "maximum": 30
+                                },
+                                {
+                                  "type": "number",
+                                  "minimum": -30,
+                                  "maximum": 30
+                                }
+                              ],
+                              "items": false,
+                              "minItems": 3,
+                              "maxItems": 3
+                            },
+                            "rotation": {
+                              "type": "array",
+                              "prefixItems": [
+                                {
+                                  "type": "number",
+                                  "minimum": -1,
+                                  "maximum": 1
+                                },
+                                {
+                                  "type": "number",
+                                  "minimum": -1,
+                                  "maximum": 1
+                                },
+                                {
+                                  "type": "number",
+                                  "minimum": -1,
+                                  "maximum": 1
+                                },
+                                {
+                                  "type": "number",
+                                  "minimum": -1,
+                                  "maximum": 1
+                                }
+                              ],
+                              "items": false,
+                              "minItems": 4,
+                              "maxItems": 4
+                            },
+                            "scale": {
+                              "type": "array",
+                              "prefixItems": [
+                                {
+                                  "type": "number",
+                                  "minimum": 0.1,
+                                  "maximum": 10
+                                },
+                                {
+                                  "type": "number",
+                                  "minimum": 0.1,
+                                  "maximum": 10
+                                },
+                                {
+                                  "type": "number",
+                                  "minimum": 0.1,
+                                  "maximum": 10
+                                }
+                              ],
+                              "items": false,
+                              "minItems": 3,
+                              "maxItems": 3
+                            },
+                            "visible": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "assetId",
+                            "position",
+                            "rotation",
+                            "scale",
+                            "visible"
+                          ],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "required": [
+                      "sceneId",
+                      "version",
+                      "objects"
+                    ],
+                    "additionalProperties": false,
+                    "description": "Canonical scene schema version 1: metres, right-handed +Y up, -Z forward, local XYZW unit quaternion rotation; scale is dimensionless. This version field is not a save revision."
+                  },
+                  "updatedAt": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "canEdit": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "projectId",
+                  "sceneId",
+                  "revision",
+                  "document",
+                  "updatedAt",
+                  "canEdit"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "scene"
+            ],
+            "additionalProperties": false
+          },
+          "requestId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "ok",
+          "data",
+          "requestId"
+        ],
+        "additionalProperties": false
+      },
       "CreativeMode": {
         "type": "string",
         "enum": [
@@ -965,6 +2016,18 @@
             "format": "date-time",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
           },
+          "nativeContentUrl": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\/api\\/v1\\/assets\\/[0-9a-f-]{36}\\/native-content$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Authenticated native USDZ download for model/vnd.usdz+zip assets up to 32 MiB; otherwise null. The server validates archive and texture bounds before delivery; no conversion or upload is provided."
+          },
           "contentUrl": {
             "anyOf": [
               {
@@ -987,6 +2050,7 @@
           "height",
           "durationSeconds",
           "createdAt",
+          "nativeContentUrl",
           "contentUrl"
         ],
         "additionalProperties": false
@@ -1060,6 +2124,18 @@
                   "format": "date-time",
                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                 },
+                "nativeContentUrl": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^\\/api\\/v1\\/assets\\/[0-9a-f-]{36}\\/native-content$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Authenticated native USDZ download for model/vnd.usdz+zip assets up to 32 MiB; otherwise null. The server validates archive and texture bounds before delivery; no conversion or upload is provided."
+                },
                 "contentUrl": {
                   "anyOf": [
                     {
@@ -1082,6 +2158,7 @@
                 "height",
                 "durationSeconds",
                 "createdAt",
+                "nativeContentUrl",
                 "contentUrl"
               ],
               "additionalProperties": false
@@ -1374,6 +2451,18 @@
                       "format": "date-time",
                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
                     },
+                    "nativeContentUrl": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "pattern": "^\\/api\\/v1\\/assets\\/[0-9a-f-]{36}\\/native-content$"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "Authenticated native USDZ download for model/vnd.usdz+zip assets up to 32 MiB; otherwise null. The server validates archive and texture bounds before delivery; no conversion or upload is provided."
+                    },
                     "contentUrl": {
                       "anyOf": [
                         {
@@ -1396,6 +2485,7 @@
                     "height",
                     "durationSeconds",
                     "createdAt",
+                    "nativeContentUrl",
                     "contentUrl"
                   ],
                   "additionalProperties": false

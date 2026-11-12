@@ -58,7 +58,8 @@
             "height": null,
             "durationSeconds": 1.25,
             "createdAt": "2026-11-12T08:30:00Z",
-            "contentUrl": null
+            "contentUrl": null,
+            "nativeContentUrl": null
           }
         ],
         "hasMore": false
@@ -140,6 +141,149 @@
         ]
       },
       "requestId": "fixture-request"
+    }
+  },
+  {
+    "schema": "CanonicalSpatialScene",
+    "value": {
+      "sceneId": "c842b5e5-8453-4a67-9c88-87f8e9e7b110",
+      "version": 1,
+      "objects": [
+        {
+          "id": "product",
+          "assetId": "e21386ae-51f4-44d9-991b-2e89e981bd96",
+          "position": [
+            0,
+            0,
+            -1
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "visible": true
+        }
+      ]
+    }
+  },
+  {
+    "schema": "SpatialSceneSnapshot",
+    "value": {
+      "projectId": "c842b5e5-8453-4a67-9c88-87f8e9e7b110",
+      "sceneId": "c842b5e5-8453-4a67-9c88-87f8e9e7b110",
+      "revision": 3,
+      "document": {
+        "sceneId": "c842b5e5-8453-4a67-9c88-87f8e9e7b110",
+        "version": 1,
+        "objects": [
+          {
+            "id": "product",
+            "assetId": "e21386ae-51f4-44d9-991b-2e89e981bd96",
+            "position": [
+              0,
+              0,
+              -1
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "visible": true
+          }
+        ]
+      },
+      "updatedAt": "2026-11-12T00:00:00.000Z",
+      "canEdit": true
+    }
+  },
+  {
+    "schema": "SpatialSceneResponse",
+    "value": {
+      "ok": true,
+      "data": {
+        "scene": {
+          "projectId": "c842b5e5-8453-4a67-9c88-87f8e9e7b110",
+          "sceneId": "c842b5e5-8453-4a67-9c88-87f8e9e7b110",
+          "revision": 3,
+          "document": {
+            "sceneId": "c842b5e5-8453-4a67-9c88-87f8e9e7b110",
+            "version": 1,
+            "objects": [
+              {
+                "id": "product",
+                "assetId": "e21386ae-51f4-44d9-991b-2e89e981bd96",
+                "position": [
+                  0,
+                  0,
+                  -1
+                ],
+                "rotation": [
+                  0,
+                  0,
+                  0,
+                  1
+                ],
+                "scale": [
+                  1,
+                  1,
+                  1
+                ],
+                "visible": true
+              }
+            ]
+          },
+          "updatedAt": "2026-11-12T00:00:00.000Z",
+          "canEdit": true
+        }
+      },
+      "requestId": "spatial-roundtrip"
+    }
+  },
+  {
+    "schema": "SaveSpatialScene",
+    "value": {
+      "expectedRevision": 3,
+      "document": {
+        "sceneId": "c842b5e5-8453-4a67-9c88-87f8e9e7b110",
+        "version": 1,
+        "objects": [
+          {
+            "id": "product",
+            "assetId": "e21386ae-51f4-44d9-991b-2e89e981bd96",
+            "position": [
+              0,
+              0,
+              -1
+            ],
+            "rotation": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              1,
+              1,
+              1
+            ],
+            "visible": true
+          }
+        ]
+      }
     }
   }
 ]

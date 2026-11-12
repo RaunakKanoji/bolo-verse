@@ -1,7 +1,7 @@
 /** Deliberately small OpenAPI 3.1 DTO generator. Unsupported constructs fail closed. */
 export type Schema = Record<string, unknown>;
 const identifier = /^[A-Za-z][A-Za-z0-9]*$/;
-const keys = new Set(["$ref", "type", "properties", "required", "additionalProperties", "items", "enum", "const", "anyOf", "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "minLength", "maxLength", "format", "pattern", "minItems", "maxItems", "minProperties", "maxProperties", "description", "$schema"]);
+const keys = new Set(["$ref", "type", "properties", "required", "additionalProperties", "items", "prefixItems", "enum", "const", "anyOf", "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "minLength", "maxLength", "format", "pattern", "minItems", "maxItems", "minProperties", "maxProperties", "description", "$schema"]);
 const upper = (value: string) => value[0].toUpperCase() + value.slice(1);
 const quote = JSON.stringify;
 function object(value: unknown): Schema {
@@ -33,12 +33,12 @@ export function generateModels(schemas: Record<string, Schema>) {
   function check(schema: Schema) {
     for (const key of Object.keys(schema)) if (!keys.has(key)) throw new Error(`Unsupported schema keyword: ${key}`);
   }
-  function emit(typeName: string, schema: Schema): { ts: string; swift: string } {
+  function emit(typeName: string, schema: Schema, objectField = false): { ts: string; swift: string; tupleLength?: number } {
     name(typeName); check(schema);
     const nil = nullable(schema);
     if (nil) {
-      const inner = emit(`${typeName}Value`, nil);
-      return { ts: `(${inner.ts} | null)`, swift: `${inner.swift}?` };
+      const inner = emit(`${typeName}Value`, nil, objectField);
+      return { ...inner, ts: `(${inner.ts} | null)`, swift: `${inner.swift}?` };
     }
     if (schema.$ref) {
       if (typeof schema.$ref !== "string" || !schema.$ref.startsWith("#/components/schemas/")) throw new Error("Only local component references are supported");
@@ -65,6 +65,16 @@ export function generateModels(schemas: Record<string, Schema>) {
     if (schema.type === "number") return { ts: "number", swift: "Double" };
     if (schema.type === "integer") return { ts: "number", swift: "Int64" };
     if (schema.type === "boolean") return { ts: "boolean", swift: "Bool" };
+    if (schema.type === "array" && schema.prefixItems !== undefined) {
+      const members = schema.prefixItems;
+      if (!objectField || !Array.isArray(members) || ![3, 4].includes(members.length) || schema.items !== false || schema.minItems !== members.length || schema.maxItems !== members.length) {
+        throw new Error("Only closed three/four-number tuples directly in object fields are supported");
+      }
+      const first = object(members[0]);
+      check(first);
+      if (first.type !== "number" || Object.keys(first).some((key) => !["type", "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "description"].includes(key)) || members.some((member) => JSON.stringify(member) !== JSON.stringify(first))) throw new Error("Only homogeneous numeric tuples are supported");
+      return { ts: `[${members.map(() => "number").join(", ")}]`, swift: "[Double]", tupleLength: members.length };
+    }
     if (schema.type === "array") {
       const item = emit(`${typeName}Item`, object(schema.items));
       return { ts: `Array<${item.ts}>`, swift: `[${item.swift}]` };
@@ -78,13 +88,14 @@ export function generateModels(schemas: Record<string, Schema>) {
       name(key);
       const child = object(value), isNullable = !!nullable(child);
       if (!required.has(key) && isNullable) throw new Error("Optional nullable fields require a three-state representation; unsupported");
-      return { key, required: required.has(key), ...emit(`${typeName}${upper(key)}`, child) };
+      return { key, required: required.has(key), ...emit(`${typeName}${upper(key)}`, child, true) };
     });
     const members = fields.map((field) => `  public var \`${field.key}\`: ${field.swift}${field.required ? "" : "?"}`).join("\n");
     const initializer = `  public init(${fields.map((field) => `\`${field.key}\`: ${field.swift}${field.required ? "" : "? = nil"}`).join(", ")}) {\n${fields.map((field) => `    self.\`${field.key}\` = \`${field.key}\``).join("\n")}\n  }`;
     const codingKeys = fields.map((field) => `    case \`${field.key}\``).join("\n");
-    const decode = fields.map((field) => `    self.\`${field.key}\` = ${field.required ? "" : `container.contains(.\`${field.key}\`) ? `}try container.decode(${field.swift}.self, forKey: .\`${field.key}\`)${field.required ? "" : " : nil"}`).join("\n");
-    const encode = fields.map((field) => `    try container.${field.required ? "encode" : "encodeIfPresent"}(self.\`${field.key}\`, forKey: .\`${field.key}\`)`).join("\n");
+    const tupleCount = (field: typeof fields[number]) => `self.\`${field.key}\`${!field.required || field.swift.endsWith("?") ? `?.count ?? ${field.tupleLength}` : ".count"}`;
+    const decode = fields.map((field) => `    self.\`${field.key}\` = ${field.required ? "" : `container.contains(.\`${field.key}\`) ? `}try container.decode(${field.swift}.self, forKey: .\`${field.key}\`)${field.required ? "" : " : nil"}${field.tupleLength ? `\n    guard (${tupleCount(field)}) == ${field.tupleLength} else { throw DecodingError.dataCorruptedError(forKey: .\`${field.key}\`, in: container, debugDescription: "Expected exactly ${field.tupleLength} vector components") }` : ""}`).join("\n");
+    const encode = fields.map((field) => `${field.tupleLength ? `    guard (${tupleCount(field)}) == ${field.tupleLength} else { throw EncodingError.invalidValue(self.\`${field.key}\` as Any, .init(codingPath: encoder.codingPath, debugDescription: "Expected exactly ${field.tupleLength} vector components")) }\n` : ""}    try container.${field.required ? "encode" : "encodeIfPresent"}(self.\`${field.key}\`, forKey: .\`${field.key}\`)`).join("\n");
     declare(typeName, `public struct ${typeName}: Codable, Sendable {\n${members}\n\n${initializer}\n\n  private enum CodingKeys: String, CodingKey {\n${codingKeys}\n  }\n\n  public init(from decoder: any Decoder) throws {\n    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)\n    let allowed: Set<String> = Set([${fields.map((field) => quote(field.key)).join(", ")}])\n    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {\n      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ${typeName} property"))\n    }\n    let container = try decoder.container(keyedBy: CodingKeys.self)\n${decode}\n  }\n\n  public func encode(to encoder: any Encoder) throws {\n    var container = encoder.container(keyedBy: CodingKeys.self)\n${encode}\n  }\n}`);
     return { ts: `{\n${fields.map((field) => `  ${field.key}${field.required ? "" : "?"}: ${field.ts};`).join("\n")}\n}`, swift: typeName };
   }

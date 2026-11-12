@@ -1,9 +1,12 @@
-import { GET as readValidatedAsset } from "@/app/api/xr/assets/[assetId]/route";
+import { getV1Subject } from "@/server/auth/api-identity";
+import { errorResponse } from "@/server/auth/errors";
+import { readAuthorizedPreview } from "@/server/providers/authorized-preview";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-/** Keep the existing bounded, MIME-validated R2 reader and post-read reauthorization. */
 export async function GET(request: Request, context: { params: Promise<{ assetId: string }> }) {
-  return readValidatedAsset(request, context);
+  const requestId = crypto.randomUUID();
+  try {
+    return await readAuthorizedPreview(await getV1Subject(request), request, context);
+  } catch (error) { return errorResponse(error, requestId); }
 }

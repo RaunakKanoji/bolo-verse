@@ -7,6 +7,19 @@ describe("language-neutral model generation", () => {
       expect(() => generateModels({ Bad: schema })).toThrow();
     }
   });
+  it("generates exact numeric vector tuples and refuses heterogeneous or open tuples", () => {
+    const vector = { type: "array", prefixItems: Array.from({ length: 3 }, () => ({ type: "number", minimum: -30, maximum: 30 })), items: false, minItems: 3, maxItems: 3 };
+    const root = (position: object) => ({ VectorDocument: { type: "object", additionalProperties: false, required: ["position"], properties: { position } } });
+    expect(generateModels(root(vector)).typescript).toContain("position: [number, number, number]");
+    for (const invalid of [
+      { ...vector, items: { type: "number" } }, { ...vector, maxItems: 4 },
+      { ...vector, prefixItems: [{ type: "number" }, { type: "string" }, { type: "number" }] },
+      { ...vector, prefixItems: Array.from({ length: 3 }, () => ({ type: "number", enum: [1, 2] })) },
+    ]) expect(() => generateModels(root(invalid))).toThrow();
+    // Tuple decoding constraints cannot be dropped through root/array typealiases.
+    expect(() => generateModels({ Vector: vector })).toThrow();
+    expect(() => generateModels({ Vectors: { type: "array", items: vector } })).toThrow();
+  });
   it("rejects dangling references and unsafe schema/type names", () => {
     expect(() => generateModels({ Bad: { $ref: "#/components/schemas/Missing" } })).toThrow();
     expect(() => generateModels({ "Bad;import": { type: "string" } })).toThrow();
