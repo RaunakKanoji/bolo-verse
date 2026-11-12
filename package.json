@@ -24,7 +24,10 @@
     "tokens:check": "node scripts/generate-tokens.mjs --check",
     "contracts:generate": "node --import tsx scripts/generate-contracts.ts",
     "contracts:check": "node --import tsx scripts/generate-contracts.ts --check",
-    "contracts:test:swift": "node --import tsx scripts/test-swift-contracts.ts"
+    "contracts:test:swift": "node --import tsx scripts/test-swift-contracts.ts",
+    "native:sync": "node scripts/sync-native-contracts.mjs",
+    "native:check": "node scripts/sync-native-contracts.mjs --check",
+    "native:test": "swift test --package-path apps/visionos/ShapeStudioCore"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.1165.0",
