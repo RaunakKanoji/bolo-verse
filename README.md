@@ -2,7 +2,7 @@
 
 An incremental web and native spatial foundation for creative production. The initial [audit and plan](docs/shape-studio/phase-0-plan.md) established shared contracts, private drafts, tokens and the four-mode web playground. The [native app](apps/visionos/README.md) now adds SwiftUI windows, RealityKit volumes, authorized services and scene persistence. Existing browser XR, text/speech adapters and recording tools remain available. Functional media generation and full collaboration remain later phases.
 
-The current [unified platform architecture](docs/architecture/system-overview.md) establishes a pnpm/Turborepo workspace around the existing applications. Shared scene schemas, strict TypeScript settings and lint configuration are real consumed packages. The working Next app remains at the root during this increment; a dedicated R3F editor is a later functional slice. See [local setup](docs/development/local-setup.md) and the [phased plan](docs/superpowers/plans/2026-11-12-unified-monorepo-foundation.md).
+The current [unified platform architecture](docs/architecture/system-overview.md) establishes a pnpm/Turborepo workspace around the existing applications. Shared scene schemas, strict TypeScript settings and lint configuration are real consumed packages. The Next portal/backend now lives in `apps/web`; `apps/spatial-web` is the separate canonical R3F desktop editor, and `apps/visionos` remains the independent native app. Root commands orchestrate both browser applications. See [local setup](docs/development/local-setup.md) and the [phased plan](docs/superpowers/plans/2026-11-12-unified-monorepo-foundation.md).
 
 ## Run locally
 
@@ -15,9 +15,9 @@ pnpm env:check
 pnpm dev
 ```
 
-Open `http://localhost:3000/studio/create` for the creative playground or `/xr/preview` for the spatial sample. This public sample requires no provider credentials, uses clearly labeled original sample content and saves nothing. Select panels, move/rotate/scale them with the inspector, drag to look, and use W/A/S/D while the canvas has focus.
+Open `http://localhost:3000/workspace` for the new 3D editor entry, `/studio/create` for the creative playground or `/xr/preview` for the spatial sample. This public sample requires no provider credentials, uses clearly labeled original sample content and saves nothing. Select panels, move/rotate/scale them with the inspector, drag to look, and use W/A/S/D while the canvas has focus.
 
-If port 3000 is occupied, run `pnpm dev --port 3001` and use that port consistently in the browser and environment configuration. The development/build scripts copy the pinned A-Frame bundle and license to ignored `public/vendor/aframe/`; the scene does not depend on a script CDN.
+If port 3000 is occupied, run `pnpm dev --port 3001` and use that port consistently in the browser and environment configuration. The development/build scripts copy the pinned A-Frame bundle and license to ignored `apps/web/public/vendor/aframe/`; the scene does not depend on a script CDN.
 
 ```sh
 pnpm build

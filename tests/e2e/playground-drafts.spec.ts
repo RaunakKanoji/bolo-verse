@@ -4,7 +4,7 @@ import {
   createEmptyCreativeDraftDocument,
   SaveCreativeDraftSchema,
   type CreativeDraftSnapshot,
-} from "../../src/lib/contracts/shape";
+} from "../../apps/web/src/lib/contracts/shape";
 
 let origin = "";
 let harness: ChildProcess | undefined;

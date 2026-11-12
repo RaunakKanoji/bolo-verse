@@ -1,6 +1,6 @@
 # ADR 0001: Incremental workspace around the existing applications
 
-Status: Accepted for unified Phase 1, 12 November 2026.
+Status: Accepted for unified Phase 1, 12 November 2026. The temporary root-app location is superseded by [ADR 0004](0004-three-application-boundaries.md) in the subsequent functional R3F migration; the completed foundation remains valid.
 
 The repository already contains working Next, A-Frame and native SwiftUI applications. Moving the root web application immediately would change environment discovery, migrations, browser fixtures, asset preparation, code generation and Vercel root configuration without delivering a new functional slice.
 

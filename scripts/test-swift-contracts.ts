@@ -3,7 +3,7 @@ import { spawnSync } from "node:child_process";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { ShapeApiSchemas } from "../src/lib/contracts/shape";
+import { ShapeApiSchemas } from "../apps/web/src/lib/contracts/shape";
 
 const scratch = await mkdtemp(join(tmpdir(), "shape-contracts-"));
 const models = "packages/api-contract/generated/ShapeModels.swift";

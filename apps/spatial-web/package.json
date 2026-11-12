@@ -1,0 +1,37 @@
+{
+  "name": "@shape/spatial-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node ../../scripts/spatial-next.mjs dev --port 3001",
+    "build": "node ../../scripts/spatial-next.mjs build",
+    "start": "node ../../scripts/spatial-next.mjs start --port 3001",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "node ../../scripts/spatial-next.mjs typegen && tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@clerk/nextjs": "7.9.25",
+    "@react-three/fiber": "9.5.0",
+    "@shape/scene-schema": "workspace:*",
+    "next": "16.4.6",
+    "react": "19.2.9",
+    "react-dom": "19.2.9",
+    "server-only": "0.0.1",
+    "three": "0.187.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@shape/typescript-config": "workspace:*",
+    "@shape/eslint-config": "workspace:*",
+    "@types/node": "24.19.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@types/three": "0.187.0",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.4.6",
+    "typescript": "5.9.3",
+    "vitest": "5.1.0"
+  }
+}

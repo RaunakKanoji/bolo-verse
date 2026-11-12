@@ -1,6 +1,14 @@
 # Shape Studio progress tracker
 
-Updated 12 November 2026 (Asia/Kolkata). Current scope: Phase 0 audit and Phase 1 monorepo foundation from the [unified platform prompt](../docs/product/UNIFIED_PLATFORM_SPEC.md). See the [system overview](../docs/architecture/system-overview.md) and [committed plan](../docs/superpowers/plans/2026-11-12-unified-monorepo-foundation.md).
+Updated 12 November 2026 (Asia/Kolkata). Current scope: subsequent three-application restructuring after completed Phase 0 audit and Phase 1 monorepo foundation from the [unified platform prompt](../docs/product/UNIFIED_PLATFORM_SPEC.md). See the [system overview](../docs/architecture/system-overview.md) and [committed plan](../docs/superpowers/plans/2026-11-12-unified-monorepo-foundation.md).
+
+## Development startup recovery — 12 November 2026
+
+The reported `PageNotFoundError` for `/_not-found/page` came from an already-running Next dev process rooted at the former repository-root app. Its dev route manifest was empty after source relocation. Restarted using the actual monorepo launcher and preserved the unrelated service on port 3000; web/spatial dev now use ports 3001/3002.
+
+Investigation also reproduced `EPERM` from detached process-group shutdown, which left temporary Next workers/locks alive. The launcher now signals its direct, non-detached Next CLI children; each CLI owns its worker cleanup. Verified a real clean stop (all four temporary/public ports closed), then restarted the same app ports successfully.
+
+The new unknown-route browser regression failed with HTTP 500 against the obsolete process, then passed against the correct app. Seven development Chromium flows passed, including home/navigation, real 404 recovery and the spatial gateway. The launcher integration regression reproduced the old process-group `EPERM` and passes the fixed direct-child lifecycle. Full workspace recheck results are recorded in the delivery status.
 
 ## Native simulator window recovery — 12 November 2026
 
@@ -17,11 +25,15 @@ Verification: six simulator UI tests and three hosted RealityKit tests completed
 | 2 — Shared backend | Reuse established; extensions planned | Existing Clerk/project membership/SQL permissions and typed v1 contracts; organization/profile administration is not implemented. |
 | 3 — Core web | Existing functionality retained | Projects, briefs, ready asset views and browser assistant exist; fuller domain workflows remain scoped increments. |
 | 4 — Shared spatial foundation | Canonical v1 established | Current CAS persistence retained. Hierarchy/environment, multi-scene history, explicit v2 migration and common renderer interface are future work. |
-| 5 — Browser spatial | A-Frame retained; R3F planned | No new R3F runtime or empty spatial application was added in Phase 1. |
+| 5 — Browser spatial | Canonical R3F desktop slice implemented and locally verified | Separate apps/web and apps/spatial-web; A-Frame/recording retained. See new milestone evidence below. |
 | 6 — Voice and AI | Existing browser adapters retained | Shared cross-platform command/tool registry and native microphone workflows remain planned. |
 | 7 — Native foundation | Existing tested increment retained | Native SwiftUI/RealityKit remains independent of pnpm; live registration/storage and physical-device acceptance remain open. |
 | 8 — Collaboration and review | Planned | Presence/realtime and complete client deliverable workflows are not implemented by tooling changes. |
 | 9 — Production hardening | External gates open | No remote CI execution, live services, deployment or physical-headset acceptance claimed. |
+
+## Three-application milestone
+
+The completed foundation is followed by [application extraction and canonical desktop editing](../docs/development/three-application-status.md). Web/backend now live in `apps/web`; R3F desktop editing lives in `apps/spatial-web`; native remains independent in `apps/visionos`. Fresh commit-packaging verification on `feat/three-application-spatial-editor` passed all 14 `pnpm check` tasks, 445 tests in 43 files and both production builds. All 43 production Chromium cases passed, including session renewal/switching and 404 recovery. Swift contract typechecking, 11 bidirectional fixtures, nine invalid payloads and native request/route checks passed. The previously recorded 48 native core tests and independent reviews remain historical evidence; no new native app or device run was performed. No live services, deployment or physical-device verification is claimed.
 
 ## Current Phase 1 verification
 

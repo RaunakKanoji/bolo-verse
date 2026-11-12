@@ -1,7 +1,12 @@
 import type { NextConfig } from "next";
+import { fileURLToPath } from "node:url";
+
+const repositoryRoot = fileURLToPath(new URL("../..", import.meta.url));
 
 const config: NextConfig = {
   transpilePackages: ["@shape/scene-schema"],
+  outputFileTracingRoot: repositoryRoot,
+  turbopack: { root: repositoryRoot },
   poweredByHeader: false,
   async headers() {
     return [{ source: "/:path*", headers: [

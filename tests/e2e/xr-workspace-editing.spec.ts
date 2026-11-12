@@ -1,6 +1,6 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { expect, test, type Page } from "@playwright/test";
-import { createDefaultXRLayout, SaveXRWorkspaceSchema, type XRWorkspaceData } from "../../src/lib/contracts/xr-workspace";
+import { createDefaultXRLayout, SaveXRWorkspaceSchema, type XRWorkspaceData } from "../../apps/web/src/lib/contracts/xr-workspace";
 import { createMediaWorkspaceFixture, createTestGLB, createWorkspaceFixture, TEST_ASSET_IDS, TEST_GLTF, TEST_PNG_BASE64 } from "../browser-fixtures/xr-workspace-data";
 
 let origin = "";

@@ -1,6 +1,6 @@
 # Shape Studio engineering guidance
 
-Read `context/project-overview.md`, `context/architecture-context.md` and `context/progress-tracker.md` first. The latest unified prompt is `docs/product/UNIFIED_PLATFORM_SPEC.md`; the active architecture and phased plan are linked from `docs/architecture/system-overview.md`. Phase 1 establishes real workspace boundaries around the existing apps. Preserve web/XR/recording/native behavior; R3F editing, organizations and realtime remain later functional slices.
+Read `context/project-overview.md`, `context/architecture-context.md` and `context/progress-tracker.md` first. The latest unified prompt is `docs/product/UNIFIED_PLATFORM_SPEC.md`; the active architecture and phased plan are linked from `docs/architecture/system-overview.md`. Phase 1 established the workspace foundation. The subsequent three-application milestone moves web/backend to `apps/web` and the canonical R3F desktop editor to `apps/spatial-web`; native remains in `apps/visionos`. Preserve web/XR/recording/native behavior; organizations, conversion, shared voice and realtime remain later slices.
 
 - Use Next.js App Router, strict TypeScript, Tailwind/shadcn, A-Frame/WebXR, Clerk, Neon/Drizzle, private R2 and pnpm. Keep the original direct Three.js recording lab isolated; use AFRAME.THREE within the XR runtime to avoid mixing engine versions.
 - Keep credentials, identity verification, tenant authorization, database access and signing server-only. Every private read/mutation checks authorization; never introduce a public test-auth bypass.

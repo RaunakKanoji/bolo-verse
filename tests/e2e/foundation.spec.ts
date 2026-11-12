@@ -8,6 +8,14 @@ test("home exposes a working recording experiment and honest project setup", asy
   await expect(page.getByRole("heading", { name: "Connect your workspace" })).toBeVisible();
 });
 
+test("unknown routes render the application 404 and can return home", async ({ page }) => {
+  const response = await page.goto("/not-a-shape-route");
+  expect(response?.status()).toBe(404);
+  await expect(page.getByRole("heading", { name: "This page isn’t available." })).toBeVisible();
+  await page.getByRole("link", { name: "Back to home", exact: true }).click();
+  await expect(page.getByRole("heading", { name: /Good things/ })).toBeVisible();
+});
+
 test("consent gates a real portrait recording with synthetic microphone input", async ({ page, browser }, testInfo) => {
   const graphicsErrors: string[] = [];
   page.on("console", message => {

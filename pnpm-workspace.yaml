@@ -1,7 +1,13 @@
 packages:
+  - apps/web
+  - apps/spatial-web
   - packages/scene-schema
   - packages/typescript-config
   - packages/eslint-config
+
+# Keep the workspace's node_modules topology identical in CI, local shells and
+# restricted environments; pnpm otherwise varies this default by environment.
+enableGlobalVirtualStore: false
 
 # A-Frame 1.8's published bundles include bmfont text, but its package manifest
 # also pins this Git dependency. Declare the identical pin at the application

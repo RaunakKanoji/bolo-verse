@@ -9,7 +9,7 @@ import {
   OutputMetadataSchema,
   OutputSourceSnapshotSchema,
   StudioCommandSchema,
-} from "../../src/lib/contracts";
+} from "../../apps/web/src/lib/contracts";
 
 const id = "9b25b4e8-3d0d-41d6-9e33-d94546392815";
 const command = (action: string, params: unknown = {}) => ({

@@ -5,12 +5,12 @@ import { useStore } from "zustand";
 import {
   createPlaygroundStore,
   type PlaygroundStore,
-} from "../../src/features/playground/playground-state";
+} from "../../apps/web/src/features/playground/playground-state";
 import {
   useCreativeCapabilities,
   useCreativeDraft,
-} from "../../src/features/playground/use-creative-services";
-import { PromptPanel } from "../../src/features/playground/PromptPanel";
+} from "../../apps/web/src/features/playground/use-creative-services";
+import { PromptPanel } from "../../apps/web/src/features/playground/PromptPanel";
 import "../../packages/design-tokens/generated/tokens.css";
 
 function Prompt({ projectId, store }: { projectId: string; store: PlaygroundStore }) {

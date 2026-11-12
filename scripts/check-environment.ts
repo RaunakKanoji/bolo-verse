@@ -1,6 +1,6 @@
 import nextEnv from "@next/env";
 import { z } from "zod";
-import { parseServerEnv } from "../src/server/config/env";
+import { parseServerEnv } from "../apps/web/src/server/config/env";
 
 nextEnv.loadEnvConfig(process.cwd());
 try {

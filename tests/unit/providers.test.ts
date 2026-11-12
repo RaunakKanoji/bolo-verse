@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
-import { parseServerEnv } from "../../src/server/config/env";
-import { createProviderRegistry, getProviderReadiness } from "../../src/server/providers";
+import { parseServerEnv } from "../../apps/web/src/server/config/env";
+import { createProviderRegistry, getProviderReadiness } from "../../apps/web/src/server/providers";
 
 describe("M0 provider boundary", () => {
   it("reports missing configuration without exposing credential values", () => {

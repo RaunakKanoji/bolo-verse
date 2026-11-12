@@ -2,13 +2,13 @@
 
 ## Additive foundation
 
-The latest [unified architecture](../docs/architecture/system-overview.md) supersedes the earlier phase boundary. pnpm/Turborepo now orchestrates actual scene-schema, TypeScript-config and ESLint-config packages around the root Next application. Shared API/token directories remain language-neutral artifacts without JavaScript manifests. Native Xcode builds remain independent. The eventual `apps/web`/R3F `apps/spatial-web` move is a later functional migration, documented in ADR 0001.
+The [unified architecture](../docs/architecture/system-overview.md) now has real `apps/web`, `apps/spatial-web` and independent `apps/visionos` boundaries. The completed monorepo foundation is preserved; [ADR 0004](../docs/adr/0004-three-application-boundaries.md) supersedes its temporary root Next location through a functional canonical R3F editing slice.
 
-The Next.js App Router web app remains at the repository root. Relocating it to apps/web would add migration risk without changing the deliverable. `packages/api-contract` and `packages/design-tokens` hold language-neutral artifacts; `apps/visionos` contains the native Xcode app and testable Swift package. Swift is not a JavaScript workspace package.
+`apps/web` owns the Next App Router portal, sole modular backend, legacy isolated A-Frame and direct Three.js recording lab. It routes `/workspace*` and `/spatial-static*` to `apps/spatial-web` under the same browser origin. Spatial SSR uses authorized no-store API transport; browser API/media requests remain same-origin. Shared API/token directories remain language-neutral artifacts. Swift stays outside the JavaScript workspace graph.
 
-Server Components resolve private project context. Interactive editing is isolated under `src/features/playground`; a scoped Zustand store handles ephemeral editing state, React Hook Form handles prompts, and a per-workspace TanStack Query client handles capability/draft requests. Query data is not a shared module singleton. Prompts and local files are not persisted to browser storage. The only browser preference persisted is appearance.
+Server Components resolve private project context. Interactive editing is isolated under `apps/web/src/features/playground`; a scoped Zustand store handles ephemeral editing state, React Hook Form handles prompts, and a per-workspace TanStack Query client handles capability/draft requests. Query data is not a shared module singleton. Prompts and local files are not persisted to browser storage. The only browser preference persisted is appearance.
 
-Keep the existing A-Frame iframe and original recording renderer isolated. The latest target architecture selects R3F for the future custom editor, with A-Frame retained separately. Phase 1 adds no unused rendering dependencies. See ADR 0003 for renderer boundaries.
+Keep the existing A-Frame iframe and original recording renderer isolated. The custom desktop editor now lives in spatial-web using R3F, with A-Frame retained separately. The earlier Phase 1 introduced no renderer dependencies; this later functional slice introduces R3F. See ADR 0003 for renderer boundaries.
 
 ## Trust boundaries
 

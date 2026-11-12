@@ -10,6 +10,202 @@ overrides:
 importers:
 
   .:
+    devDependencies:
+      '@aws-sdk/client-s3':
+        specifier: 3.1165.0
+        version: 3.1165.0
+      '@clerk/backend':
+        specifier: 3.27.0
+        version: 3.27.0(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
+      '@clerk/nextjs':
+        specifier: 7.9.25
+        version: 7.9.25(next@16.4.6(@babel/core@7.29.13)(@playwright/test@1.65.0)(@types/node@24.19.2)(react-dom@19.2.9(react@19.2.9))(react@19.2.9))(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
+      '@electric-sql/pglite':
+        specifier: 0.5.16
+        version: 0.5.16
+      '@neondatabase/serverless':
+        specifier: 1.2.0
+        version: 1.2.0
+      '@next/env':
+        specifier: 16.4.6
+        version: 16.4.6
+      '@playwright/test':
+        specifier: 1.65.0
+        version: 1.65.0
+      '@radix-ui/react-slot':
+        specifier: 1.5.0
+        version: 1.5.0(@types/react@19.3.0)(react@19.2.9)
+      '@shape/eslint-config':
+        specifier: workspace:*
+        version: link:packages/eslint-config
+      '@shape/scene-schema':
+        specifier: workspace:*
+        version: link:packages/scene-schema
+      '@shape/typescript-config':
+        specifier: workspace:*
+        version: link:packages/typescript-config
+      '@tailwindcss/postcss':
+        specifier: 4.3.5
+        version: 4.3.5
+      '@tanstack/react-query':
+        specifier: 5.107.1
+        version: 5.107.1(@types/react@19.3.0)(react@19.2.9)
+      '@types/node':
+        specifier: 24.19.2
+        version: 24.19.2
+      '@types/react':
+        specifier: 19.3.0
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: 19.3.0
+        version: 19.3.0(@types/react@19.3.0)
+      '@types/three':
+        specifier: 0.187.0
+        version: 0.187.0
+      '@types/ws':
+        specifier: 8.18.2
+        version: 8.18.2
+      aframe:
+        specifier: 1.8.0
+        version: 1.8.0
+      class-variance-authority:
+        specifier: 0.7.1
+        version: 0.7.1
+      clsx:
+        specifier: 2.1.1
+        version: 2.1.1
+      drizzle-kit:
+        specifier: 0.31.11
+        version: 0.31.11
+      drizzle-orm:
+        specifier: 0.45.4
+        version: 0.45.4(@electric-sql/pglite@0.5.16)(@neondatabase/serverless@1.2.0)
+      esbuild:
+        specifier: 0.28.2
+        version: 0.28.2
+      eslint:
+        specifier: 9.39.5
+        version: 9.39.5(jiti@2.7.0)
+      eslint-config-next:
+        specifier: 16.4.6
+        version: 16.4.6(@typescript-eslint/parser@8.72.2(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
+      lucide-react:
+        specifier: 1.72.0
+        version: 1.72.0(@types/react@19.3.0)(react@19.2.9)
+      next:
+        specifier: 16.4.6
+        version: 16.4.6(@babel/core@7.29.13)(@playwright/test@1.65.0)(@types/node@24.19.2)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
+      prettier:
+        specifier: 3.10.1
+        version: 3.10.1
+      react:
+        specifier: 19.2.9
+        version: 19.2.9
+      react-dom:
+        specifier: 19.2.9
+        version: 19.2.9(react@19.2.9)
+      react-hook-form:
+        specifier: 7.92.0
+        version: 7.92.0(@types/react@19.3.0)(react@19.2.9)
+      server-only:
+        specifier: 0.0.1
+        version: 0.0.1
+      tailwind-merge:
+        specifier: 3.7.0
+        version: 3.7.0
+      tailwindcss:
+        specifier: 4.3.5
+        version: 4.3.5
+      three:
+        specifier: 0.187.0
+        version: 0.187.0
+      three-bmfont-text:
+        specifier: github:dmarcos/three-bmfont-text#c3eec235b9188aa0d8ed949101236e6d5fccf071
+        version: https://codeload.github.com/dmarcos/three-bmfont-text/tar.gz/c3eec235b9188aa0d8ed949101236e6d5fccf071
+      tsx:
+        specifier: 4.23.15
+        version: 4.23.15
+      turbo:
+        specifier: 2.11.11
+        version: 2.11.11
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 5.1.0
+        version: 5.1.0(@types/node@24.19.2)(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15))
+      ws:
+        specifier: 8.22.2
+        version: 8.22.2
+      zod:
+        specifier: 4.6.7
+        version: 4.6.7
+      zustand:
+        specifier: 5.1.0
+        version: 5.1.0(@types/react@19.3.0)(react@19.2.9)(use-sync-external-store@1.7.0(react@19.2.9))
+
+  apps/spatial-web:
+    dependencies:
+      '@clerk/nextjs':
+        specifier: 7.9.25
+        version: 7.9.25(next@16.4.6(@babel/core@7.29.13)(@playwright/test@1.65.0)(@types/node@24.19.2)(react-dom@19.2.9(react@19.2.9))(react@19.2.9))(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
+      '@react-three/fiber':
+        specifier: 9.5.0
+        version: 9.5.0(@types/react@19.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(three@0.187.0)
+      '@shape/scene-schema':
+        specifier: workspace:*
+        version: link:../../packages/scene-schema
+      next:
+        specifier: 16.4.6
+        version: 16.4.6(@babel/core@7.29.13)(@playwright/test@1.65.0)(@types/node@24.19.2)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
+      react:
+        specifier: 19.2.9
+        version: 19.2.9
+      react-dom:
+        specifier: 19.2.9
+        version: 19.2.9(react@19.2.9)
+      server-only:
+        specifier: 0.0.1
+        version: 0.0.1
+      three:
+        specifier: 0.187.0
+        version: 0.187.0
+      zod:
+        specifier: 4.6.7
+        version: 4.6.7
+    devDependencies:
+      '@shape/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
+      '@shape/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
+      '@types/node':
+        specifier: 24.19.2
+        version: 24.19.2
+      '@types/react':
+        specifier: 19.3.0
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: 19.3.0
+        version: 19.3.0(@types/react@19.3.0)
+      '@types/three':
+        specifier: 0.187.0
+        version: 0.187.0
+      eslint:
+        specifier: 9.39.5
+        version: 9.39.5(jiti@2.7.0)
+      eslint-config-next:
+        specifier: 16.4.6
+        version: 16.4.6(@typescript-eslint/parser@8.72.2(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 5.1.0
+        version: 5.1.0(@types/node@24.19.2)(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15))
+
+  apps/web:
     dependencies:
       '@aws-sdk/client-s3':
         specifier: 3.1165.0
@@ -23,12 +219,15 @@ importers:
       '@neondatabase/serverless':
         specifier: 1.2.0
         version: 1.2.0
+      '@next/env':
+        specifier: 16.4.6
+        version: 16.4.6
       '@radix-ui/react-slot':
         specifier: 1.5.0
         version: 1.5.0(@types/react@19.3.0)(react@19.2.9)
       '@shape/scene-schema':
         specifier: workspace:*
-        version: link:packages/scene-schema
+        version: link:../../packages/scene-schema
       '@tanstack/react-query':
         specifier: 5.107.1
         version: 5.107.1(@types/react@19.3.0)(react@19.2.9)
@@ -79,23 +278,14 @@ importers:
         version: 4.6.7
       zustand:
         specifier: 5.1.0
-        version: 5.1.0(@types/react@19.3.0)(react@19.2.9)
+        version: 5.1.0(@types/react@19.3.0)(react@19.2.9)(use-sync-external-store@1.7.0(react@19.2.9))
     devDependencies:
-      '@electric-sql/pglite':
-        specifier: 0.5.16
-        version: 0.5.16
-      '@next/env':
-        specifier: 16.4.6
-        version: 16.4.6
-      '@playwright/test':
-        specifier: 1.65.0
-        version: 1.65.0
       '@shape/eslint-config':
         specifier: workspace:*
-        version: link:packages/eslint-config
+        version: link:../../packages/eslint-config
       '@shape/typescript-config':
         specifier: workspace:*
-        version: link:packages/typescript-config
+        version: link:../../packages/typescript-config
       '@tailwindcss/postcss':
         specifier: 4.3.5
         version: 4.3.5
@@ -114,36 +304,18 @@ importers:
       '@types/ws':
         specifier: 8.18.2
         version: 8.18.2
-      drizzle-kit:
-        specifier: 0.31.11
-        version: 0.31.11
-      esbuild:
-        specifier: 0.28.2
-        version: 0.28.2
       eslint:
         specifier: 9.39.5
         version: 9.39.5(jiti@2.7.0)
       eslint-config-next:
         specifier: 16.4.6
         version: 16.4.6(@typescript-eslint/parser@8.72.2(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
-      prettier:
-        specifier: 3.10.1
-        version: 3.10.1
       tailwindcss:
         specifier: 4.3.5
         version: 4.3.5
-      tsx:
-        specifier: 4.23.15
-        version: 4.23.15
-      turbo:
-        specifier: 2.11.11
-        version: 2.11.11
       typescript:
         specifier: 5.9.3
         version: 5.9.3
-      vitest:
-        specifier: 5.1.0
-        version: 5.1.0(@types/node@24.19.2)(vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15))
 
   packages/eslint-config:
     dependencies:
@@ -310,6 +482,10 @@ packages:
     resolution: {integrity: sha512-fJM50YYjlTiBhgdkGmC1tBpv+FMAyo4annf2X6Aks+0yRlaiVkYW/3f07xAfVVkYIoZ9fFZp+mEThUFnuybhkQ==}
     engines: {node: '>=6.0.0'}
     hasBin: true
+
+  '@babel/runtime@7.29.13':
+    resolution: {integrity: sha512-v+oN26xP4YIlQsbQ/CbTH1WG5m/l/DjKKZNy/Kp3f/AFvbgt7Em/D0FeMM3O2hX0YzeN2M16W8lOpyhIkfCBcQ==}
+    engines: {node: '>=6.9.0'}
 
   '@babel/template@7.29.7':
     resolution: {integrity: sha512-puq+Gf35oI24FeN11LkoUQFqv9uwNeWpxXZi/Ji3rRIoKAzKnxRaZ+Gkj0vKS9ZCiTESfng1N9LyOyXvo+m+Gg==}
@@ -1164,6 +1340,31 @@ packages:
       '@types/react':
         optional: true
 
+  '@react-three/fiber@9.5.0':
+    resolution: {integrity: sha512-FiUzfYW4wB1+PpmsE47UM+mCads7j2+giRBltfwH7SNhah95rqJs3ltEs9V3pP8rYdS0QlNne+9Aj8dS/SiaIA==}
+    peerDependencies:
+      expo: '>=43.0'
+      expo-asset: '>=8.4'
+      expo-file-system: '>=11.0'
+      expo-gl: '>=11.0'
+      react: '>=19 <19.3'
+      react-dom: '>=19 <19.3'
+      react-native: '>=0.78'
+      three: '>=0.156'
+    peerDependenciesMeta:
+      expo:
+        optional: true
+      expo-asset:
+        optional: true
+      expo-file-system:
+        optional: true
+      expo-gl:
+        optional: true
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+
   '@rolldown/binding-android-arm-eabi@1.2.18':
     resolution: {integrity: sha512-ubTG+4KlidvioxjOFdsdEa2F6JVGZb8m2ByJUqQ7fYzUeT1cEn194POcsQ10PKH4p//q0YQn4SB3YpSuzcA1Yg==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -1454,6 +1655,11 @@ packages:
     resolution: {integrity: sha512-ZI7bU42mZXXKHn/qNLEw2IrbiINU7X5+vfgdixBHkCNpYWXjKgfQ/P+uyGb5CjOLB9UcnTeg3rylQtV2hym44Q==}
     peerDependencies:
       '@types/react': ^19.3.0
+
+  '@types/react-reconciler@0.28.9':
+    resolution: {integrity: sha512-HHM3nxyUZ3zAylX8ZEyrDNd2XZOnQ0D5XfunJF5FLQnZbHHYq4UWvW1QfelQNXv1ICNkwYhfxjwfnqivYB6bFg==}
+    peerDependencies:
+      '@types/react': '*'
 
   '@types/react@19.3.0':
     resolution: {integrity: sha512-N0rFCuH9YoxG9/m61l9MfpJKfmLOVU0em7ipIz6TRgSSkvReLB9vL85GB+yr8Bs5leqpvg96JSwF4ZS1s4viQg==}
@@ -2537,6 +2743,11 @@ packages:
     resolution: {integrity: sha512-H0dkQoCa3b2VEeKQBOxFph+JAbcrQdE7KC0UkqwpLmv2EC4P41QXP+rqo9wYodACiG5/WM5s9oDApTU8utwj9g==}
     engines: {node: '>= 0.4'}
 
+  its-fine@2.1.1:
+    resolution: {integrity: sha512-C5ZoVkeqSt0Aje0tzESO+iT/EQpNFNL39GkP7mCACtoZUFD6GcyerFCr6kp0ZtiII4W9HoYkY48Soy5xE/uHKw==}
+    peerDependencies:
+      react: ^19.0.0
+
   jiti@2.7.0:
     resolution: {integrity: sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ==}
     hasBin: true
@@ -2934,6 +3145,15 @@ packages:
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
+  react-use-measure@2.1.7:
+    resolution: {integrity: sha512-KrvcAo13I/60HpwGO5jpW7E9DfusKyLPLvuHlUyP5zqnmAPhNc6qTRjUQrdTADl0lpPpDVU2/Gg51UlOGHXbdg==}
+    peerDependencies:
+      react: '>=16.13'
+      react-dom: '>=16.13'
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+
   react@19.2.9:
     resolution: {integrity: sha512-RuLdAokXv3sRmZa2/N8QH0KmTBIgDKC+buRUikGqow31+mGSGidLCX2o4XFq8OV+xBFWfhM9DVgTq1PPHADH4w==}
     engines: {node: '>=0.10.0'}
@@ -3136,6 +3356,11 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
+  suspend-react@0.1.3:
+    resolution: {integrity: sha512-aqldKgX9aZqpoDp3e8/BZ8Dm7x1pJl+qI3ZKxDN0i/IQTWUwBx/ManmlVJ3wowqbno6c2bmiIfs+Um6LbsjJyQ==}
+    peerDependencies:
+      react: '>=17.0'
+
   tailwind-merge@3.7.0:
     resolution: {integrity: sha512-XPPUyAc+cvspz3lHTcR/QgPfW2A0lv/xQNIjX3HGhLR+Nq2lHaLq5MtTesHn8GUr3W3DguT2KT5x3NVgRtYwmA==}
 
@@ -3147,7 +3372,7 @@ packages:
     engines: {node: '>=6'}
 
   three-bmfont-text@https://codeload.github.com/dmarcos/three-bmfont-text/tar.gz/c3eec235b9188aa0d8ed949101236e6d5fccf071:
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/dmarcos/three-bmfont-text/tar.gz/c3eec235b9188aa0d8ed949101236e6d5fccf071}
+    resolution: {gitHosted: true, integrity: sha512-HznkGMuFq4l7Tgl+DGqrIzZtVEJioQcLnpOYt8h/1M/k0Tu9fCnA+Rc/tExN4TFf4CEIPVT3VrgjEl3lwOM63A==, tarball: https://codeload.github.com/dmarcos/three-bmfont-text/tar.gz/c3eec235b9188aa0d8ed949101236e6d5fccf071}
     version: 3.0.0
 
   three@0.187.0:
@@ -3240,6 +3465,11 @@ packages:
 
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
+
+  use-sync-external-store@1.7.0:
+    resolution: {integrity: sha512-6L+EeigHMQhdaIPNIFUKwfWJSwWFQ8gJbJ2DLOs5sDIegTwR9fRxvnM3uciHKjIZhFz+KAv2emhWMRvDmMcY8A==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   vite@8.3.8:
     resolution: {integrity: sha512-LzOn3h9rG/0vhLdXrV4yJ4QFA9eEoqCl+Yx+kGJd7aB9w6nfNgVHKSYwLPZUHrz4ZGa+t+kXjV9itvcHDLQouA==}
@@ -3667,6 +3897,8 @@ snapshots:
   '@babel/parser@7.29.13':
     dependencies:
       '@babel/types': 7.29.11
+
+  '@babel/runtime@7.29.13': {}
 
   '@babel/template@7.29.7':
     dependencies:
@@ -4229,6 +4461,26 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.3.0
 
+  '@react-three/fiber@9.5.0(@types/react@19.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(three@0.187.0)':
+    dependencies:
+      '@babel/runtime': 7.29.13
+      '@types/webxr': 0.5.24
+      base64-js: 1.5.1
+      buffer: 6.0.3
+      its-fine: 2.1.1(@types/react@19.3.0)(react@19.2.9)
+      react: 19.2.9
+      react-use-measure: 2.1.7(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
+      scheduler: 0.27.0
+      suspend-react: 0.1.3(react@19.2.9)
+      three: 0.187.0
+      use-sync-external-store: 1.7.0(react@19.2.9)
+      zustand: 5.1.0(@types/react@19.3.0)(react@19.2.9)(use-sync-external-store@1.7.0(react@19.2.9))
+    optionalDependencies:
+      react-dom: 19.2.9(react@19.2.9)
+    transitivePeerDependencies:
+      - '@types/react'
+      - immer
+
   '@rolldown/binding-android-arm-eabi@1.2.18':
     optional: true
 
@@ -4433,6 +4685,10 @@ snapshots:
       undici-types: 7.24.6
 
   '@types/react-dom@19.3.0(@types/react@19.3.0)':
+    dependencies:
+      '@types/react': 19.3.0
+
+  '@types/react-reconciler@0.28.9(@types/react@19.3.0)':
     dependencies:
       '@types/react': 19.3.0
 
@@ -5651,6 +5907,13 @@ snapshots:
       has-symbols: 1.1.0
       set-function-name: 2.0.2
 
+  its-fine@2.1.1(@types/react@19.3.0)(react@19.2.9):
+    dependencies:
+      '@types/react-reconciler': 0.28.9(@types/react@19.3.0)
+      react: 19.2.9
+    transitivePeerDependencies:
+      - '@types/react'
+
   jiti@2.7.0: {}
 
   js-cookie@3.0.8: {}
@@ -6009,6 +6272,12 @@ snapshots:
 
   react-is@16.13.1: {}
 
+  react-use-measure@2.1.7(react-dom@19.2.9(react@19.2.9))(react@19.2.9):
+    dependencies:
+      react: 19.2.9
+    optionalDependencies:
+      react-dom: 19.2.9(react@19.2.9)
+
   react@19.2.9: {}
 
   reflect.getprototypeof@1.0.10:
@@ -6289,6 +6558,10 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
+  suspend-react@0.1.3(react@19.2.9):
+    dependencies:
+      react: 19.2.9
+
   tailwind-merge@3.7.0: {}
 
   tailwindcss@4.3.5: {}
@@ -6439,6 +6712,10 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
+  use-sync-external-store@1.7.0(react@19.2.9):
+    dependencies:
+      react: 19.2.9
+
   vite@8.3.8(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15):
     dependencies:
       lightningcss: 1.33.0
@@ -6555,7 +6832,8 @@ snapshots:
 
   zod@4.6.7: {}
 
-  zustand@5.1.0(@types/react@19.3.0)(react@19.2.9):
+  zustand@5.1.0(@types/react@19.3.0)(react@19.2.9)(use-sync-external-store@1.7.0(react@19.2.9)):
     optionalDependencies:
       '@types/react': 19.3.0
       react: 19.2.9
+      use-sync-external-store: 1.7.0(react@19.2.9)

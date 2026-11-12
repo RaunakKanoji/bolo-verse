@@ -66,6 +66,7 @@ describe("CI platform selection", () => {
   it.each([
     "packages/scene-schema/src/index.ts",
     "src/lib/contracts/shape.ts",
+    "apps/web/src/lib/contracts/shape.ts",
     "packages/api-contract/generated/ShapeModels.swift",
     "packages/design-tokens/tokens.json",
     "scripts/generate-contracts.ts",

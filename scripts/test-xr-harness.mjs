@@ -9,7 +9,7 @@ const result = await build({
   entryPoints: ["tests/browser-fixtures/xr-workspace-entry.tsx"],
   bundle: true, write: false, platform: "browser", format: "esm", target: "es2022",
   outfile: "test-results/xr-component-harness/entry.js",
-  tsconfig: "tsconfig.json", jsx: "automatic",
+  tsconfig: "apps/web/tsconfig.json", jsx: "automatic",
   // The harness has no Next router/compiler. Navigation is covered against the
   // real Next server; use an ordinary anchor only at this framework boundary.
   alias: { "next/link": resolve(root, "tests/browser-fixtures/next-link.tsx") },
@@ -22,7 +22,7 @@ if (process.argv.includes("--build-only")) {
   process.exit(0);
 }
 const files = new Map(result.outputFiles.map(file => [`/${basename(file.path)}`, file.contents]));
-files.set("/vendor/aframe/aframe-1.8.0.min.js", await readFile(resolve(root, "public/vendor/aframe/aframe-1.8.0.min.js")));
+files.set("/vendor/aframe/aframe-1.8.0.min.js", await readFile(resolve(root, "apps/web/public/vendor/aframe/aframe-1.8.0.min.js")));
 const html = '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>XR component test harness</title><link rel="stylesheet" href="/entry.css"><style>body{margin:0;padding:24px;font:15px system-ui,sans-serif;background:#f5f7fb;color:#1d1d1f}h1{font-size:20px}button,input,textarea,select{font:inherit}.fixture-note{padding:12px;border:1px solid #dfe4ec;margin-bottom:20px}</style></head><body><h1>XR component test harness</h1><p class="fixture-note">Test fixtures only. No authentication, private project data or live providers.</p><main id="root"></main><script type="module" src="/entry.js"></script></body></html>';
 const server = createServer((request, response) => {
   const path = new URL(request.url ?? "/", "http://127.0.0.1").pathname;

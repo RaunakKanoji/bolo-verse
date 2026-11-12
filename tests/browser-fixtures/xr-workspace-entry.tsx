@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
-import XRWorkspaceClient from "../../src/xr/XRWorkspaceClient";
-import { XRWorkspaceDataSchema } from "../../src/lib/contracts/xr-workspace";
+import XRWorkspaceClient from "../../apps/web/src/xr/XRWorkspaceClient";
+import { XRWorkspaceDataSchema } from "../../apps/web/src/lib/contracts/xr-workspace";
 
 // This entry is bundled by a test-only localhost server. It is not a Next route
 // and cannot bypass authentication or load private application data.
