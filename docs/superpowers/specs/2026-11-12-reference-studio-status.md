@@ -2,6 +2,8 @@
 
 Updated 2026-11-12, Asia/Kolkata.
 
+This records the concurrent visual/editor session's checks. Integration subsequently added pre-decoder image validation and four regression tests. The combined final run passed **306 unit/PostgreSQL tests and 24 production-browser tests**; see [implementation status](../../IMPLEMENTATION_STATUS.md) for the latest evidence and local commits.
+
 ## Implementation
 
 The existing browser XR stack was retained: Next.js 16/React 19, strict TypeScript, Tailwind/shadcn, Clerk, Neon/Drizzle, private R2, A-Frame 1.8 in its own same-origin realm, Gemini/Sarvam server adapters, validated workspace commands, bounded asset readers, optimistic layout persistence, and the isolated mono recording lab.
