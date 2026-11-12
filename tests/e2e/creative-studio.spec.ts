@@ -63,7 +63,7 @@ test("image canvas applies adjustments, compares, resets, and exports real edite
   const event = page.waitForEvent("download");
   await page.getByRole("button", { name: "Download PNG", exact: true }).click();
   const download = await event;
-  expect(download.suggestedFilename()).toBe("boloverse-image-edit.png");
+  expect(download.suggestedFilename()).toBe("shape-studio-image-edit.png");
   const location = testInfo.outputPath("edited.png");
   await download.saveAs(location);
   const { readFile } = await import("node:fs/promises");
@@ -103,11 +103,60 @@ test("creative screens fit narrow viewports and image preset controls remain acc
   await page.screenshot({ path: testInfo.outputPath("dashboard-mobile.png"), fullPage: true });
   await page.goto("/studio/create");
   await expect(page.getByRole("img", { name: "Image adjustment preview" })).toBeVisible();
+  await page.getByRole("button", { name: "Image editing", exact: true }).click();
   await page.getByRole("button", { name: "Vivid", exact: true }).click();
   await expect(page.getByRole("slider", { name: "Saturation", exact: true })).toHaveValue("125");
+  await page.getByRole("button", { name: "Close image editing", exact: true }).click();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({
     path: testInfo.outputPath("creative-canvas-mobile.png"),
     fullPage: true,
   });
+});
+
+test("playground preserves prompts and local variants across modes and guards unsaved navigation", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1600, height: 1000 });
+  await page.goto("/studio/create");
+  await expect(page.getByRole("img", { name: "Image adjustment preview" })).toBeVisible();
+  await page
+    .getByRole("textbox", { name: "Image prompt", exact: true })
+    .fill("A lavender product study");
+  await page.getByRole("button", { name: "Video", exact: true }).click();
+  await page
+    .getByRole("textbox", { name: "Video prompt", exact: true })
+    .fill("A slow botanical reveal");
+  await expect(page.getByRole("button", { name: "Generate video", exact: true })).toBeDisabled();
+  await page.getByRole("button", { name: "Image", exact: true }).click();
+  await expect(page.getByRole("textbox", { name: "Image prompt", exact: true })).toHaveValue(
+    "A lavender product study",
+  );
+  await page.getByRole("slider", { name: "Brightness", exact: true }).fill("125");
+  await page.getByRole("button", { name: "Capture local variant", exact: true }).click();
+  await page.getByRole("slider", { name: "Brightness", exact: true }).fill("80");
+  await page.getByRole("button", { name: "Restore local variant 1", exact: true }).click();
+  await expect(page.getByRole("slider", { name: "Brightness", exact: true })).toHaveValue("125");
+  await expect(page.getByRole("region", { name: "Generation history", exact: true })).toContainText(
+    "No generation jobs",
+  );
+  await page.getByRole("button", { name: "Zoom in", exact: true }).click();
+  await expect(page.getByLabel("Preview zoom", { exact: true })).toHaveText("125%");
+  await page.getByRole("button", { name: "Fit", exact: true }).click();
+  await expect(page.getByLabel("Preview zoom", { exact: true })).toHaveText("100%");
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await page
+    .getByRole("navigation", { name: "Studio navigation" })
+    .getByRole("link", { name: "Projects", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/studio\/create$/);
+  await expect(page.getByRole("textbox", { name: "Image prompt", exact: true })).toHaveValue(
+    "A lavender product study",
+  );
+  page.on("dialog", (dialog) => dialog.accept());
+  await page
+    .getByRole("navigation", { name: "Studio navigation" })
+    .getByRole("link", { name: "Projects", exact: true })
+    .click();
+  await expect(page).not.toHaveURL(/\/studio\/create$/);
 });

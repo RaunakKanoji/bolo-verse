@@ -260,7 +260,7 @@ export default function XRWorkspaceClient(props: XRWorkspaceProps) {
           aria-label={preview ? "Spatial samples" : "Project navigator"}
         >
           <Link href="/" className={styles.homeLink} aria-label="Home">
-            <House size={16} /> BoloVerse
+            <House size={16} /> Shape Studio
           </Link>
           <div className={styles.projectIdentity}>
             <span>YOUR STUDIO</span>

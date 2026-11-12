@@ -10,3 +10,4 @@ allowBuilds:
 
 minimumReleaseAgeExclude:
   - prettier@3.10.1
+  - react-hook-form@7.92.0
