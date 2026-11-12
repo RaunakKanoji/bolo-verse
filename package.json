@@ -27,7 +27,10 @@
     "contracts:test:swift": "node --import tsx scripts/test-swift-contracts.ts",
     "native:sync": "node scripts/sync-native-contracts.mjs",
     "native:check": "node scripts/sync-native-contracts.mjs --check",
-    "native:test": "swift test --package-path apps/visionos/ShapeStudioCore"
+    "native:test": "swift test --package-path apps/visionos/ShapeStudioCore",
+    "check": "turbo run build",
+    "env:check": "node --conditions=react-server --import tsx scripts/check-environment.ts",
+    "workspace:graph": "turbo run build --dry=json"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.1165.0",
@@ -51,7 +54,8 @@
     "three-bmfont-text": "github:dmarcos/three-bmfont-text#c3eec235b9188aa0d8ed949101236e6d5fccf071",
     "ws": "8.22.2",
     "zod": "4.6.7",
-    "zustand": "5.1.0"
+    "zustand": "5.1.0",
+    "@shape/scene-schema": "workspace:*"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.16",
@@ -71,7 +75,10 @@
     "tailwindcss": "4.3.5",
     "tsx": "4.23.15",
     "typescript": "5.9.3",
-    "vitest": "5.1.0"
+    "vitest": "5.1.0",
+    "@shape/typescript-config": "workspace:*",
+    "@shape/eslint-config": "workspace:*",
+    "turbo": "2.11.11"
   },
   "type": "module",
   "packageManager": "pnpm@11.12.0"

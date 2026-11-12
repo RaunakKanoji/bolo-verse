@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const config: NextConfig = {
+  transpilePackages: ["@shape/scene-schema"],
   poweredByHeader: false,
   async headers() {
     return [{ source: "/:path*", headers: [

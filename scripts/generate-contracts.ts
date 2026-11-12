@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
+import { dirname, resolve } from "node:path";
 import { z } from "zod";
 import { ShapeApiOperations, ShapeApiSchemas } from "../src/lib/contracts/shape";
 import { generateClient, generateModels, type Operation, type Schema } from "./lib/contract-generator";
@@ -47,14 +48,15 @@ const client = generateClient(operations, artifact.components.schemas as Record<
 const outputs = new Map([
   ["openapi.json", published], ["generated/models.ts", models.typescript], ["generated/ShapeModels.swift", models.swift],
   ["generated/client.ts", client.typescript], ["generated/ShapeAPIRoutes.swift", client.swift],
+  ["../../docs/api/openapi.yaml", published],
 ]);
 for (const [path, expected] of outputs) {
-  const target = `${root}${path}`;
+  const target = resolve(root, path);
   if (check) {
     const actual = await readFile(target, "utf8").catch(() => "");
     if (actual !== expected) throw new Error(`Contract artifact is stale: ${path}. Run contracts:generate.`);
   } else {
-    await mkdir(new URL(`../packages/api-contract/${path.includes("/") ? "generated/" : ""}`, import.meta.url), { recursive: true });
+    await mkdir(dirname(target), { recursive: true });
     await writeFile(target, expected);
   }
 }

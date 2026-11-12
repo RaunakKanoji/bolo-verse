@@ -1,6 +1,37 @@
 # Shape Studio progress tracker
 
-Updated 12 November 2026 (Asia/Kolkata). Current scope: the native Spatial foundation extends the completed web foundation. Follow the [native plan](../docs/superpowers/plans/2026-11-12-native-spatial-foundation.md) and [validation evidence](../docs/shape-studio/native-validation.md).
+Updated 12 November 2026 (Asia/Kolkata). Current scope: Phase 0 audit and Phase 1 monorepo foundation from the [unified platform prompt](../docs/product/UNIFIED_PLATFORM_SPEC.md). See the [system overview](../docs/architecture/system-overview.md) and [committed plan](../docs/superpowers/plans/2026-11-12-unified-monorepo-foundation.md).
+
+## Native simulator window recovery — 12 November 2026
+
+Fixed repeated product opening creating empty duplicate windows. The workspace, product volume and inspector now use unique windows; launch presents the workspace, and both auxiliary windows include **Open Workspace**. Volume renderer ownership is acquired/released with appearance/disappearance, and **Close volume** returns to the workspace.
+
+Verification: six simulator UI tests and three hosted RealityKit tests completed with zero unexpected failures. One reopened-model accessibility assertion remains a strict expected failure: display capture confirms the model renders, but its automation accessibility entry is missing after reopening. All 48 Swift core tests and native artifact drift checks passed. Physical-device and live-service acceptance remain open. See [native validation](../docs/shape-studio/native-validation.md) for evidence and limitations.
+
+## Unified platform phases
+
+| Phase | Status | Scope / next work |
+| --- | --- | --- |
+| 0 — Audit and architecture | Complete | Actual 22-table/domain/API inventory, target directory layout, dependency graph, strict v1 compatibility and phased plan committed before implementation. |
+| 1 — Monorepo foundation | Complete; locally verified | Real scene/config packages, pnpm workspace, Turbo check graph, safe environment diagnostics, path-aware independent native CI and requested documentation. Existing shells retained. |
+| 2 — Shared backend | Reuse established; extensions planned | Existing Clerk/project membership/SQL permissions and typed v1 contracts; organization/profile administration is not implemented. |
+| 3 — Core web | Existing functionality retained | Projects, briefs, ready asset views and browser assistant exist; fuller domain workflows remain scoped increments. |
+| 4 — Shared spatial foundation | Canonical v1 established | Current CAS persistence retained. Hierarchy/environment, multi-scene history, explicit v2 migration and common renderer interface are future work. |
+| 5 — Browser spatial | A-Frame retained; R3F planned | No new R3F runtime or empty spatial application was added in Phase 1. |
+| 6 — Voice and AI | Existing browser adapters retained | Shared cross-platform command/tool registry and native microphone workflows remain planned. |
+| 7 — Native foundation | Existing tested increment retained | Native SwiftUI/RealityKit remains independent of pnpm; live registration/storage and physical-device acceptance remain open. |
+| 8 — Collaboration and review | Planned | Presence/realtime and complete client deliverable workflows are not implemented by tooling changes. |
+| 9 — Production hardening | External gates open | No remote CI execution, live services, deployment or physical-headset acceptance claimed. |
+
+## Current Phase 1 verification
+
+- `pnpm check`: 11 successful tasks, including lint/types/formatting, environment/drift checks, 425 unit/PostgreSQL tests in 36 files and the Next production build.
+- All 32 Chromium regression cases passed against the production server; existing editing, XR and recording behavior is preserved.
+- Swift contract verification passed (11 round-trip fixtures, 9 invalid payloads, request/route checks), along with 48 native core tests. No native rendering source changed or new simulator/device run was claimed.
+- Frozen installation passed. Turbo package cache reuse and invalidation after shared compiler configuration changes were verified. Independent reviews found no remaining blocker.
+- See [Phase 1 files, decisions and evidence](../docs/development/phase-1-status.md). Local branch: `feat/unified-monorepo-foundation`; no remote push or deployment.
+
+## Preserved previous Shape Studio roadmap
 
 | Phase | Status | Evidence / remaining scope |
 | --- | --- | --- |
@@ -14,7 +45,7 @@ Updated 12 November 2026 (Asia/Kolkata). Current scope: the native Spatial found
 | 7 — Native spatial capabilities | Implemented increment | Bounded RealityKit viewer, local/project USDZ, targeted gestures, canonical scene CAS and explicit immersive study. Conversion and multi-object immersive production remain open. |
 | 8 — Full platform acceptance | Open | Live accounts, deployed infrastructure, accessibility audit, measured device performance and physical headsets remain external checks. |
 
-## Native delivery verification
+## Preserved native delivery verification
 
 - 394 web/API/PostgreSQL tests and 48 Swift core tests pass.
 - All 32 production Chromium cases pass; browser XR, recording and creative editing remain intact.

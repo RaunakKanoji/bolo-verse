@@ -2,6 +2,8 @@
 
 An incremental web and native spatial foundation for creative production. The initial [audit and plan](docs/shape-studio/phase-0-plan.md) established shared contracts, private drafts, tokens and the four-mode web playground. The [native app](apps/visionos/README.md) now adds SwiftUI windows, RealityKit volumes, authorized services and scene persistence. Existing browser XR, text/speech adapters and recording tools remain available. Functional media generation and full collaboration remain later phases.
 
+The current [unified platform architecture](docs/architecture/system-overview.md) establishes a pnpm/Turborepo workspace around the existing applications. Shared scene schemas, strict TypeScript settings and lint configuration are real consumed packages. The working Next app remains at the root during this increment; a dedicated R3F editor is a later functional slice. See [local setup](docs/development/local-setup.md) and the [phased plan](docs/superpowers/plans/2026-11-12-unified-monorepo-foundation.md).
+
 ## Run locally
 
 Use Node.js 24 or newer and **pnpm 11.12.0**, pinned in `package.json`.
@@ -9,6 +11,7 @@ Use Node.js 24 or newer and **pnpm 11.12.0**, pinned in `package.json`.
 ```sh
 pnpm install --frozen-lockfile
 cp .env.example .env.local
+pnpm env:check
 pnpm dev
 ```
 
@@ -29,7 +32,7 @@ The dashboard at `/` and `/studio` uses authorized project data or clearly label
 
 1. Configure a real Clerk application and set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`. Configure the corresponding development/preview domains.
 2. Set a Neon `DATABASE_URL`. Set `DATABASE_MIGRATION_URL` when a separate direct migration connection is needed; otherwise it falls back to `DATABASE_URL`.
-3. Review all **five** SQL migrations in `drizzle/`, then run `pnpm db:migrate`. Migration `0003_xr_workspaces.sql` adds project layouts; `0004` adds private creative drafts and append-only review decisions.
+3. Review all **six** SQL migrations (`0000–0005`) in `drizzle/`, then run `pnpm db:migrate`. Migration `0003` adds browser layouts, `0004` adds private drafts and append-only decisions, and `0005` adds canonical native-compatible scenes.
 4. Set `NEXT_PUBLIC_APP_URL` to the exact browser origin. `ALLOWED_ORIGINS` can list additional trusted origins separated by commas. `localhost` and `127.0.0.1` are different origins.
 5. Sign in, visit `/app/projects`, create a project and open `/studio`. Choose **Open Spatial Studio**, then your project.
 
@@ -47,6 +50,8 @@ These are implemented network adapters. Environment readiness does not prove a s
 
 ## Checks and evidence
 
+`pnpm check` runs the complete JavaScript workspace check graph and production build through Turbo. Native compilation and database mutations are separate. `pnpm workspace:graph` shows task dependencies; individual commands remain available:
+
 ```sh
 pnpm format:check
 pnpm lint
@@ -62,7 +67,7 @@ pnpm test:e2e
 
 The browser suite defaults to `http://127.0.0.1:3000`. To reuse a server on another origin, set, for example, `PLAYWRIGHT_BASE_URL=http://localhost:3001 pnpm test:e2e`. Use the same hostname and port as the running server. Run the missing-configuration browser scenarios without live Clerk/Neon secrets. Formatting currently covers XR/project UI; lint and typecheck cover the application.
 
-PGlite integration tests execute the actual PostgreSQL queries with the identity boundary mocked. Chromium tests render the real A-Frame canvas; editable-project browser scenarios use an isolated component harness and mocked HTTP responses. Synthetic microphone input and simulated XR sessions do not establish live authentication, provider behavior, headset compatibility or physical microphone quality. Current results are recorded in [implementation status](docs/IMPLEMENTATION_STATUS.md).
+PGlite integration tests execute the actual PostgreSQL queries with the identity boundary mocked. Chromium tests render the real A-Frame canvas; editable-project browser scenarios use an isolated component harness and mocked HTTP responses. Synthetic microphone input and simulated XR sessions do not establish live authentication, provider behavior, headset compatibility or physical microphone quality. Current results are recorded in [Phase 1 verification](docs/development/phase-1-status.md); earlier browser implementation evidence is preserved in [implementation status](docs/IMPLEMENTATION_STATUS.md).
 
 ## Guides
 
@@ -72,12 +77,12 @@ PGlite integration tests execute the actual PostgreSQL queries with the identity
 - [Progress](progress-tracker.md), [decisions](docs/DECISIONS.md) and [integration inventory](docs/INTEGRATIONS.md)
 - [Implementation plan](docs/superpowers/plans/2026-11-12-functional-xr-studio.md) and [device runbook](docs/DEMO_RUNBOOK.md)
 
-Only desktop Chromium behavior has browser-test evidence here. Physical headset checks and a hosted deployment remain outstanding. The manifest provides installation hints; there is no service worker or offline cache of private responses/audio. Native visionOS is future work.
+Desktop Chromium has browser-test evidence; the native app has separate [simulator evidence](docs/shape-studio/native-validation.md). Physical headset checks and hosted deployment remain outstanding. The web manifest provides installation hints; there is no service worker or offline cache of private responses/audio.
 
 ## Shape Studio foundation
 
 - [Project context and current scope](context/project-overview.md), [architecture](context/architecture-context.md), [progress](context/progress-tracker.md), [implementation evidence and limits](docs/shape-studio/implementation-status.md).
 - [OpenAPI and generated TypeScript/Swift contracts](packages/api-contract/README.md), [semantic tokens](packages/design-tokens/README.md).
-- [Native/provider research](docs/shape-studio/native-provider-research.md) and [visionOS roadmap](apps/visionos/README.md).
+- [Native/provider research](docs/shape-studio/native-provider-research.md) and [visionOS setup](apps/visionos/README.md).
 
 Open an authorized project and choose **Open Creative Studio** to explicitly save a private prompt draft. `/api/v1` exposes safe project/asset projections and conflict-aware drafts; original API paths remain compatible. Local images and edit variants are not uploaded. Generate is disabled for all four modes until Phase 3 connects durable jobs, provider calls and private output storage.

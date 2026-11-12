@@ -4,19 +4,22 @@ import SwiftUI
 struct ProductVolumeView: View {
     let workspace: SpatialWorkspace
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.openWindow) private var openWindow
+    @Environment(\.dismissWindow) private var dismissWindow
     @State private var volumeID = UUID()
     @State private var ownsRenderer = false
 
     var body: some View {
         GeometryReader3D { geometry in
             RealityView { content in
-                if workspace.attachVolume(volumeID) {
-                    ownsRenderer = true
+                if ownsRenderer {
                     content.add(workspace.root)
                     workspace.setVolumeBounds(content.convert(geometry.frame(in: .local), from: .local, to: .scene))
                 }
             } update: { content in
                 if ownsRenderer {
+                    // A retained RealityView can reappear after its root was detached.
+                    content.add(workspace.root)
                     workspace.setVolumeBounds(content.convert(geometry.frame(in: .local), from: .local, to: .scene))
                     workspace.applyTransform()
                 }
@@ -39,13 +42,24 @@ struct ProductVolumeView: View {
                 if workspace.isLoading { ProgressView().controlSize(.small) }
                 Button("Reset", systemImage: "arrow.counterclockwise") { workspace.resetTransform() }
                     .disabled(workspace.isLoading)
+                Button("Open Workspace", systemImage: "rectangle") { openWindow(id: "workspace") }
+                    .accessibilityIdentifier("volume-open-workspace")
+                Button("Close volume", systemImage: "xmark") {
+                    openWindow(id: "workspace")
+                    dismissWindow(id: "product-volume")
+                }.accessibilityIdentifier("close-product-volume")
             }
             .padding().glassBackgroundEffect()
+        }
+        .onAppear {
+            ownsRenderer = workspace.attachVolume(volumeID)
         }
         .onChange(of: scenePhase) { _, phase in
             if phase != .active { workspace.endGestures() }
         }
-        .onDisappear { workspace.detachVolume(volumeID); ownsRenderer = false }
+        .onDisappear {
+            workspace.detachVolume(volumeID); ownsRenderer = false
+        }
     }
 
     private var dragGesture: some Gesture {

@@ -19,3 +19,5 @@ apps/visionos/Config/Local.xcconfig
 **/DerivedData/
 **/xcuserdata/
 *.xcresult/
+
+.turbo/
