@@ -9,6 +9,7 @@ import type {
   OutputSourceSnapshot, SceneDocument,
 } from "@/lib/contracts";
 import type { XRLayout } from "@/lib/contracts/xr-workspace";
+import type { CreativeDraftDocument } from "@/lib/contracts/shape";
 
 // UUIDs identify application resources; Clerk subjects deliberately remain text.
 const id = () => uuid("id").defaultRandom().primaryKey();
@@ -60,6 +61,22 @@ export const projectMembers = pgTable("project_members", {
 }, (table) => [
   primaryKey({ columns: [table.projectId, table.clerkUserId] }),
   index("project_members_user_idx").on(table.clerkUserId),
+]);
+
+// Drafts belong to a single authenticated author within an authorized project.
+// They are not published project content or generation jobs.
+export const creativeDrafts = pgTable("creative_drafts", {
+  id: id(),
+  projectId: uuid("project_id").notNull().references(() => projects.id, { onDelete: "restrict" }),
+  ownerClerkId: text("owner_clerk_id").notNull(),
+  revision: integer("revision").notNull(),
+  document: jsonb("document").$type<CreativeDraftDocument>().notNull(),
+  createdAt: createdAt(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  unique("creative_drafts_project_owner_uq").on(table.projectId, table.ownerClerkId),
+  check("creative_draft_revision_positive", sql`${table.revision} > 0`),
+  check("creative_draft_document_version", sql`COALESCE(${table.document}->>'schemaVersion' = '1', false)`),
 ]);
 
 export const briefVersions = pgTable("brief_versions", {

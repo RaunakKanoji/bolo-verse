@@ -1,6 +1,6 @@
-# BoloVerse engineering guidance
+# Shape Studio engineering guidance
 
-Read `docs/XR_BROWSER_STUDIO_SPEC.md` first, then the historical XR/build specifications as needed. The latest browser-studio brief supersedes the older phase boundary: implement its milestones in order, preserving the working application and security/privacy invariants. Update the tracker/status with implemented, tested and externally unverified behavior; do not claim hardware compatibility from desktop tests.
+Read `context/project-overview.md`, `context/architecture-context.md` and `docs/shape-studio/phase-0-plan.md` first. The latest Shape Studio brief scopes this delivery to Phase 1 and the initial web creative studio; later generation/collaboration/native phases must not be presented as implemented. Preserve existing XR and recording functionality. Update context/progress-tracker.md and the root tracker with implemented, tested and externally unverified behavior.
 
 - Use Next.js App Router, strict TypeScript, Tailwind/shadcn, A-Frame/WebXR, Clerk, Neon/Drizzle, private R2 and pnpm. Keep the original direct Three.js recording lab isolated; use AFRAME.THREE within the XR runtime to avoid mixing engine versions.
 - Keep credentials, identity verification, tenant authorization, database access and signing server-only. Every private read/mutation checks authorization; never introduce a public test-auth bypass.

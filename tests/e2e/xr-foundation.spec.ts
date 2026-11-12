@@ -84,7 +84,7 @@ test("XR route teardown leaves no active scene and supports reopening", async ({
   await expect(page.frameLocator('iframe[title="XR studio canvas"]').locator("a-scene canvas")).toBeVisible({ timeout: 30000 });
   await page.getByRole("link", { name: "Home", exact: true }).click();
   await expect(page.locator('iframe[title="XR studio canvas"]')).toHaveCount(0);
-  await page.getByRole("navigation", { name: "Studio navigation" }).getByRole("link", { name: "Spatial Studio", exact: true }).click();
+  await page.getByRole("navigation", { name: "Workspace tools" }).getByRole("link", { name: "Spatial Studio", exact: true }).click();
   await expect(page.getByTestId("xr-runtime-status")).toContainText(/ready|desktop/i, { timeout: 30000 });
   await expect(page.locator('iframe[title="XR studio canvas"]')).toHaveCount(1);
   const reopened = page.frameLocator('iframe[title="XR studio canvas"]');

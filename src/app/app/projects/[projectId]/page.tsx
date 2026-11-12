@@ -37,6 +37,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ projec
         <p className={styles.objective}>{project.objective}</p>
       </div>
       <div className={styles.toolbar}>
+        <Button asChild size="lg"><Link href={`/studio/create?projectId=${project.id}`}>Open Creative Studio</Link></Button>
         <Button asChild size="lg">
           <Link href={`/studio/xr/${project.id}`}>
             <Glasses aria-hidden="true" />

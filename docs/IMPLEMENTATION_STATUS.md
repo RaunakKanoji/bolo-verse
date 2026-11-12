@@ -1,5 +1,7 @@
 # Functional XR studio implementation status
 
+Historical browser-XR delivery. The active cross-platform phase is recorded in [Shape Studio implementation status](shape-studio/implementation-status.md) and [context progress](../context/progress-tracker.md).
+
 Updated 2026-11-12 (Asia/Kolkata). Scope: the latest [browser studio specification](XR_BROWSER_STUDIO_SPEC.md). Historical [Phase 1](XR_PHASE1_IMPLEMENTATION_STATUS.md) and [M0](M0_IMPLEMENTATION_STATUS.md) evidence remains separate. Implementation is locally verified; live accounts and physical-device acceptance remain open.
 
 ## Features and changed files

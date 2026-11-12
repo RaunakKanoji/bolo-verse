@@ -1,0 +1,12 @@
+{
+  "sceneId": "c842b5e5-8453-4a67-9c88-87f8e9e7b110",
+  "version": 1,
+  "objects": [{
+    "id": "product",
+    "assetId": "e21386ae-51f4-44d9-991b-2e89e981bd96",
+    "position": [0, 0, -1],
+    "rotation": [0, 0, 0, 1],
+    "scale": [1, 1, 1],
+    "visible": true
+  }]
+}

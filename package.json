@@ -1,5 +1,5 @@
 {
-  "name": "boloverse",
+  "name": "shape-studio",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -17,9 +17,14 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "node --conditions=react-server --import tsx scripts/seed.ts",
-    "format": "prettier --write src/xr src/features/projects src/features/workspace",
-    "format:check": "prettier --check src/xr src/features/projects src/features/workspace",
-    "xr:prepare": "node scripts/prepare-xr.mjs"
+    "format": "prettier --write src/xr src/features/projects src/features/workspace src/features/playground",
+    "format:check": "prettier --check src/xr src/features/projects src/features/workspace src/features/playground",
+    "xr:prepare": "node scripts/prepare-xr.mjs",
+    "tokens:generate": "node scripts/generate-tokens.mjs",
+    "tokens:check": "node scripts/generate-tokens.mjs --check",
+    "contracts:generate": "node --import tsx scripts/generate-contracts.ts",
+    "contracts:check": "node --import tsx scripts/generate-contracts.ts --check",
+    "contracts:test:swift": "node --import tsx scripts/test-swift-contracts.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.1165.0",
@@ -27,6 +32,7 @@
     "@clerk/nextjs": "7.9.25",
     "@neondatabase/serverless": "1.2.0",
     "@radix-ui/react-slot": "1.5.0",
+    "@tanstack/react-query": "5.107.1",
     "aframe": "1.8.0",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
@@ -35,12 +41,14 @@
     "next": "16.4.6",
     "react": "19.2.9",
     "react-dom": "19.2.9",
+    "react-hook-form": "7.92.0",
     "server-only": "0.0.1",
     "tailwind-merge": "3.7.0",
     "three": "0.187.0",
     "three-bmfont-text": "github:dmarcos/three-bmfont-text#c3eec235b9188aa0d8ed949101236e6d5fccf071",
     "ws": "8.22.2",
-    "zod": "4.6.7"
+    "zod": "4.6.7",
+    "zustand": "5.1.0"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.16",
