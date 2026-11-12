@@ -316,7 +316,7 @@ export const uploadEvents = pgTable("upload_events", {
   index("upload_events_project_idx").on(table.projectId),
 ]);
 
-// No rate-limit endpoint exists in M0; later features must increment this row atomically.
+// Project creation uses an atomic upsert; additional budgets must retain that guarantee.
 export const rateLimitBuckets = pgTable("rate_limit_buckets", {
   keyHash: text("key_hash").primaryKey(),
   windowStart: timestamp("window_start", { withTimezone: true }).notNull(),

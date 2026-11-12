@@ -2,33 +2,38 @@
 
 Last updated: 2026-11-12 (Asia/Kolkata).
 
-## Current milestone: M0 — Foundation and feasibility
+## Current phase: XR Phase 1 — Foundation
 
-Implemented. Verified: lint, strict typecheck, 93 tests, 5 browser tests, production build and migration/schema consistency. Real Chromium encoding/playback/download verified using synthetic microphone input. Live providers and physical Android/headset checks remain unverified.
+The newer [XR implementation specification](docs/XR_IMPLEMENTATION_SPEC.md) supersedes the original M1–M9 roadmap. Phase 1 is implemented and locally verified: 164 unit/PostgreSQL tests, nine production Chromium tests, lint, types, formatting, build and schema consistency passed. Live Clerk/Neon and physical-headset acceptance remain unverified.
 
-- [x] Read implementation brief and audit repository (only the original brief exists; no Git history).
-- [x] Select the specified Next.js/Clerk/Neon/Drizzle/R2 architecture.
-- [x] Scaffold application, strict TypeScript, Tailwind/shadcn and checks.
-- [x] Add strict shared contracts, environment validation and provider interfaces.
-- [x] Add Clerk/server authorization boundaries and initial SQL migrations.
-- [x] Build a real local mono-canvas + microphone recording experiment.
-- [x] Verify unit/integration/browser behavior and production build.
-- [x] Document configuration, evidence, limitations and Android steps.
-- [x] Initialize Git and create the requested local initial commit.
+- [x] Read the attached master XR prompt and save a repository copy.
+- [x] Preserve the existing Next.js/Clerk/Neon/Drizzle foundation and local recorder.
+- [x] Adopt pnpm, pin A-Frame 1.8.0, add scoped Prettier and GitHub Actions checks.
+- [x] Implement authorized create/list/open/edit project metadata with strict validation and a durable creation limit.
+- [x] Add private `/xr/[projectId]` and clearly labeled public `/xr/preview` routes.
+- [x] Render a real desktop A-Frame scene in an owned, disposable iframe.
+- [x] Add sample selection, accessible companion controls, reset and seated/standing views.
+- [x] Implement capability detection and explicit WebXR entry/exit with session cleanup.
+- [x] Pass 164 unit/PostgreSQL tests, development Chromium tests, lint, typecheck, formatting, production build and schema-drift check.
+- [x] Inspect desktop/mobile XR screenshots and decoded recording pixels.
+- [x] Independent code review: no remaining Critical/Important findings.
+- [x] Complete final production Chromium verification and prepare the local implementation commit.
 
-## Milestone sequence
+## Current phase sequence
 
-| Milestone | Status |
+| Phase | Status |
 | --- | --- |
-| M0 Foundation and feasibility | Implemented; local checks passed; live/phone checks pending |
-| M1 Stereo studio | Not started; requires `next` |
-| M2 Voice and first idea | Not started |
-| M3 Two-device flow | Not started |
-| M4 Real reel and watch | Not started |
-| M5 Brief checks and client review | Not started |
-| M6 Demo reliability | Not started |
-| M7 Creator artifacts | Not started |
-| M8 One editor and formats | Not started |
-| M9 Expanded XR and usability | Not started |
+| Phase 1 Foundation | Implemented and locally verified; live account/headset acceptance open |
+| Phase 2 Spatial workspace | Not started: manipulation, saved scene state, recovery |
+| Phase 3 Creative tools | Not started |
+| Phase 4 AI assistant | Not started |
+| Phase 5 Client review | Not started |
+| Phase 6 Collaboration and polish | Not started |
 
-Detailed evidence: [implementation status](docs/IMPLEMENTATION_STATUS.md).
+## Preserved M0 baseline
+
+- Initial commit: `a1b8dc02b01244623916fa3c5493955eb762afce` on `main`, pushed to `origin/main` in the prior handoff.
+- Original M0 recording experiment and privacy/tenant boundaries remain intact.
+- [Historical M0 evidence](docs/M0_IMPLEMENTATION_STATUS.md) records 93 tests and five browser checks at that milestone; the current suite includes those regressions.
+
+Detailed current evidence and open hardware/provider checks: [implementation status](docs/IMPLEMENTATION_STATUS.md).

@@ -1,5 +1,7 @@
 # Third-party notices
 
+A-Frame 1.8.0 is distributed under the MIT license. `scripts/prepare-xr.mjs` copies its installed license alongside the local bundle at `/vendor/aframe/LICENSE`. A-Frame includes its own Three.js fork and dependencies; preserve the notices in their distributed packages. The XR panels and room geometry are original procedural assets.
+
 The Button component in `src/components/ui/button.tsx` adapts the shadcn/ui Radix Button pattern.
 
 MIT License

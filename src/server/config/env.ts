@@ -25,7 +25,7 @@ const ServerEnvSchema = z.object({
   SHOTSTACK_API_KEY: optionalText,
   SHOTSTACK_ENV: z.preprocess(blankToUndefined, z.enum(["sandbox", "production"]).optional()),
   APP_MODE: z.preprocess(blankToUndefined, z.enum(["live", "demo"]).default("live")),
-  ENABLE_EXTERNAL_EDITOR: flag, ENABLE_BACKGROUND_REMOVAL: flag, ENABLE_WEBXR: flag,
+  ENABLE_EXTERNAL_EDITOR: flag, ENABLE_BACKGROUND_REMOVAL: flag,
   ALLOWED_ORIGINS: z.preprocess(blankToUndefined, z.string().transform((value) => value.split(",").map((entry) => entry.trim())).pipe(z.array(origin).min(1)).optional()),
   COMMAND_LOG_RETENTION_DAYS: z.preprocess(blankToUndefined, z.coerce.number().int().min(0).max(365).default(7)),
   VERCEL: optionalText, VERCEL_ENV: optionalText, VERCEL_TARGET_ENV: optionalText,

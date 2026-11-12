@@ -1,73 +1,53 @@
 # Implementation status
 
-Updated 2026-11-12 (Asia/Kolkata). Current scope: **M0 — foundation and feasibility**. M1 is not started; wait for the user's `next`.
+Updated 2026-11-12 (Asia/Kolkata). Current scope: **XR Phase 1 — foundation**, following the user's newer [master specification](XR_IMPLEMENTATION_SPEC.md). Phase 2 has not started. The original M0 recorder is preserved; its historical evidence is [archived separately](M0_IMPLEMENTATION_STATUS.md).
 
 ## Implemented
 
-- Next.js 16 / React 19 App Router, strict TypeScript, Tailwind 4, checked-in shadcn/Radix Button, responsive entry/workspace/lab screens, manifest/icons, accessible navigation and setup/error states.
-- Canonical v1 strict Zod command union, envelopes, locales, bounded document/media/provider schemas. These validate proposals; the stateful command dispatcher/reducer is later work.
-- Lazy server-only environment validation, explicit migration URL fallback, local-only demo guard, provider/storage/editor interfaces with unconfigured/configured-unverified states. Unsupported provider operations throw; none fabricate results.
-- Clerk proxy and server identity checks; private project list/detail APIs with no-store structured results; membership-scoped repositories; transactional/idempotent personal-workspace creation.
-- Nineteen typed Drizzle tables and three reviewable SQL migrations. Composite project foreign keys, operation-ID bounds/uniqueness, immutable ready output/source and asset identity protection. R2 byte immutability still requires the actual M3 upload/finalization implementation.
-- Idempotent fictional Ilkal sample seed with brief, direction, script and three storyboard cards. CLI resolves a real Clerk account before writes. No output or approval is fabricated.
-- Browser-only Three.js mono experiment: original procedural textile card, fixed portrait camera, encoded draft watermark, capability checks and explicit local narration consent. Real microphone API + canvas MediaRecorder, 5/15-second timer, manual stop, MIME negotiation, final chunk handling, empty/interrupted/error rejection, resource cleanup, local playback and actual-format download.
-- Completed local takes remain in memory for download/discard; they are clearly **not saved**. No audio upload, speech recognition, transcript retention or cloud save occurs. In-app links warn before discarding; reload/close uses the browser unload warning. Back/Forward can bypass link confirmation and lose the take.
-
-## Changed files
-
-- Application/tooling: `package.json`, `package-lock.json`, TypeScript/Next/Tailwind/ESLint/Vitest/Playwright configs, `components.json`, `src/app/**`, `src/components/ui/button.tsx`, icons.
-- Contracts/config/providers: `src/lib/contracts/**`, `src/server/config/**`, `src/server/providers/**`, `.env.example`.
-- Server/data: `src/proxy.ts`, `src/server/auth/**`, `src/server/db/**`, `src/app/api/projects/**`, `drizzle/**`, `drizzle.config.ts`, `scripts/seed.ts`.
-- Capture: `src/features/studio/**`; checks: `tests/unit/**`, `tests/integration/**`, `tests/e2e/**`.
-- Documentation: preserved `Implementation_Prompt.md`; added `AGENTS.md`, `progress-tracker.md`, `README.md`, `THIRD_PARTY_NOTICES.md`, `docs/BUILD_SPEC.md`, `docs/DECISIONS.md`, `docs/INTEGRATIONS.md`, `docs/DEMO_RUNBOOK.md`, this status and the M0 plan.
+- Existing Next.js 16 / React 19, strict TypeScript, Tailwind/shadcn, Clerk and Neon/Drizzle foundation retained. pnpm 11.12.0 replaces npm; pinned dependencies, one lockfile, scoped Prettier and a GitHub Actions quality workflow are included.
+- Real project metadata creation/list/open/edit. Strict schemas reject extra fields; the server selects the user's personal workspace. Project and creator membership creation are transactional. Owners/creators/editors may update; clients remain read-only. Trusted origins, a 16 KiB JSON limit and a durable ten-creations/hour budget protect mutations. No new migration is needed.
+- Server-authorized `/xr/[projectId]` loads project name/objective only after identity/membership checks. Missing configuration, signed-out, forbidden and unavailable states are explicit. Public `/xr/preview` contains original sample content, clearly labeled unsaved; it cannot substitute for private project access.
+- A-Frame 1.8.0 loads from a local pinned distribution in a disposable same-origin iframe. One adapter owns its scene and cleanup; React owns the accessible companion controls. A-Frame's Three fork is isolated from the original recording engine. No runtime fonts, scripts, photos or controller models are fetched from external hosts.
+- Real desktop rendering, pointer look, focused W/A/S/D, reset, seated/standing views and sample selection. The 2D inspector remains accessible. Scene documents have strict versioned validation, but scene persistence/manipulation is not a Phase 1 feature.
+- Secure-context/WebXR detection, explicit immersive session request, verified presenting state, controller rays, spatial/2D exit controls and session teardown. Rejected or late sessions do not claim success. Fatal graphics errors preserve the active session's exit control. Headset behavior remains physically unverified.
+- Original `/studio/feasibility`: actual mono portrait canvas plus microphone recording, consent, interruption handling, playback/download and encoded draft watermark. Local media remains unsaved and private to browser memory.
 
 ## Verification evidence
 
-Environment: macOS development host, Node 24.22.0, npm 11.19.1, Playwright Chromium **158.0.8127.18**. No physical Android device was attached.
+Environment: macOS, Node 24.22.0, pnpm 11.12.0 and Playwright Chromium 158.0.8127.18. No physical headset or Android device was attached; no live provider secrets were configured.
 
-| Command/check | Observed result |
+| Check | Observed result |
 | --- | --- |
-| `npm install --save-exact --no-fund --no-audit` | Dependencies installed; exact direct versions and lockfile committed. Subsequent package additions also installed successfully. |
-| `npm run lint` | Passed, zero warnings/errors |
-| `npm run typecheck` | Passed |
-| `npm test` | **93 tests passed**, six files; includes real PostgreSQL/PGlite migration/repository tests and seed-CLI rejection tests |
-| `npm run build` | Optimized production build passed; public screens static, private API/workspace routes dynamic |
-| `npm run db:generate` | Nineteen tables, no schema changes/drift |
-| `npm run test:e2e` | **5 tests passed**: home/setup, consent/real recording/audio/playback/download/decoded frame, missing-config API denial, completed-take navigation guard, active-take navigation guard. No WebGL INVALID_OPERATION errors. |
-| Desktop/mobile viewport inspection | Rendered UI inspected at 1440px and 390px widths; mobile accessible link names preserved |
-| Fresh code review | No remaining Critical/Important M0 issues. Timing label clarified; Back/Forward limitation documented. |
+| `pnpm install --frozen-lockfile --offline` | Passed with the downloaded packages; lockfile unchanged and supply-chain checks passed |
+| `pnpm format:check` | Passed for XR/project UI modules |
+| `pnpm lint` | Passed, zero warnings/errors |
+| `pnpm typecheck` | Passed |
+| `pnpm test` | **164 passed** across 11 files, including 53 project-mutation cases and 18 XR cases |
+| `pnpm build` | Optimized production build passed; public preview static, private project/XR/API routes dynamic |
+| `pnpm db:generate` | Nineteen tables, no schema changes/drift |
+| `pnpm test:e2e` against development server | **9 passed**: actual XR pixels, selection, missing-headset state, no external asset requests, mobile layout, route cleanup, private denial and original recording regressions |
+| `pnpm test:e2e` against production server | **9 passed** after the final exit-control fix; same XR and recording behaviors verified |
+| Visual inspection | Desktop 1440px and mobile 390px XR screenshots inspected; original decoded video frame contains artwork, text and draft watermark |
+| Independent review | No remaining Critical/Important source findings; did not claim hardware/provider validation |
 
-The recording test uses a **synthetic Chromium microphone**, while canvas rendering, MediaRecorder encoding, video decoding/playback and file download are real. It observed 720×1280 decoded video, nonempty WebM bytes and one decoded audio track. A decoded PNG frame was visually inspected: the textile artwork, text and encoded draft watermark are present (not a blank/black video). The actual `.webm` and decoded frame remain in ignored `test-results/` for this run. Optional bundled Playwright FFmpeg inspection reported VP8 video and mono 48 kHz Opus audio; its minimal build lacks the requested null muxer, so that standalone decode command failed and is not counted as verification. Successful media decoding/playback evidence comes from Chromium. The 30 fps setting is a configured target, not a measured sustained frame rate. Elapsed-to-ready includes encoder finalization, not exact encoded media duration.
+Sandbox execution note: installation used the host pnpm store. Sandboxed pnpm commands discover a different writable store and attempted an unnecessary automatic reinstall. Checks used the session-only `pnpm_config_verify_deps_before_run=false` environment override after successful installation. This does not change repository settings, lockfile verification or supply-chain policies. A first large-package download timed out; the longer-timeout retry succeeded. Initial new browser/CLI assertions were corrected for actual capability copy and pnpm's script logging, then rerun.
 
-Auth integration tests mock only Clerk identity/network boundaries and replace the connection provider with PGlite; actual route/repository SQL runs against PostgreSQL. This proves application authorization logic, not live Clerk token verification or a live Neon connection. The actual Clerk code path uses the SDK and has no public test-auth bypass.
+Project integration tests mock Clerk identity/network and use real repository/route SQL against PGlite PostgreSQL. They cover cross-tenant denial, role changes, transactional rollback, concurrent budget enforcement, origin/content-type/body bounds and malformed UTF-8 cleanup. They do not establish live Clerk token verification or a remote Neon connection.
 
-Bugs found and corrected during verification: StrictMode remount lost the WebGL context; reused WebGL pixel-store state caused initialization warnings (now reset on disposal); missing link-navigation warning for local takes; operation IDs accepted by shared schemas were rejected by UUID database columns; an asset could reference an upload grant from another project. Regressions cover these paths.
+XR session lifecycle tests use simulated browser/renderer boundaries to exercise request rejection, retry, end, failed binding and late resolution after disposal. Desktop Chromium runs the actual A-Frame/WebGL renderer. Pixel checks reject blank output; tests also prove the parent document has no A-Frame custom element or AFRAME/THREE global and that navigation reopens exactly one scene. These checks cannot establish physical headset comfort, controller mapping or performance.
 
-Sandbox restrictions initially blocked local ports, browser launch and Turbopack worker ports; reruns with approved local-execution permissions succeeded. These were environment restrictions, not passed application checks. An initial lint configuration warning was corrected.
+The recording browser check uses a synthetic Chromium microphone with real rendering, MediaRecorder encoding, decoding/playback and file download. It observes nonempty 720×1280 media and an audio track, with actual artwork/watermark pixels. Synthetic input does not measure real microphone quality. Evidence images and media are ignored artifacts in `test-results/`.
 
-## Unconfigured / unverified / deferred
+## Open acceptance and later work
 
-- **Not deployed:** no remote repository, cloud deployment, Neon project, Clerk application or R2 bucket was created. The initial commit is local only.
-- **Clerk + Neon:** provide real Clerk publishable/secret keys, database URL, configure sign-in domains, and apply all three migrations to a development database. Live login, remote persistence and seed remain unverified.
-- **R2 / Sarvam / Gemini:** interfaces only; no live operation in M0. Storage CORS, upload/finalization, speech models/speakers, actual voice quality, structured model output and usage budgets are later integration gates.
-- **Physical Android/headset:** microphone quality, motion axes, stereo readability, codec behavior, encoding load, FPS, heat/battery and second-phone playback remain unverified. Synthetic input cannot establish them.
-- **M1 onward:** stereo/orientation/recenter, full preflight, scene edits/undo, VAD/voice, project editing/assignment UI, phone pairing, cloud media save/watch links, brand checks and client review are not active. No live model/media result, approval, analytics or provider success is simulated.
-- Local recording consent stays in page memory (version/time); durable authenticated session consent is implemented with the later studio session flow. Local media is lost on reload/navigation unless downloaded; no recovery is promised.
-- The draft watermark is burned into the file. Approval cannot remove encoded pixels. A future clean export requires a new verified render.
-
-## Exact Android checks
-
-1. Deploy this code to a selected Vercel HTTPS preview; use `https://<preview-host>/studio/feasibility` on Android Chrome. An HTTP LAN IP does not satisfy protected-browser API requirements.
-2. Keep the phone outside a headset. Confirm readiness, accept the local microphone disclosure, tap **Record 5-second test**, grant microphone access and speak.
-3. Let the timer stop; play the local result with sound. Check encoded dimensions, actual MIME/extension and visible watermark, then download before leaving.
-4. Repeat a 15-second take and manual stop. Test denied permission, backgrounding during a take, retry and download playback on a second phone. Record real device/browser versions and outcomes; do not mark unperformed tests passed.
-
-Full instructions and recovery: [DEMO_RUNBOOK.md](DEMO_RUNBOOK.md). Setup and exact commands: [README.md](../README.md).
+- **Live Clerk/Neon:** configure credentials and allowed domains, apply the three existing migrations to a development database, then test real sign-in, create/edit/reload, client read-only access and unrelated-user denial. There is no public authentication bypass.
+- **Physical headset:** on HTTPS, verify entry/exit, parent-button activation reaching the same-origin XR frame, head tracking, both controller rays, reconnect, seated/standing comfort, errors, session teardown and sustained performance. Follow [the runbook](DEMO_RUNBOOK.md); leave outcomes unverified until performed.
+- **Physical Android:** original recording codec, microphone, heat and second-device playback acceptance remains open.
+- **Phase 2 onward:** object placement/manipulation, persistent scenes, uploads/assets, creative tools, AI/voice, review and collaboration remain deferred. R2/Sarvam/Gemini interfaces are not live integrations. No fake save, generated result, approval or metric is supplied.
+- **Hosting/CI:** no deployment or cloud resource was created. The new workflow has local-equivalent verification but has not yet run on GitHub for this branch.
 
 ## Repository handoff
 
-Initialized Git on `main` and created the requested initial local commit containing M0, the lockfile, migrations, documentation and tests. No remote/push was performed.
+Initial M0 commit `a1b8dc02b01244623916fa3c5493955eb762afce` exists on `main` and was pushed to `https://github.com/RaunakKanoji/bolo-verse.git` during the prior handoff. Phase 1 is retained on local branch `feat/xr-foundation`; its handoff includes the implementation, pnpm lockfile, tests, tracker and documentation. No Phase 1 push or deployment is claimed.
 
-## Milestone handoff
-
-M0 code is implemented and locally verifiable; live cloud/physical-device acceptance is explicitly open. Next is **M1 — stereo studio**, only after the user says `next`.
+Next scope is **Phase 2 — spatial workspace**. Stop at this phase boundary until the user asks to continue.
