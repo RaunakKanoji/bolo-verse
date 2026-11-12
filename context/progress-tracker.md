@@ -1,6 +1,22 @@
 # Shape Studio progress tracker
 
-Updated 12 November 2026 (Asia/Kolkata). Current scope: subsequent three-application restructuring after completed Phase 0 audit and Phase 1 monorepo foundation from the [unified platform prompt](../docs/product/UNIFIED_PLATFORM_SPEC.md). See the [system overview](../docs/architecture/system-overview.md) and [committed plan](../docs/superpowers/plans/2026-11-12-unified-monorepo-foundation.md).
+Updated 12 November 2026 (Asia/Kolkata). Current scope: integration of the completed web, browser spatial and native increments into local `main`, following the Phase 0 audit and Phase 1 monorepo foundation from the [unified platform prompt](../docs/product/UNIFIED_PLATFORM_SPEC.md). See the [system overview](../docs/architecture/system-overview.md) and [committed plan](../docs/superpowers/plans/2026-11-12-unified-monorepo-foundation.md).
+
+## Main integration — 12 November 2026
+
+All five completed development branches are merged into local `main` in dependency order, with separate merge commits and their original commits preserved. The feature branches and the separate native worktree remain available.
+
+| Development branch | Merge commit |
+| --- | --- |
+| `feat/xr-foundation` | `300a7a0` |
+| `feat/shape-studio-foundation` | `9b92815` |
+| `feat/shape-spatial-native` | `47ed694` |
+| `feat/unified-monorepo-foundation` | `0c6d782` |
+| `feat/three-application-spatial-editor` | `b061639` |
+
+The merged file tree exactly matches verified feature commit `4b2f93d` before this documentation update. Fresh pre-merge `pnpm check` passed all 14 tasks, 445 tests in 43 files and both production builds. Post-merge `pnpm test` independently passed all 445 tests on `main`. All 48 Swift core tests in nine suites passed on the same native source state. The checked-in Xcode project also compiled successfully on merged `main` for the generic visionOS Simulator target with signing disabled; this was a build, not an app interaction or physical-device test. The 43 production Chromium cases and Swift contract fixtures remain recorded in the preceding commit-packaging verification; they were not rerun for this history-only integration.
+
+No caches, generated build output, credentials or private media were committed. No remote push, live migration, provider call or deployment was performed. Existing live-service, native accessibility and physical-device acceptance gates remain open.
 
 ## Development startup recovery — 12 November 2026
 
