@@ -1,6 +1,6 @@
 # Shared scene format
 
-The pure [scene-schema package](../../packages/scene-schema/src/index.ts) owns canonical v1 validation and orientation conversion. Existing callers retain the compatibility import at `src/lib/contracts/spatial-scene.ts`. Neither location may import a renderer, browser API, database or authentication runtime.
+The pure [scene-schema package](../../packages/scene-schema/src/index.ts) owns canonical v1 validation and orientation conversion. Existing callers retain the compatibility import at `apps/web/src/lib/contracts/spatial-scene.ts`. Neither location may import a renderer, browser API, database or authentication runtime.
 
 Canonical document shape:
 
@@ -25,7 +25,7 @@ Strict validation rejects unknown fields, duplicate object IDs, nonfinite number
 
 `GET/PUT /api/v1/projects/{projectId}/spatial-scene` return a snapshot with `projectId`, `sceneId`, `revision`, `document`, `updatedAt` and `canEdit`. PUT accepts `{expectedRevision, document}`. An unsaved authorized scene reads as revision 0 with no objects. Save revision is not the document's `version`; stale writes return a conflict while clients retain local changes.
 
-The [repository](../../src/server/db/spatial-scenes.ts) checks project roles and every referenced ready asset in the SQL write. Metadata contains asset IDs, never object-storage keys or arbitrary content URLs.
+The [repository](../../apps/web/src/server/db/spatial-scenes.ts) checks project roles and every referenced ready asset in the SQL write. Metadata contains asset IDs, never object-storage keys or arbitrary content URLs.
 
 Three formats currently coexist intentionally: canonical quaternion scenes in `spatial_scenes`, legacy A-Frame Euler layouts in `xr_workspaces`, and session recording documents in `scene_state`. Pure Euler/quaternion helpers do not migrate or overwrite saved layouts. A shared project identity does not yet imply all renderers edit the same scene document.
 

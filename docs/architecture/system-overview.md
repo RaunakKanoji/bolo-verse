@@ -8,13 +8,15 @@ One Next.js modular backend serves the conventional web UI, isolated A-Frame bro
 
 ```mermaid
 flowchart LR
-  Web[Root Next app and backend] --> Scene["@shape/scene-schema"]
+  Web[apps/web Next gateway and backend] --> Scene["@shape/scene-schema"]
   Web --> TS["@shape/typescript-config"]
   Web --> Lint["@shape/eslint-config"]
   Scene --> TS
   Scene --> Lint
   Web --> API[Authorized v1 API]
-  Native[Native SwiftUI / RealityKit] --> API
+  Spatial[apps/spatial-web R3F desktop editor] --> API
+  Spatial --> Scene
+  Native[apps/visionos SwiftUI / RealityKit] --> API
   API --> DB[Neon / Drizzle repositories]
   API --> Storage[Bounded private R2 proxies]
   Registry[Strict shared contracts] --> OpenAPI[Generated OpenAPI and TS/Swift]
@@ -28,9 +30,11 @@ The three JavaScript packages have actual consumers and explicit `workspace:*` d
 
 ## Directory evolution
 
-Today the working Next app remains at `src/`, with root configs, tests and deployment entry points. The native app remains at `apps/visionos`. Shared tooling and scene schemas are real workspace packages. Turbo registers root tasks for incremental adoption; root `dev`, `build`, `test` and database commands remain compatible.
+The web application and authoritative modular backend live in `apps/web`. The independently built Next application in `apps/spatial-web` provides the canonical desktop editor. The existing Xcode app remains in `apps/visionos`, independent of pnpm. Shared tooling and scene schemas remain consumed workspace packages; API/token outputs remain language-neutral artifacts.
 
-The eventual layout is `apps/web`, `apps/spatial-web`, `apps/visionos`, consumed shared packages and justified worker runtimes. Move the root web app when a functional R3F client slice makes that boundary useful, with explicit environment/test/deployment migration. Do not add wrapper-only application manifests, empty realtime services or unused domain packages. [Decision record](../adr/0001-incremental-workspace.md).
+The web application is the same-origin gateway. `/workspace` and `/workspace/:projectId` route to spatial-web; `/spatial-static/*` serves that app's collision-free Next assets. All existing `/api/*`, `/app/*`, `/studio/*`, `/xr/*`, public media and A-Frame vendor routes remain web-owned. Cross-application links perform full navigation. Spatial SSR forwards session transport to a configured web API origin with no-store fetches; API authorization remains authoritative. Browser writes and asset fetches stay relative to the public gateway origin.
+
+Root `dev/start` starts and tears down both browser servers, `build` builds both, and `check` runs the shared validation graph. See [ADR 0004](../adr/0004-three-application-boundaries.md) and [setup/deployment](../development/local-setup.md). No empty domain packages or independent duplicate backend are introduced.
 
 ## Domain and interface boundaries
 

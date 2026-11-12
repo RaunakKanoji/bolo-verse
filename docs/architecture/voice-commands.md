@@ -1,13 +1,13 @@
 # Voice and AI command boundaries
 
-The browser XR implementation has explicit microphone consent, capture ownership, transcription/listening feedback and cleanup. [Sarvam speech adapters](../../src/server/providers/xr-speech.ts) and the [Gemini assistant adapter](../../src/server/providers/xr-assistant.ts) execute server-side. Live credentials/provider behavior remain separate acceptance gates.
+The browser XR implementation has explicit microphone consent, capture ownership, transcription/listening feedback and cleanup. [Sarvam speech adapters](../../apps/web/src/server/providers/xr-speech.ts) and the [Gemini assistant adapter](../../apps/web/src/server/providers/xr-assistant.ts) execute server-side. Live credentials/provider behavior remain separate acceptance gates.
 
-Existing private routes are `/api/xr/assistant/{projectId}`, `/transcribe` and `/speak`. Their [application service](../../src/server/xr-assistant/service.ts) authorizes creator/editor access, resolves project context and applies a shared durable request budget before provider calls. Native voice/conversation is not connected to these routes and has no microphone capture implementation yet.
+Existing private routes are `/api/xr/assistant/{projectId}`, `/transcribe` and `/speak`. Their [application service](../../apps/web/src/server/xr-assistant/service.ts) authorizes creator/editor access, resolves project context and applies a shared durable request budget before provider calls. Native voice/conversation is not connected to these routes and has no microphone capture implementation yet.
 
 Two command families currently exist:
 
-- `src/lib/contracts/commands.ts`: bounded recording/product commands in a versioned envelope with request ID and expected scene revision.
-- `src/lib/contracts/xr-assistant.ts`: XR proposals `OPEN_ASSET`, `FOCUS_PANEL`, `RESET_WORKSPACE` and `GENERATE_IDEAS`. Validation checks both shape and the exact authorized project/asset/panel set.
+- `apps/web/src/lib/contracts/commands.ts`: bounded recording/product commands in a versioned envelope with request ID and expected scene revision.
+- `apps/web/src/lib/contracts/xr-assistant.ts`: XR proposals `OPEN_ASSET`, `FOCUS_PANEL`, `RESET_WORKSPACE` and `GENERATE_IDEAS`. Validation checks both shape and the exact authorized project/asset/panel set.
 
 These families are not a completed cross-platform registry. Existing browser proposals require explicit application; destructive reset requires confirmation. No path executes arbitrary model-generated code. Raw command audio is not persisted by the current speech request path.
 

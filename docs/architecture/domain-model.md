@@ -1,6 +1,6 @@
 # Domain model
 
-Phase 1 preserves the existing modular backend and 22-table schema. The source of truth is [Drizzle schema](../../src/server/db/schema.ts), with checked-in migrations `0000–0005`. Workspace packaging does not require a new database migration.
+Phase 1 preserves the existing modular backend and 22-table schema. The source of truth is [Drizzle schema](../../apps/web/src/server/db/schema.ts), with checked-in migrations `0000–0005`. Workspace packaging does not require a new database migration.
 
 | Responsibility | Implemented tables |
 | --- | --- |
@@ -20,13 +20,13 @@ Phase 1 preserves the existing modular backend and 22-table schema. The source o
 
 Clerk owns account identity; persisted subjects are text, while application resources generally use UUIDs. There is no local `users` or Clerk Organizations administration table. A personal workspace has one `personal_owner_clerk_id`; it must not be relabelled as a full organization model.
 
-Projects inherit workspace ownership and may grant explicit `creator`, `editor` or `client` membership. Workspace owners and project creators/editors can edit; explicit project members can read. Ordinary workspace membership alone does not expose every project. [SQL authorization predicates](../../src/server/db/projects.ts) enforce these rules on the server.
+Projects inherit workspace ownership and may grant explicit `creator`, `editor` or `client` membership. Workspace owners and project creators/editors can edit; explicit project members can read. Ordinary workspace membership alone does not expose every project. [SQL authorization predicates](../../apps/web/src/server/db/projects.ts) enforce these rules on the server.
 
 Project-scoped composite foreign keys prevent cross-project references between briefs, artifacts, assets and outputs. Drafts additionally belong to one Clerk subject within the project. Review decisions reject UPDATE/DELETE through migration 0004; append new decisions to preserve history.
 
 Canonical scenes use revision-checked writes and ready assets from the same project. Their schema version is independent of the database revision. See [scene format](scene-format.md) for the distinction from existing browser and recording layouts.
 
-Schema presence is not feature completion. Processing-job and review records do not establish a media-generation worker, a complete client portal or upload-finalization workflow. The current functional repositories are under `src/server/db`; application orchestration is extracted into focused services where needed, such as `src/server/xr-assistant/service.ts`.
+Schema presence is not feature completion. Processing-job and review records do not establish a media-generation worker, a complete client portal or upload-finalization workflow. The current functional repositories are under `apps/web/src/server/db`; application orchestration is extracted into focused services where needed, such as `apps/web/src/server/xr-assistant/service.ts`.
 
 The development [seed command](../../scripts/seed.ts) explicitly resolves an existing Clerk account before creating a labelled fictional project, proposed brief and draft artifacts. Normal startup does not insert synthetic client approvals, generated assets or sample projects.
 
