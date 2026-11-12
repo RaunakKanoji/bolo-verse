@@ -1,6 +1,6 @@
 # UI context
 
-Light mode is primary: soft canvas, frosted surfaces, lavender selection, subtle borders, readable type and generous spacing. Semantic tokens originate in `packages/design-tokens/tokens.json`, generate CSS/Swift constants, and include dark appearance. Native views will use system materials rather than CSS blur replicas.
+Light mode is primary: soft canvas, frosted surfaces, lavender selection, subtle borders, readable type and generous spacing. Semantic tokens originate in `packages/design-tokens/tokens.json`, generate CSS/Swift constants, and include dark appearance. Native views use system materials/typography with shared accents, radii and spacing; volumes and immersive studies use native gaze/pinch targeting without raw tracking access.
 
 The web creative playground has a narrow tools rail, floating primary navigation and controls / preview / editing columns. Narrow layouts must preserve draft/edit state, keep controls reachable and avoid page overflow. Icon-only links retain accessible names. Respect reduced motion and keyboard focus. Alt+1…4 navigate outside editable fields.
 

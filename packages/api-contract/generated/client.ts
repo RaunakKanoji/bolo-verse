@@ -17,6 +17,12 @@ export function createShapeClient(fetcher: typeof fetch = fetch) {
     return payload as T;
   }
   return {
+    getSpatialScene(projectId: string, signal?: AbortSignal): Promise<Models.SpatialSceneResponse> {
+      return request(`/api/v1/projects/${encodeURIComponent(projectId)}/spatial-scene`, { method: "GET", signal });
+    },
+    saveSpatialScene(projectId: string, body: Models.SaveSpatialScene, signal?: AbortSignal): Promise<Models.SpatialSceneResponse> {
+      return request(`/api/v1/projects/${encodeURIComponent(projectId)}/spatial-scene`, { method: "PUT", signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    },
     getCreativeCapabilities(signal?: AbortSignal): Promise<Models.CreativeCapabilitiesResponse> {
       return request(`/api/v1/capabilities`, { method: "GET", signal });
     },

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { ApiErrorSchema, RequestIdSchema, ResourceIdSchema } from "./api";
 import { CreateProjectSchema, UpdateProjectSchema } from "./projects";
+import { CanonicalSpatialObjectSchema, CanonicalSpatialSceneSchema, SpatialSceneSnapshotSchema, SpatialSceneResultSchema, SaveSpatialSceneSchema } from "./spatial-scene";
 
 export const creativePromptLimit = 2000;
 export const CreativeModeSchema = z.enum(["image", "video", "audio", "model3d"]);
@@ -64,6 +65,8 @@ export const AssetSummarySchema = z.strictObject({
   height: z.int().positive().nullable(),
   durationSeconds: z.number().nonnegative().nullable(),
   createdAt: z.iso.datetime(),
+  nativeContentUrl: z.string().regex(/^\/api\/v1\/assets\/[0-9a-f-]{36}\/native-content$/).nullable()
+    .describe("Authenticated native USDZ download for model/vnd.usdz+zip assets up to 32 MiB; otherwise null. The server validates archive and texture bounds before delivery; no conversion or upload is provided."),
   contentUrl: z.string().regex(/^\/api\/v1\/assets\/[0-9a-f-]{36}\/content$/).nullable()
     .describe("Authenticated browser preview URL for supported MIME types up to 20 MiB; otherwise null. Not a general asset download."),
 });
@@ -78,10 +81,17 @@ export const ProjectDetailResponseSchema = successEnvelope(ProjectDetailSchema);
 export const AssetListResponseSchema = successEnvelope(AssetListSchema);
 export const CreativeDraftResponseSchema = successEnvelope(CreativeDraftResultSchema);
 export const CreativeCapabilitiesResponseSchema = successEnvelope(CreativeCapabilitiesSchema);
+export const SpatialSceneResponseSchema = successEnvelope(SpatialSceneResultSchema);
 export const ShapeErrorResponseSchema = z.strictObject({ ok: z.literal(false), error: ApiErrorSchema, requestId: RequestIdSchema });
 
 /** Source registry for the language-neutral OpenAPI artifact and generated clients. */
 export const ShapeApiSchemas = {
+  CanonicalSpatialObject: CanonicalSpatialObjectSchema,
+  CanonicalSpatialScene: CanonicalSpatialSceneSchema,
+  SpatialSceneSnapshot: SpatialSceneSnapshotSchema,
+  SpatialSceneResult: SpatialSceneResultSchema,
+  SaveSpatialScene: SaveSpatialSceneSchema,
+  SpatialSceneResponse: SpatialSceneResponseSchema,
   CreativeMode: CreativeModeSchema,
   CreativeDraftDocument: CreativeDraftDocumentSchema,
   CreativeDraftSnapshot: CreativeDraftSnapshotSchema,
@@ -106,6 +116,8 @@ export const ShapeApiSchemas = {
 } as const;
 
 export const ShapeApiOperations = [
+  { operationId: "getSpatialScene", method: "get", path: "/api/v1/projects/{projectId}/spatial-scene", responseSchema: "SpatialSceneResponse", summary: "Read the authorized canonical project scene", security: "session", pathParameters: ["projectId"] },
+  { operationId: "saveSpatialScene", method: "put", path: "/api/v1/projects/{projectId}/spatial-scene", responseSchema: "SpatialSceneResponse", requestSchema: "SaveSpatialScene", summary: "Save a canonical scene with an expected revision", security: "session", pathParameters: ["projectId"] },
   { operationId: "getCreativeCapabilities", method: "get", path: "/api/v1/capabilities", responseSchema: "CreativeCapabilitiesResponse", summary: "Read implemented creative-generation capabilities", security: "public" },
   { operationId: "listProjects", method: "get", path: "/api/v1/projects", responseSchema: "ProjectListResponse", summary: "List authorized projects", security: "session" },
   { operationId: "createProject", method: "post", path: "/api/v1/projects", responseSchema: "ProjectDetailResponse", requestSchema: "CreateProject", summary: "Create a project in the personal workspace", security: "session", successStatus: 201 },

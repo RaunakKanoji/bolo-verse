@@ -1,0 +1,4 @@
+// Public app configuration only. Never place provider or Clerk server keys here.
+SHAPE_API_BASE_URL =
+SHAPE_CLERK_PUBLISHABLE_KEY =
+#include? "Local.xcconfig"

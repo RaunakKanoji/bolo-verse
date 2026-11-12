@@ -6,6 +6,10 @@ public enum ShapeAPIRoutes {
   private static func segment(_ value: String) -> String {
     value.addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~"))!
   }
+  /// GET; response: SpatialSceneResponse.
+  public static func getSpatialScene(projectId: String) -> String { "/api/v1/projects/\(segment(projectId))/spatial-scene" }
+  /// PUT; response: SpatialSceneResponse; body: SaveSpatialScene.
+  public static func saveSpatialScene(projectId: String) -> String { "/api/v1/projects/\(segment(projectId))/spatial-scene" }
   /// GET; response: CreativeCapabilitiesResponse.
   public static func getCreativeCapabilities() -> String { "/api/v1/capabilities" }
   /// GET; response: ProjectListResponse.

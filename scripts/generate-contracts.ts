@@ -19,7 +19,7 @@ for (const operation of ShapeApiOperations) {
   if (paths[info.path][info.method]) throw new Error(`Duplicate operation: ${info.method} ${info.path}`);
   paths[info.path][info.method] = {
     operationId: info.operationId, summary: info.summary,
-    security: info.security === "public" ? [] : [{ ClerkSession: [] }],
+    security: info.security === "public" ? [] : [{ ClerkSession: [] }, { ClerkBearerSession: [] }],
     ...(info.pathParameters?.length ? { parameters: info.pathParameters.map((parameter) => ({ name: parameter, in: "path", required: true, schema: { type: "string", format: "uuid" } })) } : {}),
     ...(info.requestSchema ? { requestBody: { required: true, content: { "application/json": { schema: ref(info.requestSchema) } } } } : {}),
     responses: {
@@ -30,8 +30,8 @@ for (const operation of ShapeApiOperations) {
 }
 const openapi = {
   openapi: "3.1.0", jsonSchemaDialect: "https://json-schema.org/draft/2020-12/schema",
-  info: { title: "Shape Studio shared API", version: "1.0.0", description: "Implemented v1 JSON operations. Authentication is the existing Clerk web session; native authentication is not implemented. Binary media responses are documented separately." },
-  paths, components: { securitySchemes: { ClerkSession: { type: "apiKey", in: "cookie", name: "__session", description: "Clerk validated session with server authorization; browser writes also require a trusted Origin." } }, schemas },
+  info: { title: "Shape Studio shared API", version: "1.0.0", description: "Implemented v1 JSON operations. Authentication uses Clerk browser sessions or verified native session bearer JWTs; cookie mutations require trusted Origin, and supplied Origin must always be trusted. Binary media responses are documented separately." },
+  paths, components: { securitySchemes: { ClerkSession: { type: "apiKey", in: "cookie", name: "__session", description: "Clerk validated session with server authorization; browser writes also require a trusted Origin." }, ClerkBearerSession: { type: "http", scheme: "bearer", bearerFormat: "JWT", description: "Clerk session JWT for this instance. OAuth/machine tokens are not accepted; native tokens may omit Origin. Any supplied Origin must be trusted." } }, schemas },
 };
 const published = `${JSON.stringify(openapi, null, 2)}\n`;
 // Both language outputs consume this exact serialized OpenAPI artifact, never Zod internals.

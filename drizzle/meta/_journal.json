@@ -36,6 +36,13 @@
       "when": 1794478245001,
       "tag": "0004_creative_drafts",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794486781601,
+      "tag": "0005_spatial_scenes",
+      "breakpoints": true
     }
   ]
 }

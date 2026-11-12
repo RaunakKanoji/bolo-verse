@@ -15,7 +15,7 @@ const databaseUrl = z.preprocess(blankToUndefined, z.url({ protocol: /^postgres(
 const ServerEnvSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.preprocess(blankToUndefined, origin.default("http://localhost:3000")),
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: optionalText,
-  CLERK_SECRET_KEY: optionalText, CLERK_WEBHOOK_SIGNING_SECRET: optionalText,
+  CLERK_SECRET_KEY: optionalText, CLERK_WEBHOOK_SIGNING_SECRET: optionalText, CLERK_JWT_KEY: optionalText,
   DATABASE_URL: databaseUrl, DATABASE_MIGRATION_URL: databaseUrl,
   R2_ACCOUNT_ID: optionalText, R2_ACCESS_KEY_ID: optionalText,
   R2_SECRET_ACCESS_KEY: optionalText, R2_BUCKET: optionalText,

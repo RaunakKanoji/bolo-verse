@@ -1,6 +1,112 @@
 // Generated from openapi.json. Do not edit.
 // DTO types only; server Zod schemas enforce constraints.
 
+export type CanonicalSpatialObject = {
+  id: string;
+  assetId: string;
+  position: [number, number, number];
+  rotation: [number, number, number, number];
+  scale: [number, number, number];
+  visible: boolean;
+};
+
+export type CanonicalSpatialScene = {
+  sceneId: string;
+  version: 1;
+  objects: Array<{
+  id: string;
+  assetId: string;
+  position: [number, number, number];
+  rotation: [number, number, number, number];
+  scale: [number, number, number];
+  visible: boolean;
+}>;
+};
+
+export type SpatialSceneSnapshot = {
+  projectId: string;
+  sceneId: string;
+  revision: number;
+  document: {
+  sceneId: string;
+  version: 1;
+  objects: Array<{
+  id: string;
+  assetId: string;
+  position: [number, number, number];
+  rotation: [number, number, number, number];
+  scale: [number, number, number];
+  visible: boolean;
+}>;
+};
+  updatedAt: (string | null);
+  canEdit: boolean;
+};
+
+export type SpatialSceneResult = {
+  scene: {
+  projectId: string;
+  sceneId: string;
+  revision: number;
+  document: {
+  sceneId: string;
+  version: 1;
+  objects: Array<{
+  id: string;
+  assetId: string;
+  position: [number, number, number];
+  rotation: [number, number, number, number];
+  scale: [number, number, number];
+  visible: boolean;
+}>;
+};
+  updatedAt: (string | null);
+  canEdit: boolean;
+};
+};
+
+export type SaveSpatialScene = {
+  expectedRevision: number;
+  document: {
+  sceneId: string;
+  version: 1;
+  objects: Array<{
+  id: string;
+  assetId: string;
+  position: [number, number, number];
+  rotation: [number, number, number, number];
+  scale: [number, number, number];
+  visible: boolean;
+}>;
+};
+};
+
+export type SpatialSceneResponse = {
+  ok: true;
+  data: {
+  scene: {
+  projectId: string;
+  sceneId: string;
+  revision: number;
+  document: {
+  sceneId: string;
+  version: 1;
+  objects: Array<{
+  id: string;
+  assetId: string;
+  position: [number, number, number];
+  rotation: [number, number, number, number];
+  scale: [number, number, number];
+  visible: boolean;
+}>;
+};
+  updatedAt: (string | null);
+  canEdit: boolean;
+};
+};
+  requestId: string;
+};
+
 export type CreativeMode = "image" | "video" | "audio" | "model3d";
 
 export type CreativeDraftDocument = {
@@ -122,6 +228,7 @@ export type AssetSummary = {
   height: (number | null);
   durationSeconds: (number | null);
   createdAt: string;
+  nativeContentUrl: (string | null);
   contentUrl: (string | null);
 };
 
@@ -135,6 +242,7 @@ export type AssetList = {
   height: (number | null);
   durationSeconds: (number | null);
   createdAt: string;
+  nativeContentUrl: (string | null);
   contentUrl: (string | null);
 }>;
   hasMore: boolean;
@@ -196,6 +304,7 @@ export type AssetListResponse = {
   height: (number | null);
   durationSeconds: (number | null);
   createdAt: string;
+  nativeContentUrl: (string | null);
   contentUrl: (string | null);
 }>;
   hasMore: boolean;

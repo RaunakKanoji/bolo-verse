@@ -15,7 +15,8 @@ export const CanonicalSpatialObjectSchema = z.strictObject({
 });
 export const CanonicalSpatialSceneSchema = z.strictObject({
   sceneId: z.uuid(), version: z.literal(1), objects: z.array(CanonicalSpatialObjectSchema).max(50),
-}).refine(({ objects }) => new Set(objects.map(({ id }) => id)).size === objects.length, "Object IDs must be unique.");
+}).refine(({ objects }) => new Set(objects.map(({ id }) => id)).size === objects.length, "Object IDs must be unique.")
+  .describe("Canonical scene schema version 1: metres, right-handed +Y up, -Z forward, local XYZW unit quaternion rotation; scale is dimensionless. This version field is not a save revision.");
 export type QuaternionXYZW = z.infer<typeof QuaternionXYZWSchema>;
 export type CanonicalSpatialScene = z.infer<typeof CanonicalSpatialSceneSchema>;
 
@@ -41,3 +42,15 @@ export function quaternionToEulerXYZDegrees(input: QuaternionXYZW): [number, num
     : [Math.atan2(m32, m22), Math.asin(Math.max(-1, Math.min(1, m13))), 0];
   return angles.map((angle) => angle * 180 / Math.PI) as [number, number, number];
 }
+
+/** One canonical scene per project. Its stable sceneId is the project UUID. */
+export const SpatialSceneSnapshotSchema = z.strictObject({
+  projectId: z.uuid(), sceneId: z.uuid(), revision: z.int().min(0).max(2_147_483_647),
+  document: CanonicalSpatialSceneSchema, updatedAt: z.iso.datetime().nullable(), canEdit: z.boolean(),
+});
+export type SpatialSceneSnapshot = z.infer<typeof SpatialSceneSnapshotSchema>;
+export const SaveSpatialSceneSchema = z.strictObject({
+  expectedRevision: z.int().min(0).max(2_147_483_646), document: CanonicalSpatialSceneSchema,
+});
+export type SaveSpatialScene = z.infer<typeof SaveSpatialSceneSchema>;
+export const SpatialSceneResultSchema = z.strictObject({ scene: SpatialSceneSnapshotSchema });

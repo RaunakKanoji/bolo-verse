@@ -1,6 +1,6 @@
 # Shape Studio · Creative Workspace
 
-An incremental web and native spatial foundation for creative production. The [Shape Studio audit and plan](docs/shape-studio/phase-0-plan.md) scopes this delivery to shared contracts, private project drafts, semantic tokens and the initial four-mode web playground. Existing projects, browser XR, text/speech adapters and recording tools remain available. The native Xcode application and functional media generation are later phases.
+An incremental web and native spatial foundation for creative production. The initial [audit and plan](docs/shape-studio/phase-0-plan.md) established shared contracts, private drafts, tokens and the four-mode web playground. The [native app](apps/visionos/README.md) now adds SwiftUI windows, RealityKit volumes, authorized services and scene persistence. Existing browser XR, text/speech adapters and recording tools remain available. Functional media generation and full collaboration remain later phases.
 
 ## Run locally
 

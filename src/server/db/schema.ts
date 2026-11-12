@@ -10,6 +10,7 @@ import type {
 } from "@/lib/contracts";
 import type { XRLayout } from "@/lib/contracts/xr-workspace";
 import type { CreativeDraftDocument } from "@/lib/contracts/shape";
+import type { CanonicalSpatialScene } from "@/lib/contracts/spatial-scene";
 
 // UUIDs identify application resources; Clerk subjects deliberately remain text.
 const id = () => uuid("id").defaultRandom().primaryKey();
@@ -77,6 +78,20 @@ export const creativeDrafts = pgTable("creative_drafts", {
   unique("creative_drafts_project_owner_uq").on(table.projectId, table.ownerClerkId),
   check("creative_draft_revision_positive", sql`${table.revision} > 0`),
   check("creative_draft_document_version", sql`COALESCE(${table.document}->>'schemaVersion' = '1', false)`),
+]);
+
+// Canonical quaternion scenes are distinct from legacy Euler XR/recording state.
+export const spatialScenes = pgTable("spatial_scenes", {
+  projectId: uuid("project_id").primaryKey().references(() => projects.id, { onDelete: "restrict" }),
+  sceneId: uuid("scene_id").notNull().unique(),
+  revision: integer("revision").notNull(),
+  document: jsonb("document").$type<CanonicalSpatialScene>().notNull(),
+  createdAt: createdAt(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  check("spatial_scene_revision_positive", sql`${table.revision} > 0`),
+  check("spatial_scene_stable_identity", sql`${table.sceneId} = ${table.projectId} AND COALESCE(${table.document}->>'sceneId' = ${table.sceneId}::text, false)`),
+  check("spatial_scene_document_version", sql`COALESCE(${table.document}->>'version' = '1', false)`),
 ]);
 
 export const briefVersions = pgTable("brief_versions", {

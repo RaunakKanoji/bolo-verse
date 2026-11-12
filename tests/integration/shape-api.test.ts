@@ -79,7 +79,7 @@ describe("versioned Shape API", () => {
     expect((await response.json()).data.modes.every((mode: { availability: string }) => mode.availability === "not_implemented")).toBe(true);
   });
   it("projects safe authorized project fields on reads, creates and updates", async () => {
-    const result = ProjectListResponseSchema.parse(await (await LIST_PROJECTS()).json());
+    const result = ProjectListResponseSchema.parse(await (await LIST_PROJECTS(read())).json());
     expect(result.data.projects.map((project) => project.id)).toEqual([projectId]);
     expect(Object.keys(result.data.projects[0]).sort()).toEqual(["createdAt", "id", "name", "objective", "sample"]);
     const created = await CREATE_PROJECT(write({ name: "New project", objective: "A new campaign" }, "POST"));

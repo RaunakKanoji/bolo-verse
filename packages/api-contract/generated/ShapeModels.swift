@@ -9,6 +9,851 @@ private struct ShapeAnyCodingKey: CodingKey {
   init?(intValue: Int) { return nil }
 }
 
+public struct CanonicalSpatialObject: Codable, Sendable {
+  public var `id`: String
+  public var `assetId`: String
+  public var `position`: [Double]
+  public var `rotation`: [Double]
+  public var `scale`: [Double]
+  public var `visible`: Bool
+
+  public init(`id`: String, `assetId`: String, `position`: [Double], `rotation`: [Double], `scale`: [Double], `visible`: Bool) {
+    self.`id` = `id`
+    self.`assetId` = `assetId`
+    self.`position` = `position`
+    self.`rotation` = `rotation`
+    self.`scale` = `scale`
+    self.`visible` = `visible`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `assetId`
+    case `position`
+    case `rotation`
+    case `scale`
+    case `visible`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["id", "assetId", "position", "rotation", "scale", "visible"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown CanonicalSpatialObject property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`id` = try container.decode(String.self, forKey: .`id`)
+    self.`assetId` = try container.decode(String.self, forKey: .`assetId`)
+    self.`position` = try container.decode([Double].self, forKey: .`position`)
+    guard (self.`position`.count) == 3 else { throw DecodingError.dataCorruptedError(forKey: .`position`, in: container, debugDescription: "Expected exactly 3 vector components") }
+    self.`rotation` = try container.decode([Double].self, forKey: .`rotation`)
+    guard (self.`rotation`.count) == 4 else { throw DecodingError.dataCorruptedError(forKey: .`rotation`, in: container, debugDescription: "Expected exactly 4 vector components") }
+    self.`scale` = try container.decode([Double].self, forKey: .`scale`)
+    guard (self.`scale`.count) == 3 else { throw DecodingError.dataCorruptedError(forKey: .`scale`, in: container, debugDescription: "Expected exactly 3 vector components") }
+    self.`visible` = try container.decode(Bool.self, forKey: .`visible`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`id`, forKey: .`id`)
+    try container.encode(self.`assetId`, forKey: .`assetId`)
+    guard (self.`position`.count) == 3 else { throw EncodingError.invalidValue(self.`position` as Any, .init(codingPath: encoder.codingPath, debugDescription: "Expected exactly 3 vector components")) }
+    try container.encode(self.`position`, forKey: .`position`)
+    guard (self.`rotation`.count) == 4 else { throw EncodingError.invalidValue(self.`rotation` as Any, .init(codingPath: encoder.codingPath, debugDescription: "Expected exactly 4 vector components")) }
+    try container.encode(self.`rotation`, forKey: .`rotation`)
+    guard (self.`scale`.count) == 3 else { throw EncodingError.invalidValue(self.`scale` as Any, .init(codingPath: encoder.codingPath, debugDescription: "Expected exactly 3 vector components")) }
+    try container.encode(self.`scale`, forKey: .`scale`)
+    try container.encode(self.`visible`, forKey: .`visible`)
+  }
+}
+
+public enum CanonicalSpatialSceneVersion: Int, Codable, Sendable {
+  case `value1` = 1
+}
+
+public struct CanonicalSpatialSceneObjectsItem: Codable, Sendable {
+  public var `id`: String
+  public var `assetId`: String
+  public var `position`: [Double]
+  public var `rotation`: [Double]
+  public var `scale`: [Double]
+  public var `visible`: Bool
+
+  public init(`id`: String, `assetId`: String, `position`: [Double], `rotation`: [Double], `scale`: [Double], `visible`: Bool) {
+    self.`id` = `id`
+    self.`assetId` = `assetId`
+    self.`position` = `position`
+    self.`rotation` = `rotation`
+    self.`scale` = `scale`
+    self.`visible` = `visible`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `assetId`
+    case `position`
+    case `rotation`
+    case `scale`
+    case `visible`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["id", "assetId", "position", "rotation", "scale", "visible"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown CanonicalSpatialSceneObjectsItem property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`id` = try container.decode(String.self, forKey: .`id`)
+    self.`assetId` = try container.decode(String.self, forKey: .`assetId`)
+    self.`position` = try container.decode([Double].self, forKey: .`position`)
+    guard (self.`position`.count) == 3 else { throw DecodingError.dataCorruptedError(forKey: .`position`, in: container, debugDescription: "Expected exactly 3 vector components") }
+    self.`rotation` = try container.decode([Double].self, forKey: .`rotation`)
+    guard (self.`rotation`.count) == 4 else { throw DecodingError.dataCorruptedError(forKey: .`rotation`, in: container, debugDescription: "Expected exactly 4 vector components") }
+    self.`scale` = try container.decode([Double].self, forKey: .`scale`)
+    guard (self.`scale`.count) == 3 else { throw DecodingError.dataCorruptedError(forKey: .`scale`, in: container, debugDescription: "Expected exactly 3 vector components") }
+    self.`visible` = try container.decode(Bool.self, forKey: .`visible`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`id`, forKey: .`id`)
+    try container.encode(self.`assetId`, forKey: .`assetId`)
+    guard (self.`position`.count) == 3 else { throw EncodingError.invalidValue(self.`position` as Any, .init(codingPath: encoder.codingPath, debugDescription: "Expected exactly 3 vector components")) }
+    try container.encode(self.`position`, forKey: .`position`)
+    guard (self.`rotation`.count) == 4 else { throw EncodingError.invalidValue(self.`rotation` as Any, .init(codingPath: encoder.codingPath, debugDescription: "Expected exactly 4 vector components")) }
+    try container.encode(self.`rotation`, forKey: .`rotation`)
+    guard (self.`scale`.count) == 3 else { throw EncodingError.invalidValue(self.`scale` as Any, .init(codingPath: encoder.codingPath, debugDescription: "Expected exactly 3 vector components")) }
+    try container.encode(self.`scale`, forKey: .`scale`)
+    try container.encode(self.`visible`, forKey: .`visible`)
+  }
+}
+
+public struct CanonicalSpatialScene: Codable, Sendable {
+  public var `sceneId`: String
+  public var `version`: CanonicalSpatialSceneVersion
+  public var `objects`: [CanonicalSpatialSceneObjectsItem]
+
+  public init(`sceneId`: String, `version`: CanonicalSpatialSceneVersion, `objects`: [CanonicalSpatialSceneObjectsItem]) {
+    self.`sceneId` = `sceneId`
+    self.`version` = `version`
+    self.`objects` = `objects`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `sceneId`
+    case `version`
+    case `objects`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["sceneId", "version", "objects"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown CanonicalSpatialScene property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`sceneId` = try container.decode(String.self, forKey: .`sceneId`)
+    self.`version` = try container.decode(CanonicalSpatialSceneVersion.self, forKey: .`version`)
+    self.`objects` = try container.decode([CanonicalSpatialSceneObjectsItem].self, forKey: .`objects`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`sceneId`, forKey: .`sceneId`)
+    try container.encode(self.`version`, forKey: .`version`)
+    try container.encode(self.`objects`, forKey: .`objects`)
+  }
+}
+
+public enum SpatialSceneSnapshotDocumentVersion: Int, Codable, Sendable {
+  case `value1` = 1
+}
+
+public struct SpatialSceneSnapshotDocumentObjectsItem: Codable, Sendable {
+  public var `id`: String
+  public var `assetId`: String
+  public var `position`: [Double]
+  public var `rotation`: [Double]
+  public var `scale`: [Double]
+  public var `visible`: Bool
+
+  public init(`id`: String, `assetId`: String, `position`: [Double], `rotation`: [Double], `scale`: [Double], `visible`: Bool) {
+    self.`id` = `id`
+    self.`assetId` = `assetId`
+    self.`position` = `position`
+    self.`rotation` = `rotation`
+    self.`scale` = `scale`
+    self.`visible` = `visible`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `assetId`
+    case `position`
+    case `rotation`
+    case `scale`
+    case `visible`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["id", "assetId", "position", "rotation", "scale", "visible"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown SpatialSceneSnapshotDocumentObjectsItem property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`id` = try container.decode(String.self, forKey: .`id`)
+    self.`assetId` = try container.decode(String.self, forKey: .`assetId`)
+    self.`position` = try container.decode([Double].self, forKey: .`position`)
+    guard (self.`position`.count) == 3 else { throw DecodingError.dataCorruptedError(forKey: .`position`, in: container, debugDescription: "Expected exactly 3 vector components") }
+    self.`rotation` = try container.decode([Double].self, forKey: .`rotation`)
+    guard (self.`rotation`.count) == 4 else { throw DecodingError.dataCorruptedError(forKey: .`rotation`, in: container, debugDescription: "Expected exactly 4 vector components") }
+    self.`scale` = try container.decode([Double].self, forKey: .`scale`)
+    guard (self.`scale`.count) == 3 else { throw DecodingError.dataCorruptedError(forKey: .`scale`, in: container, debugDescription: "Expected exactly 3 vector components") }
+    self.`visible` = try container.decode(Bool.self, forKey: .`visible`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`id`, forKey: .`id`)
+    try container.encode(self.`assetId`, forKey: .`assetId`)
+    guard (self.`position`.count) == 3 else { throw EncodingError.invalidValue(self.`position` as Any, .init(codingPath: encoder.codingPath, debugDescription: "Expected exactly 3 vector components")) }
+    try container.encode(self.`position`, forKey: .`position`)
+    guard (self.`rotation`.count) == 4 else { throw EncodingError.invalidValue(self.`rotation` as Any, .init(codingPath: encoder.codingPath, debugDescription: "Expected exactly 4 vector components")) }
+    try container.encode(self.`rotation`, forKey: .`rotation`)
+    guard (self.`scale`.count) == 3 else { throw EncodingError.invalidValue(self.`scale` as Any, .init(codingPath: encoder.codingPath, debugDescription: "Expected exactly 3 vector components")) }
+    try container.encode(self.`scale`, forKey: .`scale`)
+    try container.encode(self.`visible`, forKey: .`visible`)
+  }
+}
+
+public struct SpatialSceneSnapshotDocument: Codable, Sendable {
+  public var `sceneId`: String
+  public var `version`: SpatialSceneSnapshotDocumentVersion
+  public var `objects`: [SpatialSceneSnapshotDocumentObjectsItem]
+
+  public init(`sceneId`: String, `version`: SpatialSceneSnapshotDocumentVersion, `objects`: [SpatialSceneSnapshotDocumentObjectsItem]) {
+    self.`sceneId` = `sceneId`
+    self.`version` = `version`
+    self.`objects` = `objects`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `sceneId`
+    case `version`
+    case `objects`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["sceneId", "version", "objects"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown SpatialSceneSnapshotDocument property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`sceneId` = try container.decode(String.self, forKey: .`sceneId`)
+    self.`version` = try container.decode(SpatialSceneSnapshotDocumentVersion.self, forKey: .`version`)
+    self.`objects` = try container.decode([SpatialSceneSnapshotDocumentObjectsItem].self, forKey: .`objects`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`sceneId`, forKey: .`sceneId`)
+    try container.encode(self.`version`, forKey: .`version`)
+    try container.encode(self.`objects`, forKey: .`objects`)
+  }
+}
+
+public struct SpatialSceneSnapshot: Codable, Sendable {
+  public var `projectId`: String
+  public var `sceneId`: String
+  public var `revision`: Int64
+  public var `document`: SpatialSceneSnapshotDocument
+  public var `updatedAt`: String?
+  public var `canEdit`: Bool
+
+  public init(`projectId`: String, `sceneId`: String, `revision`: Int64, `document`: SpatialSceneSnapshotDocument, `updatedAt`: String?, `canEdit`: Bool) {
+    self.`projectId` = `projectId`
+    self.`sceneId` = `sceneId`
+    self.`revision` = `revision`
+    self.`document` = `document`
+    self.`updatedAt` = `updatedAt`
+    self.`canEdit` = `canEdit`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `projectId`
+    case `sceneId`
+    case `revision`
+    case `document`
+    case `updatedAt`
+    case `canEdit`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["projectId", "sceneId", "revision", "document", "updatedAt", "canEdit"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown SpatialSceneSnapshot property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`projectId` = try container.decode(String.self, forKey: .`projectId`)
+    self.`sceneId` = try container.decode(String.self, forKey: .`sceneId`)
+    self.`revision` = try container.decode(Int64.self, forKey: .`revision`)
+    self.`document` = try container.decode(SpatialSceneSnapshotDocument.self, forKey: .`document`)
+    self.`updatedAt` = try container.decode(String?.self, forKey: .`updatedAt`)
+    self.`canEdit` = try container.decode(Bool.self, forKey: .`canEdit`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`projectId`, forKey: .`projectId`)
+    try container.encode(self.`sceneId`, forKey: .`sceneId`)
+    try container.encode(self.`revision`, forKey: .`revision`)
+    try container.encode(self.`document`, forKey: .`document`)
+    try container.encode(self.`updatedAt`, forKey: .`updatedAt`)
+    try container.encode(self.`canEdit`, forKey: .`canEdit`)
+  }
+}
+
+public enum SpatialSceneResultSceneDocumentVersion: Int, Codable, Sendable {
+  case `value1` = 1
+}
+
+public struct SpatialSceneResultSceneDocumentObjectsItem: Codable, Sendable {
+  public var `id`: String
+  public var `assetId`: String
+  public var `position`: [Double]
+  public var `rotation`: [Double]
+  public var `scale`: [Double]
+  public var `visible`: Bool
+
+  public init(`id`: String, `assetId`: String, `position`: [Double], `rotation`: [Double], `scale`: [Double], `visible`: Bool) {
+    self.`id` = `id`
+    self.`assetId` = `assetId`
+    self.`position` = `position`
+    self.`rotation` = `rotation`
+    self.`scale` = `scale`
+    self.`visible` = `visible`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `assetId`
+    case `position`
+    case `rotation`
+    case `scale`
+    case `visible`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["id", "assetId", "position", "rotation", "scale", "visible"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown SpatialSceneResultSceneDocumentObjectsItem property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`id` = try container.decode(String.self, forKey: .`id`)
+    self.`assetId` = try container.decode(String.self, forKey: .`assetId`)
+    self.`position` = try container.decode([Double].self, forKey: .`position`)
+    guard (self.`position`.count) == 3 else { throw DecodingError.dataCorruptedError(forKey: .`position`, in: container, debugDescription: "Expected exactly 3 vector components") }
+    self.`rotation` = try container.decode([Double].self, forKey: .`rotation`)
+    guard (self.`rotation`.count) == 4 else { throw DecodingError.dataCorruptedError(forKey: .`rotation`, in: container, debugDescription: "Expected exactly 4 vector components") }
+    self.`scale` = try container.decode([Double].self, forKey: .`scale`)
+    guard (self.`scale`.count) == 3 else { throw DecodingError.dataCorruptedError(forKey: .`scale`, in: container, debugDescription: "Expected exactly 3 vector components") }
+    self.`visible` = try container.decode(Bool.self, forKey: .`visible`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`id`, forKey: .`id`)
+    try container.encode(self.`assetId`, forKey: .`assetId`)
+    guard (self.`position`.count) == 3 else { throw EncodingError.invalidValue(self.`position` as Any, .init(codingPath: encoder.codingPath, debugDescription: "Expected exactly 3 vector components")) }
+    try container.encode(self.`position`, forKey: .`position`)
+    guard (self.`rotation`.count) == 4 else { throw EncodingError.invalidValue(self.`rotation` as Any, .init(codingPath: encoder.codingPath, debugDescription: "Expected exactly 4 vector components")) }
+    try container.encode(self.`rotation`, forKey: .`rotation`)
+    guard (self.`scale`.count) == 3 else { throw EncodingError.invalidValue(self.`scale` as Any, .init(codingPath: encoder.codingPath, debugDescription: "Expected exactly 3 vector components")) }
+    try container.encode(self.`scale`, forKey: .`scale`)
+    try container.encode(self.`visible`, forKey: .`visible`)
+  }
+}
+
+public struct SpatialSceneResultSceneDocument: Codable, Sendable {
+  public var `sceneId`: String
+  public var `version`: SpatialSceneResultSceneDocumentVersion
+  public var `objects`: [SpatialSceneResultSceneDocumentObjectsItem]
+
+  public init(`sceneId`: String, `version`: SpatialSceneResultSceneDocumentVersion, `objects`: [SpatialSceneResultSceneDocumentObjectsItem]) {
+    self.`sceneId` = `sceneId`
+    self.`version` = `version`
+    self.`objects` = `objects`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `sceneId`
+    case `version`
+    case `objects`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["sceneId", "version", "objects"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown SpatialSceneResultSceneDocument property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`sceneId` = try container.decode(String.self, forKey: .`sceneId`)
+    self.`version` = try container.decode(SpatialSceneResultSceneDocumentVersion.self, forKey: .`version`)
+    self.`objects` = try container.decode([SpatialSceneResultSceneDocumentObjectsItem].self, forKey: .`objects`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`sceneId`, forKey: .`sceneId`)
+    try container.encode(self.`version`, forKey: .`version`)
+    try container.encode(self.`objects`, forKey: .`objects`)
+  }
+}
+
+public struct SpatialSceneResultScene: Codable, Sendable {
+  public var `projectId`: String
+  public var `sceneId`: String
+  public var `revision`: Int64
+  public var `document`: SpatialSceneResultSceneDocument
+  public var `updatedAt`: String?
+  public var `canEdit`: Bool
+
+  public init(`projectId`: String, `sceneId`: String, `revision`: Int64, `document`: SpatialSceneResultSceneDocument, `updatedAt`: String?, `canEdit`: Bool) {
+    self.`projectId` = `projectId`
+    self.`sceneId` = `sceneId`
+    self.`revision` = `revision`
+    self.`document` = `document`
+    self.`updatedAt` = `updatedAt`
+    self.`canEdit` = `canEdit`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `projectId`
+    case `sceneId`
+    case `revision`
+    case `document`
+    case `updatedAt`
+    case `canEdit`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["projectId", "sceneId", "revision", "document", "updatedAt", "canEdit"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown SpatialSceneResultScene property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`projectId` = try container.decode(String.self, forKey: .`projectId`)
+    self.`sceneId` = try container.decode(String.self, forKey: .`sceneId`)
+    self.`revision` = try container.decode(Int64.self, forKey: .`revision`)
+    self.`document` = try container.decode(SpatialSceneResultSceneDocument.self, forKey: .`document`)
+    self.`updatedAt` = try container.decode(String?.self, forKey: .`updatedAt`)
+    self.`canEdit` = try container.decode(Bool.self, forKey: .`canEdit`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`projectId`, forKey: .`projectId`)
+    try container.encode(self.`sceneId`, forKey: .`sceneId`)
+    try container.encode(self.`revision`, forKey: .`revision`)
+    try container.encode(self.`document`, forKey: .`document`)
+    try container.encode(self.`updatedAt`, forKey: .`updatedAt`)
+    try container.encode(self.`canEdit`, forKey: .`canEdit`)
+  }
+}
+
+public struct SpatialSceneResult: Codable, Sendable {
+  public var `scene`: SpatialSceneResultScene
+
+  public init(`scene`: SpatialSceneResultScene) {
+    self.`scene` = `scene`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `scene`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["scene"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown SpatialSceneResult property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`scene` = try container.decode(SpatialSceneResultScene.self, forKey: .`scene`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`scene`, forKey: .`scene`)
+  }
+}
+
+public enum SaveSpatialSceneDocumentVersion: Int, Codable, Sendable {
+  case `value1` = 1
+}
+
+public struct SaveSpatialSceneDocumentObjectsItem: Codable, Sendable {
+  public var `id`: String
+  public var `assetId`: String
+  public var `position`: [Double]
+  public var `rotation`: [Double]
+  public var `scale`: [Double]
+  public var `visible`: Bool
+
+  public init(`id`: String, `assetId`: String, `position`: [Double], `rotation`: [Double], `scale`: [Double], `visible`: Bool) {
+    self.`id` = `id`
+    self.`assetId` = `assetId`
+    self.`position` = `position`
+    self.`rotation` = `rotation`
+    self.`scale` = `scale`
+    self.`visible` = `visible`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `assetId`
+    case `position`
+    case `rotation`
+    case `scale`
+    case `visible`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["id", "assetId", "position", "rotation", "scale", "visible"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown SaveSpatialSceneDocumentObjectsItem property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`id` = try container.decode(String.self, forKey: .`id`)
+    self.`assetId` = try container.decode(String.self, forKey: .`assetId`)
+    self.`position` = try container.decode([Double].self, forKey: .`position`)
+    guard (self.`position`.count) == 3 else { throw DecodingError.dataCorruptedError(forKey: .`position`, in: container, debugDescription: "Expected exactly 3 vector components") }
+    self.`rotation` = try container.decode([Double].self, forKey: .`rotation`)
+    guard (self.`rotation`.count) == 4 else { throw DecodingError.dataCorruptedError(forKey: .`rotation`, in: container, debugDescription: "Expected exactly 4 vector components") }
+    self.`scale` = try container.decode([Double].self, forKey: .`scale`)
+    guard (self.`scale`.count) == 3 else { throw DecodingError.dataCorruptedError(forKey: .`scale`, in: container, debugDescription: "Expected exactly 3 vector components") }
+    self.`visible` = try container.decode(Bool.self, forKey: .`visible`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`id`, forKey: .`id`)
+    try container.encode(self.`assetId`, forKey: .`assetId`)
+    guard (self.`position`.count) == 3 else { throw EncodingError.invalidValue(self.`position` as Any, .init(codingPath: encoder.codingPath, debugDescription: "Expected exactly 3 vector components")) }
+    try container.encode(self.`position`, forKey: .`position`)
+    guard (self.`rotation`.count) == 4 else { throw EncodingError.invalidValue(self.`rotation` as Any, .init(codingPath: encoder.codingPath, debugDescription: "Expected exactly 4 vector components")) }
+    try container.encode(self.`rotation`, forKey: .`rotation`)
+    guard (self.`scale`.count) == 3 else { throw EncodingError.invalidValue(self.`scale` as Any, .init(codingPath: encoder.codingPath, debugDescription: "Expected exactly 3 vector components")) }
+    try container.encode(self.`scale`, forKey: .`scale`)
+    try container.encode(self.`visible`, forKey: .`visible`)
+  }
+}
+
+public struct SaveSpatialSceneDocument: Codable, Sendable {
+  public var `sceneId`: String
+  public var `version`: SaveSpatialSceneDocumentVersion
+  public var `objects`: [SaveSpatialSceneDocumentObjectsItem]
+
+  public init(`sceneId`: String, `version`: SaveSpatialSceneDocumentVersion, `objects`: [SaveSpatialSceneDocumentObjectsItem]) {
+    self.`sceneId` = `sceneId`
+    self.`version` = `version`
+    self.`objects` = `objects`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `sceneId`
+    case `version`
+    case `objects`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["sceneId", "version", "objects"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown SaveSpatialSceneDocument property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`sceneId` = try container.decode(String.self, forKey: .`sceneId`)
+    self.`version` = try container.decode(SaveSpatialSceneDocumentVersion.self, forKey: .`version`)
+    self.`objects` = try container.decode([SaveSpatialSceneDocumentObjectsItem].self, forKey: .`objects`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`sceneId`, forKey: .`sceneId`)
+    try container.encode(self.`version`, forKey: .`version`)
+    try container.encode(self.`objects`, forKey: .`objects`)
+  }
+}
+
+public struct SaveSpatialScene: Codable, Sendable {
+  public var `expectedRevision`: Int64
+  public var `document`: SaveSpatialSceneDocument
+
+  public init(`expectedRevision`: Int64, `document`: SaveSpatialSceneDocument) {
+    self.`expectedRevision` = `expectedRevision`
+    self.`document` = `document`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `expectedRevision`
+    case `document`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["expectedRevision", "document"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown SaveSpatialScene property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`expectedRevision` = try container.decode(Int64.self, forKey: .`expectedRevision`)
+    self.`document` = try container.decode(SaveSpatialSceneDocument.self, forKey: .`document`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`expectedRevision`, forKey: .`expectedRevision`)
+    try container.encode(self.`document`, forKey: .`document`)
+  }
+}
+
+public enum SpatialSceneResponseOk: Codable, Sendable {
+  case value
+  public init(from decoder: any Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == true else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Unexpected boolean literal") }
+    self = .value
+  }
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.singleValueContainer()
+    try container.encode(true)
+  }
+}
+
+public enum SpatialSceneResponseDataSceneDocumentVersion: Int, Codable, Sendable {
+  case `value1` = 1
+}
+
+public struct SpatialSceneResponseDataSceneDocumentObjectsItem: Codable, Sendable {
+  public var `id`: String
+  public var `assetId`: String
+  public var `position`: [Double]
+  public var `rotation`: [Double]
+  public var `scale`: [Double]
+  public var `visible`: Bool
+
+  public init(`id`: String, `assetId`: String, `position`: [Double], `rotation`: [Double], `scale`: [Double], `visible`: Bool) {
+    self.`id` = `id`
+    self.`assetId` = `assetId`
+    self.`position` = `position`
+    self.`rotation` = `rotation`
+    self.`scale` = `scale`
+    self.`visible` = `visible`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `assetId`
+    case `position`
+    case `rotation`
+    case `scale`
+    case `visible`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["id", "assetId", "position", "rotation", "scale", "visible"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown SpatialSceneResponseDataSceneDocumentObjectsItem property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`id` = try container.decode(String.self, forKey: .`id`)
+    self.`assetId` = try container.decode(String.self, forKey: .`assetId`)
+    self.`position` = try container.decode([Double].self, forKey: .`position`)
+    guard (self.`position`.count) == 3 else { throw DecodingError.dataCorruptedError(forKey: .`position`, in: container, debugDescription: "Expected exactly 3 vector components") }
+    self.`rotation` = try container.decode([Double].self, forKey: .`rotation`)
+    guard (self.`rotation`.count) == 4 else { throw DecodingError.dataCorruptedError(forKey: .`rotation`, in: container, debugDescription: "Expected exactly 4 vector components") }
+    self.`scale` = try container.decode([Double].self, forKey: .`scale`)
+    guard (self.`scale`.count) == 3 else { throw DecodingError.dataCorruptedError(forKey: .`scale`, in: container, debugDescription: "Expected exactly 3 vector components") }
+    self.`visible` = try container.decode(Bool.self, forKey: .`visible`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`id`, forKey: .`id`)
+    try container.encode(self.`assetId`, forKey: .`assetId`)
+    guard (self.`position`.count) == 3 else { throw EncodingError.invalidValue(self.`position` as Any, .init(codingPath: encoder.codingPath, debugDescription: "Expected exactly 3 vector components")) }
+    try container.encode(self.`position`, forKey: .`position`)
+    guard (self.`rotation`.count) == 4 else { throw EncodingError.invalidValue(self.`rotation` as Any, .init(codingPath: encoder.codingPath, debugDescription: "Expected exactly 4 vector components")) }
+    try container.encode(self.`rotation`, forKey: .`rotation`)
+    guard (self.`scale`.count) == 3 else { throw EncodingError.invalidValue(self.`scale` as Any, .init(codingPath: encoder.codingPath, debugDescription: "Expected exactly 3 vector components")) }
+    try container.encode(self.`scale`, forKey: .`scale`)
+    try container.encode(self.`visible`, forKey: .`visible`)
+  }
+}
+
+public struct SpatialSceneResponseDataSceneDocument: Codable, Sendable {
+  public var `sceneId`: String
+  public var `version`: SpatialSceneResponseDataSceneDocumentVersion
+  public var `objects`: [SpatialSceneResponseDataSceneDocumentObjectsItem]
+
+  public init(`sceneId`: String, `version`: SpatialSceneResponseDataSceneDocumentVersion, `objects`: [SpatialSceneResponseDataSceneDocumentObjectsItem]) {
+    self.`sceneId` = `sceneId`
+    self.`version` = `version`
+    self.`objects` = `objects`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `sceneId`
+    case `version`
+    case `objects`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["sceneId", "version", "objects"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown SpatialSceneResponseDataSceneDocument property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`sceneId` = try container.decode(String.self, forKey: .`sceneId`)
+    self.`version` = try container.decode(SpatialSceneResponseDataSceneDocumentVersion.self, forKey: .`version`)
+    self.`objects` = try container.decode([SpatialSceneResponseDataSceneDocumentObjectsItem].self, forKey: .`objects`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`sceneId`, forKey: .`sceneId`)
+    try container.encode(self.`version`, forKey: .`version`)
+    try container.encode(self.`objects`, forKey: .`objects`)
+  }
+}
+
+public struct SpatialSceneResponseDataScene: Codable, Sendable {
+  public var `projectId`: String
+  public var `sceneId`: String
+  public var `revision`: Int64
+  public var `document`: SpatialSceneResponseDataSceneDocument
+  public var `updatedAt`: String?
+  public var `canEdit`: Bool
+
+  public init(`projectId`: String, `sceneId`: String, `revision`: Int64, `document`: SpatialSceneResponseDataSceneDocument, `updatedAt`: String?, `canEdit`: Bool) {
+    self.`projectId` = `projectId`
+    self.`sceneId` = `sceneId`
+    self.`revision` = `revision`
+    self.`document` = `document`
+    self.`updatedAt` = `updatedAt`
+    self.`canEdit` = `canEdit`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `projectId`
+    case `sceneId`
+    case `revision`
+    case `document`
+    case `updatedAt`
+    case `canEdit`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["projectId", "sceneId", "revision", "document", "updatedAt", "canEdit"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown SpatialSceneResponseDataScene property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`projectId` = try container.decode(String.self, forKey: .`projectId`)
+    self.`sceneId` = try container.decode(String.self, forKey: .`sceneId`)
+    self.`revision` = try container.decode(Int64.self, forKey: .`revision`)
+    self.`document` = try container.decode(SpatialSceneResponseDataSceneDocument.self, forKey: .`document`)
+    self.`updatedAt` = try container.decode(String?.self, forKey: .`updatedAt`)
+    self.`canEdit` = try container.decode(Bool.self, forKey: .`canEdit`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`projectId`, forKey: .`projectId`)
+    try container.encode(self.`sceneId`, forKey: .`sceneId`)
+    try container.encode(self.`revision`, forKey: .`revision`)
+    try container.encode(self.`document`, forKey: .`document`)
+    try container.encode(self.`updatedAt`, forKey: .`updatedAt`)
+    try container.encode(self.`canEdit`, forKey: .`canEdit`)
+  }
+}
+
+public struct SpatialSceneResponseData: Codable, Sendable {
+  public var `scene`: SpatialSceneResponseDataScene
+
+  public init(`scene`: SpatialSceneResponseDataScene) {
+    self.`scene` = `scene`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `scene`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["scene"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown SpatialSceneResponseData property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`scene` = try container.decode(SpatialSceneResponseDataScene.self, forKey: .`scene`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`scene`, forKey: .`scene`)
+  }
+}
+
+public struct SpatialSceneResponse: Codable, Sendable {
+  public var `ok`: SpatialSceneResponseOk
+  public var `data`: SpatialSceneResponseData
+  public var `requestId`: String
+
+  public init(`ok`: SpatialSceneResponseOk, `data`: SpatialSceneResponseData, `requestId`: String) {
+    self.`ok` = `ok`
+    self.`data` = `data`
+    self.`requestId` = `requestId`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `ok`
+    case `data`
+    case `requestId`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["ok", "data", "requestId"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown SpatialSceneResponse property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`ok` = try container.decode(SpatialSceneResponseOk.self, forKey: .`ok`)
+    self.`data` = try container.decode(SpatialSceneResponseData.self, forKey: .`data`)
+    self.`requestId` = try container.decode(String.self, forKey: .`requestId`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`ok`, forKey: .`ok`)
+    try container.encode(self.`data`, forKey: .`data`)
+    try container.encode(self.`requestId`, forKey: .`requestId`)
+  }
+}
+
 public enum CreativeMode: String, Codable, Sendable {
   case `image` = "image"
   case `video` = "video"
@@ -891,9 +1736,10 @@ public struct AssetSummary: Codable, Sendable {
   public var `height`: Int64?
   public var `durationSeconds`: Double?
   public var `createdAt`: String
+  public var `nativeContentUrl`: String?
   public var `contentUrl`: String?
 
-  public init(`id`: String, `projectId`: String, `mimeType`: String, `byteSize`: Int64, `width`: Int64?, `height`: Int64?, `durationSeconds`: Double?, `createdAt`: String, `contentUrl`: String?) {
+  public init(`id`: String, `projectId`: String, `mimeType`: String, `byteSize`: Int64, `width`: Int64?, `height`: Int64?, `durationSeconds`: Double?, `createdAt`: String, `nativeContentUrl`: String?, `contentUrl`: String?) {
     self.`id` = `id`
     self.`projectId` = `projectId`
     self.`mimeType` = `mimeType`
@@ -902,6 +1748,7 @@ public struct AssetSummary: Codable, Sendable {
     self.`height` = `height`
     self.`durationSeconds` = `durationSeconds`
     self.`createdAt` = `createdAt`
+    self.`nativeContentUrl` = `nativeContentUrl`
     self.`contentUrl` = `contentUrl`
   }
 
@@ -914,12 +1761,13 @@ public struct AssetSummary: Codable, Sendable {
     case `height`
     case `durationSeconds`
     case `createdAt`
+    case `nativeContentUrl`
     case `contentUrl`
   }
 
   public init(from decoder: any Decoder) throws {
     let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
-    let allowed: Set<String> = Set(["id", "projectId", "mimeType", "byteSize", "width", "height", "durationSeconds", "createdAt", "contentUrl"])
+    let allowed: Set<String> = Set(["id", "projectId", "mimeType", "byteSize", "width", "height", "durationSeconds", "createdAt", "nativeContentUrl", "contentUrl"])
     guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
       throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown AssetSummary property"))
     }
@@ -932,6 +1780,7 @@ public struct AssetSummary: Codable, Sendable {
     self.`height` = try container.decode(Int64?.self, forKey: .`height`)
     self.`durationSeconds` = try container.decode(Double?.self, forKey: .`durationSeconds`)
     self.`createdAt` = try container.decode(String.self, forKey: .`createdAt`)
+    self.`nativeContentUrl` = try container.decode(String?.self, forKey: .`nativeContentUrl`)
     self.`contentUrl` = try container.decode(String?.self, forKey: .`contentUrl`)
   }
 
@@ -945,6 +1794,7 @@ public struct AssetSummary: Codable, Sendable {
     try container.encode(self.`height`, forKey: .`height`)
     try container.encode(self.`durationSeconds`, forKey: .`durationSeconds`)
     try container.encode(self.`createdAt`, forKey: .`createdAt`)
+    try container.encode(self.`nativeContentUrl`, forKey: .`nativeContentUrl`)
     try container.encode(self.`contentUrl`, forKey: .`contentUrl`)
   }
 }
@@ -958,9 +1808,10 @@ public struct AssetListAssetsItem: Codable, Sendable {
   public var `height`: Int64?
   public var `durationSeconds`: Double?
   public var `createdAt`: String
+  public var `nativeContentUrl`: String?
   public var `contentUrl`: String?
 
-  public init(`id`: String, `projectId`: String, `mimeType`: String, `byteSize`: Int64, `width`: Int64?, `height`: Int64?, `durationSeconds`: Double?, `createdAt`: String, `contentUrl`: String?) {
+  public init(`id`: String, `projectId`: String, `mimeType`: String, `byteSize`: Int64, `width`: Int64?, `height`: Int64?, `durationSeconds`: Double?, `createdAt`: String, `nativeContentUrl`: String?, `contentUrl`: String?) {
     self.`id` = `id`
     self.`projectId` = `projectId`
     self.`mimeType` = `mimeType`
@@ -969,6 +1820,7 @@ public struct AssetListAssetsItem: Codable, Sendable {
     self.`height` = `height`
     self.`durationSeconds` = `durationSeconds`
     self.`createdAt` = `createdAt`
+    self.`nativeContentUrl` = `nativeContentUrl`
     self.`contentUrl` = `contentUrl`
   }
 
@@ -981,12 +1833,13 @@ public struct AssetListAssetsItem: Codable, Sendable {
     case `height`
     case `durationSeconds`
     case `createdAt`
+    case `nativeContentUrl`
     case `contentUrl`
   }
 
   public init(from decoder: any Decoder) throws {
     let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
-    let allowed: Set<String> = Set(["id", "projectId", "mimeType", "byteSize", "width", "height", "durationSeconds", "createdAt", "contentUrl"])
+    let allowed: Set<String> = Set(["id", "projectId", "mimeType", "byteSize", "width", "height", "durationSeconds", "createdAt", "nativeContentUrl", "contentUrl"])
     guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
       throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown AssetListAssetsItem property"))
     }
@@ -999,6 +1852,7 @@ public struct AssetListAssetsItem: Codable, Sendable {
     self.`height` = try container.decode(Int64?.self, forKey: .`height`)
     self.`durationSeconds` = try container.decode(Double?.self, forKey: .`durationSeconds`)
     self.`createdAt` = try container.decode(String.self, forKey: .`createdAt`)
+    self.`nativeContentUrl` = try container.decode(String?.self, forKey: .`nativeContentUrl`)
     self.`contentUrl` = try container.decode(String?.self, forKey: .`contentUrl`)
   }
 
@@ -1012,6 +1866,7 @@ public struct AssetListAssetsItem: Codable, Sendable {
     try container.encode(self.`height`, forKey: .`height`)
     try container.encode(self.`durationSeconds`, forKey: .`durationSeconds`)
     try container.encode(self.`createdAt`, forKey: .`createdAt`)
+    try container.encode(self.`nativeContentUrl`, forKey: .`nativeContentUrl`)
     try container.encode(self.`contentUrl`, forKey: .`contentUrl`)
   }
 }
@@ -1442,9 +2297,10 @@ public struct AssetListResponseDataAssetsItem: Codable, Sendable {
   public var `height`: Int64?
   public var `durationSeconds`: Double?
   public var `createdAt`: String
+  public var `nativeContentUrl`: String?
   public var `contentUrl`: String?
 
-  public init(`id`: String, `projectId`: String, `mimeType`: String, `byteSize`: Int64, `width`: Int64?, `height`: Int64?, `durationSeconds`: Double?, `createdAt`: String, `contentUrl`: String?) {
+  public init(`id`: String, `projectId`: String, `mimeType`: String, `byteSize`: Int64, `width`: Int64?, `height`: Int64?, `durationSeconds`: Double?, `createdAt`: String, `nativeContentUrl`: String?, `contentUrl`: String?) {
     self.`id` = `id`
     self.`projectId` = `projectId`
     self.`mimeType` = `mimeType`
@@ -1453,6 +2309,7 @@ public struct AssetListResponseDataAssetsItem: Codable, Sendable {
     self.`height` = `height`
     self.`durationSeconds` = `durationSeconds`
     self.`createdAt` = `createdAt`
+    self.`nativeContentUrl` = `nativeContentUrl`
     self.`contentUrl` = `contentUrl`
   }
 
@@ -1465,12 +2322,13 @@ public struct AssetListResponseDataAssetsItem: Codable, Sendable {
     case `height`
     case `durationSeconds`
     case `createdAt`
+    case `nativeContentUrl`
     case `contentUrl`
   }
 
   public init(from decoder: any Decoder) throws {
     let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
-    let allowed: Set<String> = Set(["id", "projectId", "mimeType", "byteSize", "width", "height", "durationSeconds", "createdAt", "contentUrl"])
+    let allowed: Set<String> = Set(["id", "projectId", "mimeType", "byteSize", "width", "height", "durationSeconds", "createdAt", "nativeContentUrl", "contentUrl"])
     guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
       throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown AssetListResponseDataAssetsItem property"))
     }
@@ -1483,6 +2341,7 @@ public struct AssetListResponseDataAssetsItem: Codable, Sendable {
     self.`height` = try container.decode(Int64?.self, forKey: .`height`)
     self.`durationSeconds` = try container.decode(Double?.self, forKey: .`durationSeconds`)
     self.`createdAt` = try container.decode(String.self, forKey: .`createdAt`)
+    self.`nativeContentUrl` = try container.decode(String?.self, forKey: .`nativeContentUrl`)
     self.`contentUrl` = try container.decode(String?.self, forKey: .`contentUrl`)
   }
 
@@ -1496,6 +2355,7 @@ public struct AssetListResponseDataAssetsItem: Codable, Sendable {
     try container.encode(self.`height`, forKey: .`height`)
     try container.encode(self.`durationSeconds`, forKey: .`durationSeconds`)
     try container.encode(self.`createdAt`, forKey: .`createdAt`)
+    try container.encode(self.`nativeContentUrl`, forKey: .`nativeContentUrl`)
     try container.encode(self.`contentUrl`, forKey: .`contentUrl`)
   }
 }

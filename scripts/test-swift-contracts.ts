@@ -36,6 +36,12 @@ try {
     { schema: "ErrorResponse", value: { ...(fixtures[5].value as object), ok: true } },
     { schema: "UpdateProject", value: { name: null } },
   ];
+  const scene = JSON.parse(await readFile("packages/api-contract/fixtures/canonical-scene.json", "utf8")) as { objects: Record<string, unknown>[] };
+  for (const replacement of [{ position: [0, 0] }, { rotation: [0, 0, 0, 1, 0] }, { scale: [1, "bad", 1] }]) {
+    invalid.push({ schema: "CanonicalSpatialScene", value: { ...scene, objects: [{ ...scene.objects[0], ...replacement }] } });
+  }
+  const invalidConstruction = spawnSync(executable, ["constructMalformedVector"], { encoding: "utf8" });
+  notEqual(invalidConstruction.status, 0, "Swift encoded a malformed constructed vector");
   for (const fixture of invalid) {
     const result = spawnSync(executable, [fixture.schema], { input: JSON.stringify(fixture.value), encoding: "utf8" });
     notEqual(result.status, 0, `${fixture.schema} accepted malformed transport data`);

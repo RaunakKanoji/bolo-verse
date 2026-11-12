@@ -1,6 +1,6 @@
 # Shape Studio engineering guidance
 
-Read `context/project-overview.md`, `context/architecture-context.md` and `docs/shape-studio/phase-0-plan.md` first. The latest Shape Studio brief scopes this delivery to Phase 1 and the initial web creative studio; later generation/collaboration/native phases must not be presented as implemented. Preserve existing XR and recording functionality. Update context/progress-tracker.md and the root tracker with implemented, tested and externally unverified behavior.
+Read `context/project-overview.md`, `context/architecture-context.md` and the current `context/progress-tracker.md` first. The native brief in `docs/shape-studio/SPATIAL_MASTER_SPEC.md` extends the existing web foundation; follow `docs/shape-studio/native-architecture.md` for the additive SwiftUI/RealityKit app. Generation orchestration and complete collaboration remain unimplemented. Preserve existing web/XR/recording functionality and distinguish implemented, tested and externally unverified behavior in both trackers.
 
 - Use Next.js App Router, strict TypeScript, Tailwind/shadcn, A-Frame/WebXR, Clerk, Neon/Drizzle, private R2 and pnpm. Keep the original direct Three.js recording lab isolated; use AFRAME.THREE within the XR runtime to avoid mixing engine versions.
 - Keep credentials, identity verification, tenant authorization, database access and signing server-only. Every private read/mutation checks authorization; never introduce a public test-auth bypass.
@@ -10,6 +10,7 @@ Read `context/project-overview.md`, `context/architecture-context.md` and `docs/
 - No raw command audio persistence, secret-bearing links in logs, invented metrics, or fabricated approvals.
 - Use focused behavioral tests; run lint, typecheck, tests, production build and relevant browser flows before claiming completion.
 - Commit the lockfile and reviewable SQL migrations. Never commit credentials, private media, node_modules or generated test/build output.
+- Native Swift is independent of pnpm. Keep generated contracts/tokens synchronized with `native:check`; compile the checked-in Xcode project and run Swift tests for native changes. Maintain one session observer and one volume render owner; cancel or discard stale private results. Never claim simulator/device verification from source inspection alone.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

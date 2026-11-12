@@ -27,6 +27,13 @@ struct ContractRoundtrip {
     case "UpdateProject": output = try roundtrip(UpdateProject.self, input)
     case "ErrorResponse": output = try roundtrip(ErrorResponse.self, input)
     case "CreativeCapabilitiesResponse": output = try roundtrip(CreativeCapabilitiesResponse.self, input)
+    case "CanonicalSpatialScene": output = try roundtrip(CanonicalSpatialScene.self, input)
+    case "SpatialSceneSnapshot": output = try roundtrip(SpatialSceneSnapshot.self, input)
+    case "SpatialSceneResponse": output = try roundtrip(SpatialSceneResponse.self, input)
+    case "SaveSpatialScene": output = try roundtrip(SaveSpatialScene.self, input)
+    case "constructMalformedVector":
+      let object = CanonicalSpatialObject(id: "product", assetId: "e21386ae-51f4-44d9-991b-2e89e981bd96", position: [0, 0], rotation: [0, 0, 0, 1], scale: [1, 1, 1], visible: true)
+      output = try JSONEncoder().encode(object)
     case "construct":
       let value = SaveCreativeDraft(expectedRevision: 4, document: SaveCreativeDraftDocument(schemaVersion: .value1, mode: .audio, prompts: SaveCreativeDraftDocumentPrompts(image: "", video: "", audio: "नमस्ते", model3d: "")))
       output = try JSONEncoder().encode(value)

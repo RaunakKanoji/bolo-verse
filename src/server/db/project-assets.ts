@@ -1,6 +1,7 @@
 import "server-only";
 import { and, desc, eq } from "drizzle-orm";
 import { AssetListSchema, ProjectSummarySchema, type ProjectSummary } from "@/lib/contracts/shape";
+import { nativeContentSupported } from "@/lib/contracts/native-assets";
 import { previewSupported } from "@/lib/contracts/xr-assets";
 import { BoundaryError } from "@/server/auth/errors";
 import { withDatabase } from "./client";
@@ -27,6 +28,7 @@ export async function listAuthorizedProjectAssets(subject: string, projectId: st
     return AssetListSchema.parse({
       assets: ready.slice(0, 100).map((asset) => ({
         ...asset, createdAt: asset.createdAt.toISOString(),
+        nativeContentUrl: nativeContentSupported(asset.mimeType, asset.byteSize) ? `/api/v1/assets/${asset.id}/native-content` : null,
         contentUrl: previewSupported(asset.mimeType, asset.byteSize) ? `/api/v1/assets/${asset.id}/content` : null,
       })),
       hasMore: ready.length > 100,
