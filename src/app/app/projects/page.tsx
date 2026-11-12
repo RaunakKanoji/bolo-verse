@@ -1,35 +1,69 @@
+import StudioShell from "@/features/workspace/StudioShell";
 import Link from "next/link";
-import { SignInButton, UserButton } from "@clerk/nextjs";
+import { UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { getCurrentSubject } from "@/server/auth/identity";
-import { BoundaryError } from "@/server/auth/errors";
 import { listAuthorizedProjects } from "@/server/db/projects";
+import ProjectAccessNotice from "@/features/projects/ProjectAccessNotice";
+import ProjectForm from "@/features/projects/ProjectForm";
+import { projectAccessState } from "@/features/projects/access-state";
+import styles from "@/features/projects/projects.module.css";
 
 export const dynamic = "force-dynamic";
 
 export default async function ProjectsPage() {
-  let projects: Awaited<ReturnType<typeof listAuthorizedProjects>> = [];
-  let state: "connected" | "sign-in" | "unconfigured" | "unavailable" = "connected";
+  let projects: Awaited<ReturnType<typeof listAuthorizedProjects>>;
   try {
-    const subject = await getCurrentSubject();
-    projects = await listAuthorizedProjects(subject);
+    projects = await listAuthorizedProjects(await getCurrentSubject());
   } catch (error) {
-    if (error instanceof BoundaryError && error.status === 401) state = "sign-in";
-    else if (error instanceof BoundaryError && error.status === 503) state = "unconfigured";
-    else state = "unavailable";
+    return (
+      <StudioShell title="Your projects">
+        <ProjectAccessNotice state={projectAccessState(error)} />
+      </StudioShell>
+    );
   }
 
-  if (state === "sign-in") return <section className="empty-state"><h1>Your workspace starts here.</h1><p>Sign in to view the projects assigned to your account.</p><SignInButton mode="modal"><Button>Sign in</Button></SignInButton></section>;
-
-  if (state !== "connected") return <section className="empty-state">
-    <h1>{state === "unconfigured" ? "Connect your workspace" : "Workspace temporarily unavailable"}</h1>
-    <p>{state === "unconfigured" ? "Account and database setup is needed before private projects can open. You can use the local recording lab while this is being configured." : "We could not read your projects. Check the database connection and try again."}</p>
-    <div className="setup-panel"><h2>Setup for the project owner</h2><p>Follow the repository README to configure Clerk and Neon, then apply the checked-in database migration. No sample account is signed in automatically.</p></div>
-    <Button asChild><Link href="/studio/feasibility">Open recording lab</Link></Button>
-  </section>;
-
-  return <><div className="section-heading"><div className="page-heading"><h1>Your projects</h1><p>Only projects assigned to your account appear here.</p></div><UserButton /></div>
-    {projects.length ? <div className="project-list">{projects.map(project => <article key={project.id} className="project-card"><span className="status-pill">{project.sample ? "Fictional sample" : "Project"}</span><h2>{project.name}</h2><p>{project.objective}</p><p className="muted">Artifact editing opens in later milestones.</p></article>)}</div> : <div className="setup-panel"><h2>Your workspace is ready.</h2><p>You have no assigned projects yet. This milestone establishes private access; project creation and editing are not active.</p></div>}
-    <div className="actions"><Button asChild variant="outline"><Link href="/studio/feasibility">Test local recording</Link></Button></div>
-  </>;
+  return (
+    <StudioShell title="Your projects">
+      <div className="section-heading">
+        <div className="page-heading">
+          <h1>Your projects</h1>
+          <p>Open a campaign, shape its objective, then step into the studio.</p>
+        </div>
+        <UserButton />
+      </div>
+      {projects.length ? (
+        <div className="project-list">
+          {projects.map((project) => (
+            <Link key={project.id} href={`/app/projects/${project.id}`} className={styles.card}>
+              <span className="status-pill">{project.sample ? "Fictional sample" : "Project"}</span>
+              <h2>{project.name}</h2>
+              <p>{project.objective}</p>
+              <span>Open project</span>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div className="setup-panel">
+          <h2>A place for your next project.</h2>
+          <p>
+            Create a project below. Its name and objective are saved privately in your workspace.
+          </p>
+        </div>
+      )}
+      <section className="setup-panel" aria-labelledby="new-project-heading">
+        <h2 id="new-project-heading">Create a project</h2>
+        <p>A clear name and a single objective are enough to begin.</p>
+        <ProjectForm />
+      </section>
+      <div className="actions">
+        <Button asChild variant="outline">
+          <Link href="/xr/preview">Try the public XR preview</Link>
+        </Button>
+        <Button asChild variant="ghost">
+          <Link href="/studio/feasibility">Test local recording</Link>
+        </Button>
+      </div>
+    </StudioShell>
+  );
 }

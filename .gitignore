@@ -1,4 +1,5 @@
 node_modules/
+.pnpm-store/
 .next/
 out/
 .env*
@@ -11,3 +12,4 @@ test-results/
 .DS_Store
 .superpowers/
 next-env.d.ts
+public/vendor/

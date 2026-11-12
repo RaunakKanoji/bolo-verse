@@ -1,64 +1,72 @@
-# BoloVerse
+# BoloVerse · Browser XR Creator Studio
 
-A browser-based creative workspace for Indian MSME campaigns. This repository implements **M0: foundation and feasibility** from [the build specification](docs/BUILD_SPEC.md). Later milestones are intentionally not active.
-
-The recording lab captures an actual Three.js portrait canvas and microphone stream, then provides local playback and download. It does not upload the recording or send audio to a provider. The public experiment uses an original procedural textile illustration, not private project data.
+A creative workspace built with Next.js, React, A-Frame/WebXR, Clerk and Neon/Drizzle. The [current specification](docs/XR_BROWSER_STUDIO_SPEC.md) extends the existing app with editable spatial layouts, authorized project content, protected asset previews and a bounded Gemini/Sarvam assistant. Desktop 3D is the baseline; immersive VR is offered when the browser reports support. AR detection is implemented, but AR scene entry is not enabled.
 
 ## Run locally
 
-Use Node.js 24 or newer and npm (the lockfile is checked in).
+Use Node.js 24 or newer and **pnpm 11.12.0**, pinned in `package.json`.
 
 ```sh
-npm ci
+pnpm install --frozen-lockfile
 cp .env.example .env.local
-npm run dev
+pnpm dev
 ```
 
-Open `http://localhost:3000`, then **Try local recording**. No provider credentials are needed for the public lab. Read the disclosure, consent, and record a five-second test. Allow the microphone when Chrome asks. Play/download the result before leaving: local takes do not survive reload or navigation.
+Open `http://localhost:3000/xr/preview`. This public sample requires no provider credentials, uses clearly labeled original sample content and saves nothing. Select panels, move/rotate/scale them with the inspector, drag to look, and use W/A/S/D while the canvas has focus.
 
-For a production build:
+If port 3000 is occupied, run `pnpm dev --port 3001` and use that port consistently in the browser and environment configuration. The development/build scripts copy the pinned A-Frame bundle and license to ignored `public/vendor/aframe/`; the scene does not depend on a script CDN.
 
 ```sh
-npm run build
-npm start
+pnpm build
+pnpm start
 ```
+
+This is a server-rendered application with private API routes, not a static export. The original recording lab remains at `/studio/feasibility`: it captures a portrait canvas and microphone for local playback/download. Download recordings before leaving or reloading; media is not uploaded or persisted by the lab.
+
+The dashboard at `/` and `/studio` uses authorized project data or clearly labeled illustrative studies. `/studio/create` provides local image adjustment, comparison/reset and PNG export; local imports and exported edits are not uploaded or saved to project storage. Private project images open the same canvas after server authorization. The spatial workspace fills the desktop viewport, with independently scrolling project/inspector panels and a visible transform toolbar.
 
 ## Connect private projects
 
-1. Create/configure a Clerk application. Set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` in `.env.local`; configure its allowed development/preview domains. Sign in with a real account. No test-auth bypass exists.
-2. Create a Neon development database. Set `DATABASE_URL`; optionally set `DATABASE_MIGRATION_URL` for a direct migration connection. Only the server receives these URLs.
-3. Review all three checked-in `drizzle/*.sql` migrations, then run `npm run db:migrate` against that development database. Never point an unreviewed migration at production.
-4. Visit `/app/projects`. An authenticated first visit creates a personal workspace and owner membership transactionally. Assigned projects appear there. Read endpoints independently check identity and membership.
-5. Optional fictional sample seed instructions are in [the demo runbook](docs/DEMO_RUNBOOK.md). Project creation/editing, assignment UI and client review arrive in later milestones.
+1. Configure a real Clerk application and set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`. Configure the corresponding development/preview domains.
+2. Set a Neon `DATABASE_URL`. Set `DATABASE_MIGRATION_URL` when a separate direct migration connection is needed; otherwise it falls back to `DATABASE_URL`.
+3. Review all **four** SQL migrations in `drizzle/`, then run `pnpm db:migrate`. Migration `0003_xr_workspaces.sql` adds the project layout table.
+4. Set `NEXT_PUBLIC_APP_URL` to the exact browser origin. `ALLOWED_ORIGINS` can list additional trusted origins separated by commas. `localhost` and `127.0.0.1` are different origins.
+5. Sign in, visit `/app/projects`, create a project and open `/studio`. Choose **Open Spatial Studio**, then your project.
 
-An unconfigured private API returns an explicit failure, not sample project data. Clerk/Neon live operation requires real credentials and has not been proven by local tests. See [implementation status](docs/IMPLEMENTATION_STATUS.md).
+`/studio/xr` lists authorized projects and browser capabilities. `/studio/xr/[projectId]` is the canonical workspace; `/xr/[projectId]` remains an alias. Owners, creators and editors can save layouts; assigned clients can inspect them read-only. Saves compare the stored version and return a conflict instead of silently overwriting another edit. Failed saves retain local changes.
 
-## Checks
+The workspace displays actual briefs, artifact versions, ready assets and recorded client feedback. Empty projects stay empty. Missing Clerk/Neon configuration shows a setup state; neither the public preview nor development mocks bypass private authentication or invent project data.
+
+## Optional services
+
+- **Private assets:** configure `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` and `R2_BUCKET`. Existing ready assets load through an authenticated server proxy, with a 20 MiB file limit and a conservative self-contained GLB/glTF subset. The current studio does not add an upload/finalization workflow.
+- **Text assistant:** configure `GEMINI_API_KEY` and an explicit `GEMINI_MODEL` supporting structured output. Replies propose bounded actions; reset requires confirmation.
+- **Voice:** configure `SARVAM_API_KEY`, `SARVAM_STT_MODEL`, `SARVAM_TTS_MODEL` and the EN/HI/KN speaker settings. Recording starts only after explicit consent and activation; spoken replies require playback interaction.
+
+These are implemented network adapters. Environment readiness does not prove a successful live connection; Clerk, Neon, R2, Gemini and Sarvam still require verification with configured accounts. A labeled deterministic text mock is available during local `pnpm dev` with `APP_MODE=demo` and no Gemini configuration. It is disabled in production and on Vercel, still requires real project authorization, and does not simulate speech. See [AI integration](docs/xr/ai-integration.md).
+
+## Checks and evidence
 
 ```sh
-npm run lint
-npm run typecheck
-npm test
-npm run build
-npx playwright install chromium
-npm run test:e2e
+pnpm format:check
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm exec playwright install chromium
+pnpm test:e2e
 ```
 
-Unit tests cover strict contracts, configuration, unavailable provider behavior and recording lifecycle. Integration tests run the SQL migration and authorized repositories against embedded PostgreSQL (PGlite). Playwright tests use a synthetic microphone with real browser recording; this does not measure real microphone quality or Android performance. E2E expects missing provider credentials; run it in a clean local environment without `.env.local` Clerk/Neon secrets.
+The browser suite defaults to `http://127.0.0.1:3000`. To reuse a server on another origin, set, for example, `PLAYWRIGHT_BASE_URL=http://localhost:3001 pnpm test:e2e`. Use the same hostname and port as the running server. Run the missing-configuration browser scenarios without live Clerk/Neon secrets. Formatting currently covers XR/project UI; lint and typecheck cover the application.
 
-Database tooling: `npm run db:generate`, `npm run db:migrate`, `npm run db:seed`. Speech fixture evaluation and cached speech generation scripts will be introduced with M2; no fake generation command is provided in M0.
+PGlite integration tests execute the actual PostgreSQL queries with the identity boundary mocked. Chromium tests render the real A-Frame canvas; editable-project browser scenarios use an isolated component harness and mocked HTTP responses. Synthetic microphone input and simulated XR sessions do not establish live authentication, provider behavior, headset compatibility or physical microphone quality. Current results are recorded in [implementation status](docs/IMPLEMENTATION_STATUS.md).
 
-## Phone testing and deployment
+## Guides
 
-Use an **HTTPS** preview for another device. A phone opening your computer's HTTP LAN IP is not equivalent to localhost and usually cannot use the microphone. Deploy this Next.js repository to a chosen Vercel project, set environment variables explicitly, and configure Clerk domains before testing private data. No deployment or cloud resource has been created by this initial local implementation.
+- [Architecture](docs/xr/architecture.md) and [workspace schema/API](docs/xr/workspace-schema.md)
+- [Interactions](docs/xr/interaction-system.md) and [browser/device support](docs/xr/browser-support.md)
+- [AI and speech](docs/xr/ai-integration.md), [testing](docs/xr/testing.md) and [deployment](docs/xr/deployment.md)
+- [Progress](progress-tracker.md), [decisions](docs/DECISIONS.md) and [integration inventory](docs/INTEGRATIONS.md)
+- [Implementation plan](docs/superpowers/plans/2026-11-12-functional-xr-studio.md) and [device runbook](docs/DEMO_RUNBOOK.md)
 
-For M0, open `/studio/feasibility` in Android Chrome, consent, record, play back and download. Detailed steps and failure recovery are in [the runbook](docs/DEMO_RUNBOOK.md). The manifest provides installation hints; Chrome may offer **Add to home screen**. There is no service worker or offline cache of private responses/audio. Orientation and fullscreen hints do not prove headset readiness.
-
-## Documentation
-
-- [Progress tracker](progress-tracker.md) and [milestone evidence](docs/IMPLEMENTATION_STATUS.md)
-- [Architecture decisions](docs/DECISIONS.md)
-- [Provider/version/asset inventory](docs/INTEGRATIONS.md)
-- [Device runbook](docs/DEMO_RUNBOOK.md)
-
-M1 adds the stereo studio. Proceed only after the user says `next`.
+Only desktop Chromium behavior has browser-test evidence here. Physical headset checks and a hosted deployment remain outstanding. The manifest provides installation hints; there is no service worker or offline cache of private responses/audio. Native visionOS is future work.

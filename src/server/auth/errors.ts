@@ -4,7 +4,7 @@ import type { ApiResult } from "@/lib/contracts";
 export class BoundaryError extends Error {
   constructor(
     readonly status: number,
-    readonly code: "UNAUTHORIZED" | "FORBIDDEN" | "INVALID_INPUT" | "PROVIDER_UNCONFIGURED" | "SERVICE_UNAVAILABLE",
+    readonly code: "UNAUTHORIZED" | "FORBIDDEN" | "INVALID_INPUT" | "RATE_LIMITED" | "CONFLICT" | "PROVIDER_UNCONFIGURED" | "SERVICE_UNAVAILABLE",
     message: string,
   ) {
     super(message);
@@ -12,9 +12,9 @@ export class BoundaryError extends Error {
   }
 }
 
-export function successResponse<T>(data: T, requestId: string): Response {
+export function successResponse<T>(data: T, requestId: string, status = 200): Response {
   const body: ApiResult<T> = { ok: true, data, requestId };
-  return Response.json(body, { headers: { "Cache-Control": "no-store" } });
+  return Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
 }
 
 export function errorResponse(error: unknown, requestId: string): Response {
@@ -25,7 +25,7 @@ export function errorResponse(error: unknown, requestId: string): Response {
     error: {
       code: known ? error.code : "SERVICE_UNAVAILABLE",
       message: known ? error.message : "The workspace service is temporarily unavailable.",
-      retryable: status === 503,
+      retryable: status === 429 || status === 503,
     },
     requestId,
   };

@@ -1,10 +1,29 @@
 # BoloVerse device runbook
 
+## XR Phase 1 desktop acceptance
+
+1. Use Node 24+ and pnpm 11.12.0. Run `pnpm install --frozen-lockfile`, copy `.env.example` to `.env.local`, then `pnpm dev`.
+2. Open `http://localhost:3000/xr/preview`. Confirm **Desktop preview**, a rendered room and sample panels. This public sample is unsaved and needs no credentials.
+3. Drag inside the canvas, then focus it and use W/A/S/D. Tab back to the companion controls; typing there must not move the camera. Try **Reset view**, **Seated**, **Standing**, and each **Inspect** button. The inspector and selected scene panel should agree.
+4. On a desktop without a headset, **Enter VR** is disabled with an explanation. The 3D preview remains usable. Optional runtime statistics are measured locally, not performance guarantees.
+5. Navigate Home and reopen the preview. Check one canvas, no stale input handlers or console errors. Open the recording lab and repeat its five-second capture acceptance below.
+6. For private projects, follow README Clerk/Neon setup, use the exact configured origin, sign in and visit `/app/projects`. Create a project, reload its details, edit the objective and launch **Open XR studio**. Test an assigned client cannot edit and an unrelated account cannot read the project. Local SQL tests do not substitute for this live identity check.
+
+## Headset acceptance — physically unverified
+
+1. Deploy to a chosen HTTPS preview and open `/xr/preview` in a supported headset browser. Record the headset model, browser/OS versions and URL origin. Do not mark this complete from a desktop capability stub.
+2. Confirm **Enter VR** enables only when immersive VR is supported. Click it, grant the browser request and verify stereoscopic head-tracked rendering. Rejected permission must return a visible error and leave the desktop scene usable.
+3. Use left/right controller rays to select sample panels. Confirm local text is readable, selection updates, and no remote models are fetched. Compare **Seated** and **Standing** comfort; stop if uncomfortable.
+4. Select the spatial **Exit VR** panel or headset system exit. Verify return to desktop, then enter again. Test disconnect/reconnect, route change and refresh while a session is active. There must be no continuing session or render loop after leaving.
+5. Enable runtime stats and record observed FPS/draw calls/triangles during a real session; record judder, heat, battery and readability over time. No physical performance result is supplied by this implementation.
+
+Scene movement/selection is temporary in Phase 1. Saved scene state is Phase 2; no save button or recovery is promised.
+
 ## M0: local capture acceptance
 
 This sequence tests the implemented M0 only. It does not claim the later two-phone workflow is available.
 
-1. On the development machine, run `npm ci`, copy `.env.example` to `.env.local`, and run `npm run dev`. In desktop Chrome open `http://localhost:3000/studio/feasibility`. Provider secrets can remain blank.
+1. On the development machine, run `pnpm install --frozen-lockfile`, copy `.env.example` to `.env.local`, and run `pnpm dev`. In desktop Chrome open `http://localhost:3000/studio/feasibility`. Provider secrets can remain blank.
 2. Check the capability/readiness panel. The scene is a fixed **mono** portrait preview. No stereoscopy, head tracking, STT/TTS or paired phone is active.
 3. Read the local narration disclosure, then select **I agree to record my microphone locally**. No microphone is requested before this action and recording is started.
 4. Select **Record 5-second test**. Grant the browser microphone permission. Speak a short sentence and let the timer stop the take.
@@ -35,12 +54,12 @@ Optional: Chrome menu → **Add to home screen**, if offered. The manifest suppl
 Configure Clerk/Neon and apply migrations first. Obtain the real development user's Clerk subject ID from Clerk, then run:
 
 ```sh
-npm run db:seed -- user_your_real_clerk_subject
+pnpm db:seed user_your_real_clerk_subject
 ```
 
 The seed verifies that the account exists with Clerk before database writes. Use a development database. It creates an idempotent fictional Ilkal campaign and linked draft artifacts; no client approval is fabricated. Facts are silk-cotton blend and handwoven in Ilkal; prohibited claims are pure silk and machine washable. This seed is not a login, a public API or a substitute for a real client assignment workflow. Live seed execution remains unverified without credentials.
 
-## Later two-phone sequence (not active in M0)
+## Original two-phone sequence (historical, not active)
 
 - M1: Phone A preflight, consent, motion/recenter and landscape stereo inside the headset.
 - M2: Real Sarvam/Gemini commands and spoken idea generation with language fixtures.
@@ -49,4 +68,4 @@ The seed verifies that the account exists with Clerk before database writes. Use
 - M5: Actual narration brand check against approved brief; assigned client comments/decision bound to the exact output version.
 - M6: Reconnect/expiry/provider failure tests and a measured twenty-minute physical-device session.
 
-See `BUILD_SPEC.md` for the full acceptance sequence. No link, approval or provider result should be invented to complete this runbook.
+The newer `XR_IMPLEMENTATION_SPEC.md` now governs the phase sequence. `BUILD_SPEC.md` retains the original two-phone proposal for reference. No link, approval or provider result should be invented to complete this runbook.

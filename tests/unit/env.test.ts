@@ -25,9 +25,9 @@ describe("lazy server configuration", () => {
   });
 
   it("does not interpret false strings as enabled feature flags", () => {
-    expect(parseServerEnv({ ENABLE_WEBXR: "false" }).ENABLE_WEBXR).toBe(false);
-    expect(parseServerEnv({ ENABLE_WEBXR: "true" }).ENABLE_WEBXR).toBe(true);
-    expect(() => parseServerEnv({ ENABLE_WEBXR: "yes" })).toThrow();
+    expect(parseServerEnv({ ENABLE_BACKGROUND_REMOVAL: "false" }).ENABLE_BACKGROUND_REMOVAL).toBe(false);
+    expect(parseServerEnv({ ENABLE_BACKGROUND_REMOVAL: "true" }).ENABLE_BACKGROUND_REMOVAL).toBe(true);
+    expect(() => parseServerEnv({ ENABLE_BACKGROUND_REMOVAL: "yes" })).toThrow();
   });
 
   it("accepts only explicit HTTP origins and a bounded retention period", () => {

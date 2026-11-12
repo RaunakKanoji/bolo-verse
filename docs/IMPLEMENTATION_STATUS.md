@@ -1,73 +1,68 @@
-# Implementation status
+# Functional XR studio implementation status
 
-Updated 2026-11-12 (Asia/Kolkata). Current scope: **M0 — foundation and feasibility**. M1 is not started; wait for the user's `next`.
+Updated 2026-11-12 (Asia/Kolkata). Scope: the latest [browser studio specification](XR_BROWSER_STUDIO_SPEC.md). Historical [Phase 1](XR_PHASE1_IMPLEMENTATION_STATUS.md) and [M0](M0_IMPLEMENTATION_STATUS.md) evidence remains separate. Implementation is locally verified; live accounts and physical-device acceptance remain open.
 
-## Implemented
+## Features and changed files
 
-- Next.js 16 / React 19 App Router, strict TypeScript, Tailwind 4, checked-in shadcn/Radix Button, responsive entry/workspace/lab screens, manifest/icons, accessible navigation and setup/error states.
-- Canonical v1 strict Zod command union, envelopes, locales, bounded document/media/provider schemas. These validate proposals; the stateful command dispatcher/reducer is later work.
-- Lazy server-only environment validation, explicit migration URL fallback, local-only demo guard, provider/storage/editor interfaces with unconfigured/configured-unverified states. Unsupported provider operations throw; none fabricate results.
-- Clerk proxy and server identity checks; private project list/detail APIs with no-store structured results; membership-scoped repositories; transactional/idempotent personal-workspace creation.
-- Nineteen typed Drizzle tables and three reviewable SQL migrations. Composite project foreign keys, operation-ID bounds/uniqueness, immutable ready output/source and asset identity protection. R2 byte immutability still requires the actual M3 upload/finalization implementation.
-- Idempotent fictional Ilkal sample seed with brief, direction, script and three storyboard cards. CLI resolves a real Clerk account before writes. No output or approval is fabricated.
-- Browser-only Three.js mono experiment: original procedural textile card, fixed portrait camera, encoded draft watermark, capability checks and explicit local narration consent. Real microphone API + canvas MediaRecorder, 5/15-second timer, manual stop, MIME negotiation, final chunk handling, empty/interrupted/error rejection, resource cleanup, local playback and actual-format download.
-- Completed local takes remain in memory for download/discard; they are clearly **not saved**. No audio upload, speech recognition, transcript retention or cloud save occurs. In-app links warn before discarding; reload/close uses the browser unload warning. Back/Forward can bypass link confirmation and lose the take.
+- **Routes/capabilities:** authenticated `/studio`, `/studio/xr`, `/studio/xr/[projectId]` and compatible `/xr/[projectId]`; new `src/xr/capabilities.ts`, hook, capability panel and error boundary. Optional VR/AR, graphics, pointer, touch, microphone availability and secure context are feature-detected. Detection never asks for microphone permission. AR entry stays disabled.
+- **Workspace:** `XRWorkspaceClient`, `useWorkspaceState`, `TransformPanel`, transform reducer, serializers and scene adapter provide real selection, move/rotate/scale, focus/reset, save/reload, read-only access and recoverable errors. Authorized briefs, artifacts, ready assets and reviews map to spatial content; private projects never receive samples. Runtime updates preserve a single scene. Controller transforms use the same bounded reducer.
+- **Assets:** new `xr-assets` repository/contracts, R2 reader and protected endpoint. Images/videos attach real textures; self-contained static GLB/glTF attaches geometry. PDFs remain document cards. Loading is lazy, cancellable and limited to three decoded assets. Access is checked before and after storage reads; object keys and credentials remain server-only.
+- **AI/voice:** shared assistant contracts, server providers/services/routes and `src/xr/assistant/` UI. Gemini returns bounded, authorized command proposals; users explicitly apply them and confirm reset. Sarvam transcription/TTS use server-only keys and time/size limits. Disclosed microphone capture starts explicitly, stops after 20 seconds and cleans up on disposal. Command audio is not persisted. The local text mock is clearly labeled and never bypasses authentication.
+- **Preservation/security:** existing Next/React/Clerk/Neon/Drizzle, project flows and mono recording lab remain. Strict CSP lives inside the A-Frame realm; parent headers do not globally relax scripts. Models use A-Frame's own engine. All persisted transforms and provider output are validated.
+- **Documentation/tooling:** `.env.example`, README, tracker, decisions/integration inventory and seven `docs/xr/` guides updated. AWS S3 SDK 3.1165.0 and test-only esbuild 0.28.2 are pinned in the existing pnpm lockfile.
+- **Combined visual work:** the user confirmed inclusion of the concurrent full-screen studio, dashboard and creative canvas. `src/features/workspace/` supplies the shared shell, authorized project search/empty states and local image brightness/contrast/saturation/blur adjustments, comparison/reset and real PNG export. `/studio/create` has labeled illustrative content and local import; authorized project image routes use the same editor. Edits are local and do not overwrite or save project assets.
 
-## Changed files
+## Database and APIs
 
-- Application/tooling: `package.json`, `package-lock.json`, TypeScript/Next/Tailwind/ESLint/Vitest/Playwright configs, `components.json`, `src/app/**`, `src/components/ui/button.tsx`, icons.
-- Contracts/config/providers: `src/lib/contracts/**`, `src/server/config/**`, `src/server/providers/**`, `.env.example`.
-- Server/data: `src/proxy.ts`, `src/server/auth/**`, `src/server/db/**`, `src/app/api/projects/**`, `drizzle/**`, `drizzle.config.ts`, `scripts/seed.ts`.
-- Capture: `src/features/studio/**`; checks: `tests/unit/**`, `tests/integration/**`, `tests/e2e/**`.
-- Documentation: preserved `Implementation_Prompt.md`; added `AGENTS.md`, `progress-tracker.md`, `README.md`, `THIRD_PARTY_NOTICES.md`, `docs/BUILD_SPEC.md`, `docs/DECISIONS.md`, `docs/INTEGRATIONS.md`, `docs/DEMO_RUNBOOK.md`, this status and the M0 plan.
+`drizzle/0003_xr_workspaces.sql` adds the twentieth table: project-scoped JSONB layout, schema/layout versions and timestamps. Project membership supplies ownership. Existing session `scene_state` is unchanged. Atomic membership/asset predicates and compare-and-swap updates reject stale writes and concurrent first saves with HTTP 409. There are now four migrations to apply to a configured development database.
 
-## Verification evidence
-
-Environment: macOS development host, Node 24.22.0, npm 11.19.1, Playwright Chromium **158.0.8127.18**. No physical Android device was attached.
-
-| Command/check | Observed result |
+| Route | Behavior |
 | --- | --- |
-| `npm install --save-exact --no-fund --no-audit` | Dependencies installed; exact direct versions and lockfile committed. Subsequent package additions also installed successfully. |
-| `npm run lint` | Passed, zero warnings/errors |
-| `npm run typecheck` | Passed |
-| `npm test` | **93 tests passed**, six files; includes real PostgreSQL/PGlite migration/repository tests and seed-CLI rejection tests |
-| `npm run build` | Optimized production build passed; public screens static, private API/workspace routes dynamic |
-| `npm run db:generate` | Nineteen tables, no schema changes/drift |
-| `npm run test:e2e` | **5 tests passed**: home/setup, consent/real recording/audio/playback/download/decoded frame, missing-config API denial, completed-take navigation guard, active-take navigation guard. No WebGL INVALID_OPERATION errors. |
-| Desktop/mobile viewport inspection | Rendered UI inspected at 1440px and 390px widths; mobile accessible link names preserved |
-| Fresh code review | No remaining Critical/Important M0 issues. Timing label clarified; Back/Forward limitation documented. |
+| `GET /api/xr/workspaces/[projectId]` | Authorized project/content catalog, edit capability and saved/default layout |
+| `PUT /api/xr/workspaces/[projectId]` | Bounded layout plus expected version; atomic save |
+| `POST /api/xr/workspaces/[projectId]/reset` | Expected-version reset to latest authorized content |
+| `GET /api/xr/assets/[assetId]` | Validated, streamed private preview without storage URL leakage |
+| `GET /api/xr/assistant/[projectId]` | Configuration readiness, not a claim of live verification |
+| `POST /api/xr/assistant/[projectId]` | Authorized context, bounded reply and command proposals |
+| `POST /api/xr/assistant/[projectId]/transcribe` | Consent header, bounded audio and supported language |
+| `POST /api/xr/assistant/[projectId]/speak` | Bounded text to validated WAV |
 
-The recording test uses a **synthetic Chromium microphone**, while canvas rendering, MediaRecorder encoding, video decoding/playback and file download are real. It observed 720×1280 decoded video, nonempty WebM bytes and one decoded audio track. A decoded PNG frame was visually inspected: the textile artwork, text and encoded draft watermark are present (not a blank/black video). The actual `.webm` and decoded frame remain in ignored `test-results/` for this run. Optional bundled Playwright FFmpeg inspection reported VP8 video and mono 48 kHz Opus audio; its minimal build lacks the requested null muxer, so that standalone decode command failed and is not counted as verification. Successful media decoding/playback evidence comes from Chromium. The 30 fps setting is a configured target, not a measured sustained frame rate. Elapsed-to-ready includes encoder finalization, not exact encoded media duration.
+Mutations retain trusted-origin, strict validation and authorization checks. Assistant operations share a durable per-user 20/hour budget. The standard asset viewer route is `/app/projects/[projectId]/assets/[assetId]`.
 
-Auth integration tests mock only Clerk identity/network boundaries and replace the connection provider with PGlite; actual route/repository SQL runs against PostgreSQL. This proves application authorization logic, not live Clerk token verification or a live Neon connection. The actual Clerk code path uses the SDK and has no public test-auth bypass.
+## Verification
 
-Bugs found and corrected during verification: StrictMode remount lost the WebGL context; reused WebGL pixel-store state caused initialization warnings (now reset on disposal); missing link-navigation warning for local takes; operation IDs accepted by shared schemas were rejected by UUID database columns; an asset could reference an upload grant from another project. Regressions cover these paths.
+Environment: macOS, Node 24.22.0, pnpm 11.12.0, desktop Chromium with software WebGL. No live service credentials or physical headset were configured.
 
-Sandbox restrictions initially blocked local ports, browser launch and Turbopack worker ports; reruns with approved local-execution permissions succeeded. These were environment restrictions, not passed application checks. An initial lint configuration warning was corrected.
+| Check | Observed result |
+| --- | --- |
+| Frozen offline install and peer check | Passed; no peer issues |
+| Drizzle generation | 20 tables; no schema drift |
+| Unit/PostgreSQL suite | **306 passed**, 22 files |
+| Final production browser run | **24 passed**: 12 actual Next application checks and 12 isolated editable-workspace component checks |
+| Final lint, TypeScript and scoped formatting | Passed; zero lint errors/warnings |
+| Optimized production build | Passed; all private routes remain dynamic |
+| Visual/media inspection | Desktop/mobile XR, dashboard and image canvas inspected; decoded recording contains artwork and draft watermark; PNG export pixels verified |
+| Source review | Independent review completed; identified issues fixed, targeted regressions and final combined suite pass |
 
-## Unconfigured / unverified / deferred
+The standalone browser harness bundles the actual client with explicit HTTP fixtures. It is outside deployed routes and cannot bypass production authentication. Its persistence checks prove browser behavior, while PGlite tests exercise real repository/route SQL with mocked identity/provider network boundaries. Neither establishes live Clerk/Neon connectivity. Actual A-Frame rendering/transforms are observed; simulated sessions cannot establish physical headset compatibility.
 
-- **Not deployed:** no remote repository, cloud deployment, Neon project, Clerk application or R2 bucket was created. The initial commit is local only.
-- **Clerk + Neon:** provide real Clerk publishable/secret keys, database URL, configure sign-in domains, and apply all three migrations to a development database. Live login, remote persistence and seed remain unverified.
-- **R2 / Sarvam / Gemini:** interfaces only; no live operation in M0. Storage CORS, upload/finalization, speech models/speakers, actual voice quality, structured model output and usage budgets are later integration gates.
-- **Physical Android/headset:** microphone quality, motion axes, stereo readability, codec behavior, encoding load, FPS, heat/battery and second-phone playback remain unverified. Synthetic input cannot establish them.
-- **M1 onward:** stereo/orientation/recenter, full preflight, scene edits/undo, VAD/voice, project editing/assignment UI, phone pairing, cloud media save/watch links, brand checks and client review are not active. No live model/media result, approval, analytics or provider success is simulated.
-- Local recording consent stays in page memory (version/time); durable authenticated session consent is implemented with the later studio session flow. Local media is lost on reload/navigation unless downloaded; no recovery is promised.
-- The draft watermark is burned into the file. Approval cannot remove encoded pixels. A future clean export requires a new verified render.
+The original recorder uses synthetic microphone input with real rendering, MediaRecorder encoding/decoding, playback and download. Generated media/screenshots remain ignored under `test-results/final/`. The final command was `PLAYWRIGHT_BASE_URL=http://localhost:3002 PLAYWRIGHT_OUTPUT_DIR=test-results/final pnpm test:e2e` against a fresh production server. Earlier concurrent-session runs encountered a fixed-port collision and stale build assets; ephemeral harness ports, isolated output and a rebuilt stable checkout resolved them. The real model test also exposed and fixed a cross-frame ArrayBuffer mismatch before this passing run. Checks use the session-only `pnpm_config_verify_deps_before_run=false` override after a verified install because the restricted shell discovers a different pnpm store; repository supply-chain settings remain unchanged.
 
-## Exact Android checks
+## Limitations and required acceptance
 
-1. Deploy this code to a selected Vercel HTTPS preview; use `https://<preview-host>/studio/feasibility` on Android Chrome. An HTTP LAN IP does not satisfy protected-browser API requirements.
-2. Keep the phone outside a headset. Confirm readiness, accept the local microphone disclosure, tap **Record 5-second test**, grant microphone access and speak.
-3. Let the timer stop; play the local result with sound. Check encoded dimensions, actual MIME/extension and visible watermark, then download before leaving.
-4. Repeat a 15-second take and manual stop. Test denied permission, backgrounding during a take, retry and download playback on a second phone. Record real device/browser versions and outcomes; do not mark unperformed tests passed.
+- **Live accounts:** configure Clerk domains/keys, Neon, private R2 and current Gemini/Sarvam model/speaker IDs. Apply all four migrations; verify sign-in, tenant denial, two-session conflicts, media delivery and real provider round trips. Readiness describes configuration only.
+- **Assets:** no cloud upload pipeline or professional editor is introduced. The standard workspace provides local image adjustment/export and other media viewers. Models support a bounded static subset; extensions, animation, skins, morphs, sparse accessors and external resources are rejected. Embedded image metadata and aggregate decoded allocations are checked before loading. No server transcoding/optimization pipeline yet.
+- **Persistence:** one shared project layout with explicit save; no realtime collaboration, merge UI, undo history or offline durability. Dirty-work guards cover same-origin links/full-page unload, not every client-side browser Back transition. Existing reviews are displayed; review authoring/approvals remain separate.
+- **Hardware:** Quest and Vision Pro/Safari must verify entry/exit, tracking, controller mapping, recenter, disconnects, comfort and sustained frame rate on HTTPS. Edge, Safari and mobile 3D need real-browser checks. AR, hand tracking and native visionOS are not implemented. Assistant/voice controls live in the React companion UI; a headset-native assistant panel/keyboard is not implemented.
+- **Speech/recording:** live language/model quality, real microphone handling and provider retention policies need account verification. The original physical Android codec/heat/second-device playback checklist remains open.
+- **Deployment:** no remote migration, cloud resource, Vercel deployment, CI run or push is claimed for this change. Speech upload is capped at 4 MiB, TTS at 2 MiB and streamed previews at 20 MiB; verify host/proxy behavior in deployment.
 
-Full instructions and recovery: [DEMO_RUNBOOK.md](DEMO_RUNBOOK.md). Setup and exact commands: [README.md](../README.md).
+## Next milestone and history
 
-## Repository handoff
+Next: configured-environment acceptance with real accounts and two users, followed by HTTPS headset/browser testing. Then add authorized uploads/asset optimization and richer creative/review workflows based on measured needs.
 
-Initialized Git on `main` and created the requested initial local commit containing M0, the lockfile, migrations, documentation and tests. No remote/push was performed.
+Initial commit `a1b8dc02b01244623916fa3c5493955eb762afce` already exists and was pushed in the original handoff. Foundation commit `b5652f1` remains on local `feat/xr-foundation`. Validated implementation commits are `2d75490` (persistence/assets), `72620dc` (assistant/voice), and `960d9b8` (combined studio/UI/tests). All remain local; unrelated history is preserved.
 
-## Milestone handoff
+## Reference-led interface extension
 
-M0 code is implemented and locally verifiable; live cloud/physical-device acceptance is explicitly open. Next is **M1 — stereo studio**, only after the user says `next`.
+Dashboard, project navigation and creative image canvas now follow the user's supplied visual references. The local image editor supports adjustments, presets, comparison, reset and real PNG download, and is reused behind the existing authorized image asset route. Full details, file inventory, test evidence and limitations are recorded in [the interface delivery report](superpowers/specs/2026-11-12-reference-studio-status.md). This pass verified 302 unit/integration tests and 24 production browser cases; lint, TypeScript and production build pass. It does not establish live provider or physical headset acceptance.

@@ -58,3 +58,21 @@ p { max-width: 70ch; }
 @media(max-width:800px) { .preview-label { display: none; }.topbar { padding: 16px 20px; }.topbar nav { gap: 18px; }.welcome { gap: 36px; }.feature-grid { gap: 20px; }.footer { margin: 0 24px; } }
 @media(max-width:600px) { .topbar { flex-wrap: wrap; gap: 14px; }.brand { font-size: 23px; }.topbar nav { gap: 18px; }.topbar nav span { display: none; }.topbar nav a { padding: 6px; }.main-shell { padding: 28px 20px 40px; }.welcome { grid-template-columns: 1fr; padding-bottom: 36px; gap: 30px; }h1 { letter-spacing: -1.5px; }.sample-art { max-height: 390px; }.feature-grid { grid-template-columns: 1fr; gap: 8px; }.feature p { min-height: auto; }.section-heading { align-items: flex-start; flex-direction: column; gap: 6px; }.footer { margin: 0 20px; flex-direction: column; gap: 4px; }.privacy-note { align-items: flex-start; }.page-heading h1 { font-size: 36px; }.actions { gap: 10px; } }
 @media(prefers-reduced-motion:reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+/* The spatial studio owns its application shell, including project navigation. */
+body:has(.main-shell > [data-testid="xr-workspace"]) > .topbar,
+body:has(.main-shell > [data-testid="xr-workspace"]) > .footer,
+.main-shell:has(> [data-testid="xr-workspace"]) > .page-heading {
+  display: none;
+}
+.main-shell:has(> [data-testid="xr-workspace"]) {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  min-height: 100dvh;
+}
+
+body:has([data-studio-shell]) > .topbar,
+body:has([data-studio-shell]) > .footer { display:none; }
+.main-shell:has([data-studio-shell]) { max-width:none; margin:0; padding:0; min-height:100dvh; }
+.main-shell:has([data-testid="xr-workspace"]) > a.muted { display:none; }

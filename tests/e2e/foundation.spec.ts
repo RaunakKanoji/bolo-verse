@@ -3,7 +3,7 @@ import { writeFile } from "node:fs/promises";
 
 test("home exposes a working recording experiment and honest project setup", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: /Give your next/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Good things/ })).toBeVisible();
   await page.getByRole("link", { name: "Open projects", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Connect your workspace" })).toBeVisible();
 });

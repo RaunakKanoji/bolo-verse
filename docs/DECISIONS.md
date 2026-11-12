@@ -1,4 +1,30 @@
-# M0 architecture decisions
+# Architecture decisions
+
+## Functional XR studio amendment — 2026-11-12
+
+The latest [browser studio specification](XR_BROWSER_STUDIO_SPEC.md) authorizes the full functional milestone sequence and supersedes the earlier Phase 1 stop boundary. The original application and isolated A-Frame engine remain intact.
+
+- **Project layout:** add one `xr_workspaces` table to the existing database. JSONB stores bounded, versioned IDs and transforms; project membership provides ownership. Atomic compare-and-swap writes reject concurrent updates with HTTP 409. Existing session `scene_state` remains separate.
+- **Real content:** authorized briefs, artifacts, ready assets and review records map to spatial panels. Saved references remain in the bounded catalog; reset deliberately rebuilds from current content. Private projects never receive sample data.
+- **Asset delivery:** a read-only R2 adapter backs an authenticated same-origin endpoint. Validate MIME, bytes, size and self-contained model resources before decoding; recheck authorization after storage latency. Stream the validated response, keeping storage keys and credentials server-side. Models use a conservative bounded static subset; no arbitrary external model dependencies or decoder plugins.
+- **Interaction:** React owns the document and accessible controls; the scene adapter mirrors changes without recreating the realm. Desktop and controller transform actions use the same bounded reducer. Failed saves keep local edits; confirmed reload/reset makes discarding them explicit.
+- **AI and voice:** Gemini proposes strict, authorized commands. The user applies proposals; reset asks for confirmation. Sarvam receives audio only after disclosed consent and explicit capture. Voice has duration/body limits, cancellation and cleanup. Development text mocks are unmistakable and unavailable on deployed production paths.
+- **Security and platform:** strict CSP lives inside the dedicated XR realm; the parent gains baseline frame/object/form restrictions without global script relaxation. Browser feature detection controls optional VR/AR; AR stays gated and native visionOS remains future work.
+- **Evidence:** PostgreSQL tests exercise real repository/route SQL with mocked identity/network boundaries. A standalone browser harness exercises the actual client with HTTP fixtures and cannot bypass production authentication. Hardware, live provider and remote deployment acceptance remain separate from local test results.
+
+## XR Phase 1 amendment — 2026-11-12
+
+The user's newer [XR specification](XR_IMPLEMENTATION_SPEC.md) supersedes the original engine, package manager and roadmap. Start with Phase 1; retain working M0 behavior and tenant/privacy invariants.
+
+- **Engine boundary:** a browser-only adapter owns one A-Frame 1.8.0 scene in a same-origin iframe. The iframe contains A-Frame's custom elements, global styles, listeners and render loop. Teardown ends the owned session, disposes resources and removes the realm. React owns accessible companion controls. Runtime objects use `AFRAME.THREE`; never mix them with the recording lab's Three 0.187 objects.
+- **Local assets:** copy the exact installed A-Frame distribution/license during dev/build. Canvas-rendered spatial text and model-free controller rays require no runtime CDN requests. Disable the upstream inspector, screenshot component and native session offer UI.
+- **Tooling:** pnpm 11.12.0 replaces npm with one committed lockfile. A-Frame's exact Git-pinned font dependency is declared directly and removed from its subdependency path by a scoped override; pnpm's exotic-subdependency protection stays enabled. Prettier initially covers new XR/project UI modules, avoiding unrelated legacy formatting churn. CI runs lint/types/tests/build/browser checks.
+- **Project management:** reuse the existing Drizzle tables and migrations. Create only in the authenticated user's personal workspace, atomically with creator membership and a database-backed ten-creations/hour limit. Strict JSON, 16 KiB bounds, trusted-origin checks and role authorization protect mutations.
+- **Preview boundary:** private `/xr/[projectId]` resolves authorization before rendering project metadata. `/xr/preview` contains only original, explicitly unsaved public samples. No fixture auth, database fallback or fake save path is exposed.
+- **VR behavior:** capability detection and explicit session requests control entry; immersive status requires an actual presenting XR session. The obsolete, unused `ENABLE_WEBXR` flag is removed because XR is a core capability of the new specification. Hardware acceptance stays open until a real headset is tested.
+- **Phase boundary:** Phase 1 implements project metadata and a working scene. Scene manipulation/persistence is Phase 2; speech/AI/storage/review integration remains later work.
+
+## Original M0 decisions (historical)
 
 Recorded 2026-11-12, Asia/Kolkata.
 

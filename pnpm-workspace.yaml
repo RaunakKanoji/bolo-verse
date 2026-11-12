@@ -1,0 +1,12 @@
+# A-Frame 1.8's published bundles include bmfont text, but its package manifest
+# also pins this Git dependency. Declare the identical pin at the application
+# root so pnpm can review it explicitly without allowing arbitrary Git subdeps.
+overrides:
+  "aframe@1.8.0>three-bmfont-text": "-"
+
+allowBuilds:
+  esbuild: true
+  sharp: true
+
+minimumReleaseAgeExclude:
+  - prettier@3.10.1

@@ -8,7 +8,7 @@ async function main() {
   nextEnv.loadEnvConfig(process.cwd());
   const subject = process.argv[2];
   if (!subject || !/^user_[a-zA-Z0-9]+$/.test(subject)) {
-    throw new Error("Usage: npm run db:seed -- user_<existing Clerk subject>");
+    throw new Error("Usage: pnpm db:seed user_<existing Clerk subject>");
   }
   const env = getServerEnv();
   if (!env.DATABASE_URL || !env.CLERK_SECRET_KEY) {
