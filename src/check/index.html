@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#05070d" />
-  <title>BoloVerse Upload</title>
+  <title>BoloVerse</title>
   <link rel="icon" href="/icons/icon-192.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -13,11 +13,24 @@
 </head>
 <body>
   <main>
-    <p class="label">BoloVerse · /upload</p>
-    <h1>Upload (Phone B)</h1>
-    <p class="muted">Placeholder. Built in M3: capture and send products.</p>
-    <p class="mono" id="status">…</p>
-    <a class="btn ghost" href="/">Back to system check</a>
+    <p class="label">BoloVerse · M0 scaffold</p>
+    <h1>System check</h1>
+    <p class="muted">Open this page on the Android phone. Every row should show ✓.</p>
+
+    <h2>Backend</h2>
+    <ul class="checks" id="backend"></ul>
+
+    <h2>This device</h2>
+    <ul class="checks" id="device"></ul>
+
+    <button class="btn ghost" id="rerun" type="button">Run checks again</button>
+
+    <h2>Pages</h2>
+    <nav class="links">
+    
+      <a href="/">/ (app)</a>
+      <a href="/metrics/">/metrics</a>
+    </nav>
   </main>
   <script type="module" src="./main.js"></script>
 </body>

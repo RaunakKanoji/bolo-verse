@@ -1,0 +1,59 @@
+/* Main app page. Colours/fonts come from shared/theme.css (§16). */
+.app { max-width: 560px; padding-top: 12px; }
+
+.top { display: flex; justify-content: space-between; align-items: center; padding: 8px 0 16px; border-bottom: var(--hair); }
+.wordmark { font: 700 1.4rem var(--font-head); }
+.pill { padding: 4px 8px; border: var(--hair); color: var(--pale); }
+.pill.ready { border-color: var(--cobalt); color: var(--white); }
+
+.step { padding: 20px 0; border-bottom: var(--hair); }
+.label.sub { margin: 16px 0 6px; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+label.btn { cursor: pointer; }
+
+/* Cut-out on a checkerboard (palette colours only). */
+.checker {
+  background-color: var(--white);
+  background-image:
+    linear-gradient(45deg, var(--pale) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--pale) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--pale) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--pale) 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+}
+.cutout { display: flex; align-items: center; justify-content: center; height: 240px; margin: 8px 0; border: var(--hair); overflow: hidden; }
+.cutout img { display: block; max-width: 92%; max-height: 220px; object-fit: contain; }
+
+.stage { display: grid; place-items: center; }
+.stage canvas { width: min(100%, calc(62vh * 9 / 16)); aspect-ratio: 9 / 16; height: auto; border: var(--hair); background: var(--ink); }
+
+.bgs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.bgs button { padding: 0; border: 2px solid transparent; background: none; color: var(--white); cursor: pointer; }
+.bgs img { display: block; width: 100%; aspect-ratio: 9 / 12; object-fit: cover; }
+.bgs span { display: block; padding: 4px 0; font: 0.7rem var(--font-mono); }
+.bgs [aria-checked='true'] { border-color: var(--cobalt); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips button { padding: 10px 12px; border: var(--hair); background: none; color: var(--white); font: 0.8rem var(--font-mono); cursor: pointer; }
+.chips [aria-checked='true'] { background: var(--cobalt); border-color: var(--cobalt); }
+
+.slider { display: block; margin-top: 14px; }
+.slider .label b { color: var(--white); font-weight: 600; }
+.slider input { width: 100%; accent-color: var(--cobalt); }
+.grade { margin-top: 16px; }
+.grade summary { cursor: pointer; padding: 6px 0; }
+
+.toggle { display: flex; gap: 10px; align-items: center; padding: 8px 0; }
+.toggle input { width: 22px; height: 22px; accent-color: var(--cobalt); }
+
+.progress { height: 4px; background: rgba(242, 245, 251, 0.15); margin: 6px 0; }
+.progress div { height: 100%; width: 0; background: var(--cobalt); }
+
+.result { margin-top: 12px; }
+.result video { display: block; width: min(100%, 320px); margin: 0 auto; aspect-ratio: 9 / 16; background: var(--ink); border: var(--hair); }
+.share { display: grid; justify-items: center; gap: 6px; margin-top: 12px; }
+.share canvas { width: 220px; height: 220px; }
+.share a { word-break: break-all; }
+
+.foot { padding: 20px 0; }

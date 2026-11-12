@@ -9,6 +9,33 @@
 
 ---
 
+## ⚠️ CURRENT PLAN (changed 2026-11-12) — this section overrides everything below
+
+**The VR studio is dropped.** Build a single mobile-first web app: **photo upload → spoken instruction → generated product video.**
+Sections §0, §3 (layout), §5–§11 and §14 below are historical; where they conflict with this section, this section wins.
+Still in force: §1 rules 2, 3, 5, 7 (no keys in frontend, never store command audio, timeouts + fallbacks, VERIFY flags), §16 look and feel, §17 conventions.
+
+**One page (`/`), blue/black/white theme (§16):**
+1. **Upload:** file input (camera or gallery). Remove background in-browser with `@imgly/background-removal` (preload the model). Show cut-out on a checkerboard.
+2. **Voice:** hold-to-talk mic button AND a "listening" toggle. Record clip → Edge Function `stt` (Sarvam `saaras:v3`, codemix). Show transcript.
+3. **Edge Function `brief`:** transcript + previous brief → Gemini → strict JSON:
+   `{scene, lighting, mood, motion: "push_in"|"pull_out"|"pan_left"|"pan_right"|"orbit", speed: "slow"|"medium", duration_s: 5-15, background_prompt, grade: {temperature -1..1, brightness 0.5..1.5, contrast 0.8..1.3}, confirm_text, confidence}`.
+   Later utterances EDIT the previous brief instead of starting again. Schema lives in `src/shared/briefSchema.js`.
+4. **Edge Function `background`:** `background_prompt` → Gemini image model (env `GEMINI_IMAGE_MODEL`) → 9:16 image, empty centre, no products/people/text. Cache by prompt hash in Supabase storage. **Fallback:** if generation fails, is unavailable, or takes > 20 s, pick the closest of 8 preloaded images in `/public/backgrounds` by scene keyword.
+5. **Compose** on a 720×1280 canvas: background → soft elliptical contact shadow → product cut-out (fit ~55% height, centred low) → colour grade on the whole frame, slightly stronger on background than product.
+6. **Animate** per `brief.motion` with easing; background moves at 0.6× the product's rate (parallax); one diagonal light sweep across the product; subtle film grain.
+7. **Record:** `canvas.captureStream(30)` + audio from a Web Audio mixer (live mic narration, or a Sarvam Bulbul voice-over generated from brand facts) → `MediaRecorder` → webm → Supabase storage → player, download link, QR code.
+8. **Speak** `confirm_text` with Sarvam TTS after each instruction. If `confidence < 0.6`, ask "Did you mean …?" before generating.
+9. **Keep:** keys only in Edge Functions, rate limits, command logs with `stt_ms / brief_ms / background_ms / render_ms`, and a `/metrics` page.
+
+**Milestones (stop after each for phone testing; wait for "next"):**
+- **A)** upload + cut-out + preloaded backgrounds + animate + record
+- **B)** voice → brief → scene changes
+- **C)** generated backgrounds
+- **D)** voice-over and edits by follow-up instruction
+
+---
+
 ## 0. Project summary
 
 **BoloVerse** is a **voice-only VR product studio** for MSME (micro/small business) content creators in India.

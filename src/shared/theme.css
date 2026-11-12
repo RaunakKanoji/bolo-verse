@@ -12,6 +12,7 @@
 }
 
 * { box-sizing: border-box; border-radius: 0; }
+[hidden] { display: none !important; } /* keep `hidden` working on flex/grid elements */
 
 html, body {
   margin: 0;

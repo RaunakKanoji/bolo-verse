@@ -427,21 +427,9 @@ enabled = true
 
 # BoloVerse Edge Functions. JWTs are verified in code (_shared/auth.ts requireUser),
 # so the gateway check is off; this also lets CORS preflight through.
-[functions.join-session]
-verify_jwt = false
-
 [functions.stt]
 verify_jwt = false
 
-[functions.command]
-verify_jwt = false
-
 [functions.tts]
-verify_jwt = false
-
-[functions.claimcheck]
-verify_jwt = false
-
-[functions.reel-link]
 verify_jwt = false
 

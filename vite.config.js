@@ -1,11 +1,11 @@
-// Vite multi-page config. Pages live under src/<page>/index.html so the
-// deployed URLs are /studio/, /upload/, /spectator/, /watch/, /approve/, /metrics/.
+// Vite multi-page config. The app is src/index.html; other pages live under src/<page>/index.html, so the
+// deployed URLs are / (the app), /check/ and /metrics/.
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 
 const here = import.meta.dirname;
 const root = resolve(here, 'src');
-const pages = ['studio', 'upload', 'spectator', 'watch', 'approve', 'metrics'];
+const pages = ['check', 'metrics'];
 
 export default defineConfig({
   root,
@@ -23,8 +23,6 @@ export default defineConfig({
       },
     },
   },
-  // TODO(M2): copy @ricky0123/vad-web + onnxruntime-web assets (worklet, .onnx, .wasm)
-  // into the build with vite-plugin-static-copy.
   test: {
     root: here,
     include: ['tests/**/*.test.js'],

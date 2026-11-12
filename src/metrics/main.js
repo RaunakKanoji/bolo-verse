@@ -1,4 +1,4 @@
-// /metrics/ entry. Placeholder until M8.
+// /metrics/ entry. Placeholder until milestone B.
 import { isConfigured } from "../shared/supabaseClient.js";
 
 document.getElementById("status").textContent =

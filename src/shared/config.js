@@ -1,6 +1,6 @@
 /**
  * BoloVerse shared constants. Every timeout, threshold, colour and feature flag
- * lives here so it can be tuned during the hackathon in one place.
+ * lives here so it can be tuned in one place.
  */
 
 /** Frontend env (public values only, never secrets). */
@@ -12,62 +12,52 @@ export const ENV = {
     (import.meta.env.VITE_SUPABASE_URL ? `${import.meta.env.VITE_SUPABASE_URL}/functions/v1` : ''),
 };
 
-/** Edge Function names (must match supabase/functions/<name>). */
-export const FUNCTIONS = ['join-session', 'stt', 'command', 'tts', 'claimcheck', 'reel-link'];
+/** Edge Function names (must match supabase/functions/<name>). `brief` and `background` arrive in B/C. */
+export const FUNCTIONS = ['stt', 'tts'];
 
-/** Timeouts in ms (§8.3, §8.5, §9). */
+/** Timeouts in ms. */
 export const TIMEOUTS = {
   stt: 6000,
-  command: 6000,
+  brief: 8000,
   tts: 5000,
+  background: 20000, // > 20 s → fall back to a preloaded background
   default: 8000,
   realtimeConnect: 5000,
-  confirmAnswer: 6000,
-  backgroundRemoval: 15000,
-  depth: 10000,
+  /** Inference only; the model download (first visit) is not counted. */
+  cutout: 90000,
 };
 
-export const POLL_INTERVAL_MS = 2000;
-export const FALLBACK_RETRY_MS = 60000;
-export const FAILURES_BEFORE_FALLBACK = 2;
-export const SCENE_STATE_DEBOUNCE_MS = 150;
-export const UNDO_LIMIT = 10;
+/**
+ * Background-removal model. isnet_quint8 = 44 MB download (phone friendly),
+ * isnet_fp16 = 88 MB (library default, slightly cleaner edges).
+ */
+export const CUTOUT = { model: 'isnet_quint8', maxInputPx: 1024 };
 
-/** Voice clip length limits in seconds (§8.3). */
-export const CLIP_MIN_S = 0.4;
-export const CLIP_MAX_S = 12;
-export const TTS_MAX_CLIP_S = 6;
+/** Output video (portrait reel). */
+export const VIDEO = { width: 720, height: 1280, fps: 30, bitrate: 4_000_000 };
 
-/** Confidence thresholds (§8.8). */
-export const CONFIDENCE = { execute: 0.8, ask: 0.5, recordingNoConfirm: 0.9 };
-
-/** Wake word (§8.8). */
-export const WAKE_WORD_ENABLED = true;
-export const WAKE_WORDS = ['bolo', 'बोलो', 'ಬೋಲೋ', 'bollo', 'below', 'polo'];
-
-/** VAD tuning (§8.8). VERIFY: defaults against @ricky0123/vad-web docs in M2. */
-export const VAD = {
-  positiveSpeechThreshold: 0.5,
-  minSpeechFrames: 3,
-  noisy: { positiveSpeechThreshold: 0.75, minSpeechFrames: 6 },
+/** Composition layout (fractions of the frame). */
+export const LAYOUT = {
+  productHeight: 0.55, // product fits ~55% of frame height…
+  productMaxWidth: 0.82, // …unless that would be wider than this
+  baseY: 0.86, // product's bottom edge sits here (centred low)
+  bgOversize: 1.22, // background drawn larger than the frame so motion never shows edges
+  parallax: 0.6, // background moves at 0.6× the product's rate
+  bgGradeStrength: 1, // grade strength on the background…
+  productGradeStrength: 0.6, // …slightly weaker on the product
+  grainAlpha: 0.06,
 };
 
-/** VR (§8.2). */
-export const VR = { eyeSeparation: 0.064, maxPixelRatio: 1.5, skyCrossfadeMs: 600 };
+/** Upload size limits in bytes. */
+export const LIMITS = { image: 15 * 1024 * 1024, audio: 1024 * 1024, reel: 25 * 1024 * 1024 };
 
-/** Recording (§8.7). */
-export const REEL = { width: 720, height: 1280, fps: 30, defaultSeconds: 15, minSeconds: 5, maxSeconds: 30 };
-
-/** Upload size limits in bytes (§12). */
-export const LIMITS = { image: 5 * 1024 * 1024, audio: 1024 * 1024, reel: 25 * 1024 * 1024 };
-
-export const SKIES = ['palace', 'beach', 'studio', 'market'];
 export const LANGUAGES = ['en-IN', 'hi-IN', 'kn-IN'];
 
-/** Brand colours (§16). Only these. */
+/** Confidence below this → ask "Did you mean …?" before generating (B). */
+export const CONFIRM_BELOW = 0.6;
+
+/** Brand colours (§16). Only these in the UI. */
 export const COLORS = { ink: '#05070d', white: '#f2f5fb', cobalt: '#3b74ff', pale: '#8fb6ff' };
 
-/** Keep ON during the hackathon: HUD shows timings and last error. */
 export const DEBUG = true;
-
 export const LOG_PREFIX = '[BoloVerse]';
