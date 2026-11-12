@@ -40,6 +40,10 @@ describe("isolated A-Frame realm", () => {
     frame.dispatchEvent(new Event("load"));
     expect(frame.script.src).toBe("/vendor/aframe/aframe-1.8.0.min.js");
     expect(frame.allow).toBe("xr-spatial-tracking; fullscreen");
+    expect(frame.srcdoc).toContain('http-equiv="Content-Security-Policy"');
+    expect(frame.srcdoc).toContain("script-src 'self'");
+    expect(frame.srcdoc).toContain("object-src 'none'");
+    expect(frame.srcdoc).not.toContain("unsafe-eval");
     frame.script.dispatchEvent(new Event("load"));
     const realm = await pending;
     expect(realm?.frame).toBe(frame);

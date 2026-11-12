@@ -3,7 +3,7 @@ import type { AFrameEntity, AFrameRuntime } from "../runtime/aframe-types";
 
 interface PanelComponent {
   el: AFrameEntity;
-  data: { title: string; body: string; eyebrow: string; selected: boolean };
+  data: { title: string; body: string; eyebrow: string; selected: boolean; compact: boolean };
   canvas: HTMLCanvasElement;
   texture: CanvasTexture;
   mesh: Mesh<PlaneGeometry, MeshBasicMaterial>;
@@ -49,12 +49,13 @@ export function registerStudioComponents(aframe: AFrameRuntime, ownerDocument: D
         body: { type: "string" },
         eyebrow: { type: "string" },
         selected: { default: false },
+        compact: { default: false },
       },
       init(this: PanelComponent) {
         const THREE = aframe.THREE;
         this.canvas = ownerDocument.createElement("canvas");
-        this.canvas.width = 1200;
-        this.canvas.height = 700;
+        this.canvas.width = this.data.compact ? 384 : 960;
+        this.canvas.height = this.data.compact ? 224 : 560;
         this.texture = new THREE.CanvasTexture(this.canvas);
         this.texture.colorSpace = THREE.SRGBColorSpace;
         this.mesh = new THREE.Mesh(
@@ -80,28 +81,38 @@ export function registerStudioComponents(aframe: AFrameRuntime, ownerDocument: D
       redraw(this: PanelComponent) {
         const context = this.canvas.getContext("2d");
         if (!context) return;
-        const { selected, title, body, eyebrow } = this.data;
+        const { selected, title, body, eyebrow, compact } = this.data;
+        context.setTransform(this.canvas.width / 1200, 0, 0, this.canvas.height / 700, 0, 0);
         context.clearRect(0, 0, 1200, 700);
-        context.fillStyle = selected ? "#283b60" : "#202a40";
+        context.fillStyle = selected ? "#eaf2ff" : "#ffffff";
         context.beginPath();
         context.roundRect(4, 4, 1192, 692, 34);
         context.fill();
         context.lineWidth = selected ? 8 : 3;
-        context.strokeStyle = selected ? "#9eaaff" : this.hovered ? "#8b95bb" : "#41506c";
+        context.strokeStyle = selected ? "#3478f6" : this.hovered ? "#91b6f5" : "#dfe4ec";
         context.stroke();
-        context.fillStyle = "#b4bffc";
+        if (compact) {
+          context.fillStyle = "#1d1d1f";
+          context.font = "600 116px system-ui, sans-serif";
+          context.textAlign = "center";
+          context.fillText(title, 600, 390, 1080);
+          context.textAlign = "left";
+          this.texture.needsUpdate = true;
+          return;
+        }
+        context.fillStyle = "#3478f6";
         context.font = "600 31px system-ui, sans-serif";
         context.fillText(eyebrow, 65, 80, 1070);
-        context.fillStyle = "#f5f7ff";
+        context.fillStyle = "#1d1d1f";
         context.font = "600 60px system-ui, sans-serif";
         wrapText(context, title, 65, 173, 1070, 70, 2);
-        context.fillStyle = "#d0d8ec";
+        context.fillStyle = "#495363";
         context.font = "400 37px system-ui, sans-serif";
         wrapText(context, body, 65, 340, 1070, 52, 4);
-        context.fillStyle = "#aab7d4";
+        context.fillStyle = "#596579";
         context.font = "500 28px system-ui, sans-serif";
         context.fillText(
-          selected ? "✓ SELECTED · Details in the companion panel" : "SELECT TO INSPECT",
+          selected ? "Selected · Details in the companion panel" : "Select to inspect",
           65,
           633,
           1070,
@@ -134,10 +145,16 @@ export function registerStudioComponents(aframe: AFrameRuntime, ownerDocument: D
         this.frames++;
         if (this.elapsed < 1000) return;
         const renderer = this.el.sceneEl.renderer;
+        let objects = 0;
+        this.el.sceneEl.object3D.traverseVisible((object) => {
+          if ("isMesh" in object && object.isMesh) objects++;
+        });
         this.el.emit(
           "studio-stats",
           {
             fps: Math.round((this.frames * 1000) / this.elapsed),
+            frameTimeMs: Math.round((this.elapsed / this.frames) * 100) / 100,
+            objects,
             calls: renderer.info.render.calls,
             triangles: renderer.info.render.triangles,
           },

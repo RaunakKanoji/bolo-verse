@@ -1,3 +1,4 @@
+import StudioShell from "@/features/workspace/StudioShell";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
@@ -19,14 +20,46 @@ export default async function ProjectPage({ params }: { params: Promise<{ projec
   try {
     access = await readProjectAccess(await getCurrentSubject(), parsed.data);
   } catch (error) {
-    return <ProjectAccessNotice state={projectAccessState(error)} />;
+    return (
+      <StudioShell title="Your projects">
+        <ProjectAccessNotice state={projectAccessState(error)} />
+      </StudioShell>
+    );
   }
   const { project, canEdit } = access;
-  return <>
-    <Link href="/app/projects" className="muted">Back to your projects</Link>
-    <div className="page-heading"><h1>{project.name}</h1><p className={styles.objective}>{project.objective}</p></div>
-    <div className={styles.toolbar}><Button asChild size="lg"><Link href={`/xr/${project.id}`}><Glasses aria-hidden="true" />Open XR studio</Link></Button><span className="muted">{canEdit ? "Project editor" : "Read-only project access"}</span></div>
-    <section className="setup-panel"><h2>Your project’s studio foundation</h2><p>Explore the desktop room or enter immersive VR on a supported headset. This phase loads your saved project details; spatial editing, scene saving, assets and client review arrive in later phases.</p></section>
-    {canEdit && <details className={styles.details}><summary>Edit project details</summary><ProjectForm project={{ id: project.id, name: project.name, objective: project.objective }} /></details>}
-  </>;
+  return (
+    <StudioShell title="Your projects">
+      <Link href="/app/projects" className="muted">
+        Back to your projects
+      </Link>
+      <div className="page-heading">
+        <h1>{project.name}</h1>
+        <p className={styles.objective}>{project.objective}</p>
+      </div>
+      <div className={styles.toolbar}>
+        <Button asChild size="lg">
+          <Link href={`/studio/xr/${project.id}`}>
+            <Glasses aria-hidden="true" />
+            Open Spatial Studio
+          </Link>
+        </Button>
+        <span className="muted">{canEdit ? "Project editor" : "Read-only project access"}</span>
+      </div>
+      <section className="setup-panel">
+        <h2>Your project in space</h2>
+        <p>
+          Explore the brief, creative artifacts, available assets and client feedback. Arrange the
+          workspace and save its layout, or enter immersive VR on a supported headset.
+        </p>
+      </section>
+      {canEdit && (
+        <details className={styles.details}>
+          <summary>Edit project details</summary>
+          <ProjectForm
+            project={{ id: project.id, name: project.name, objective: project.objective }}
+          />
+        </details>
+      )}
+    </StudioShell>
+  );
 }

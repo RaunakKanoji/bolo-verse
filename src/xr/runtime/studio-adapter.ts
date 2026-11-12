@@ -1,4 +1,10 @@
 import type { Object3D } from "three";
+import { XRTransformSchema, type XRTransform } from "@/lib/contracts/xr-workspace";
+import {
+  applyTransformAction,
+  SPATIAL_TRANSFORM_ACTIONS,
+  type TransformAction,
+} from "../interactions/transform-controls";
 import {
   createStudioDocument,
   serializeSceneDocument,
@@ -9,19 +15,32 @@ import {
 import type { AFrameEntity, AFrameScene } from "./aframe-types";
 import { loadAFrame, type XRRealm } from "./load-aframe";
 import { RuntimeScope } from "./scope";
+import { startSpatialAssetPreview, type SpatialAssetPreview } from "./asset-preview";
 
-export type RuntimeStats = { fps: number; calls: number; triangles: number };
+export type RuntimeStats = {
+  fps: number;
+  frameTimeMs: number;
+  calls: number;
+  triangles: number;
+  objects: number;
+};
 export type ViewingPosition = "seated" | "standing";
 type Callbacks = {
   onSelect(entity: SceneEntity): void;
   onSession(active: boolean): void;
   onStats(stats: RuntimeStats): void;
   onError(message: string, fatal?: boolean): void;
+  onDocumentChange?(document: SceneDocument): void;
 };
 
 export class StudioAdapter {
   private readonly scope = new RuntimeScope();
-  private readonly document: SceneDocument;
+  private document: SceneDocument;
+  private readonly baseline = new Map<string, XRTransform>();
+  private selectedId: string;
+  private editable = true;
+  private spatialTools: AFrameEntity[] = [];
+  private assetPreviews = new Map<string, SpatialAssetPreview>();
   private scene?: AFrameScene;
   private realm?: XRRealm;
   private camera?: AFrameEntity;
@@ -35,8 +54,14 @@ export class StudioAdapter {
     private readonly host: HTMLDivElement,
     project: WorkspaceProject,
     private readonly callbacks: Callbacks,
+    initialDocument?: SceneDocument,
   ) {
-    this.document = createStudioDocument(project);
+    this.document = serializeSceneDocument(initialDocument ?? createStudioDocument(project));
+    if (this.document.projectId !== project.id)
+      throw new Error("A scene must belong to the active project.");
+    this.selectedId = this.document.entities[0].id;
+    for (const entity of this.document.entities)
+      this.baseline.set(entity.id, XRTransformSchema.parse(entity.transform));
   }
 
   async initialize(): Promise<void> {
@@ -65,7 +90,7 @@ export class StudioAdapter {
       );
 
     scene.setAttribute("embedded", "");
-    scene.setAttribute("background", "color: #111827");
+    scene.setAttribute("background", "color: #f5f7fb");
     scene.setAttribute(
       "renderer",
       "antialias: true; colorManagement: true; maxCanvasWidth: 1920; maxCanvasHeight: 1440; highRefreshRate: true",
@@ -90,6 +115,15 @@ export class StudioAdapter {
     listen(scene, "click", (event) => {
       const entity = (event.target as HTMLElement).closest<HTMLElement>("[data-studio-id]");
       if (entity?.dataset.studioId) this.select(entity.dataset.studioId);
+      const actionId = (event.target as HTMLElement).closest<HTMLElement>("[data-studio-action]")
+        ?.dataset.studioAction;
+      if (actionId && this.editable) {
+        if (actionId === "reset") this.resetTransform(this.selectedId);
+        else {
+          const action = SPATIAL_TRANSFORM_ACTIONS.find((item) => item.id === actionId);
+          if (action) this.transformSelected(action.action);
+        }
+      }
       if ((event.target as HTMLElement).dataset.studioExit !== undefined)
         void this.exitVR().catch(() =>
           this.callbacks.onError(
@@ -112,7 +146,7 @@ export class StudioAdapter {
       this.rig.append(
         this.entity("a-entity", {
           "laser-controls": `hand: ${hand}; model: false`,
-          raycaster: "objects: .studio-interactive; far: 12; lineColor: #a5b4fc",
+          raycaster: "objects: .studio-interactive; far: 12; lineColor: #3478f6",
         }),
       );
     }
@@ -124,23 +158,8 @@ export class StudioAdapter {
       }),
     );
 
-    for (const data of this.document.entities) {
-      const panel = this.entity("a-entity", {
-        position: data.transform.position.join(" "),
-        rotation: data.transform.rotation.join(" "),
-        scale: data.transform.scale.join(" "),
-        "studio-panel": {
-          title: data.properties.title,
-          body: data.properties.body,
-          eyebrow: data.properties.eyebrow,
-          selected: data.id === "project-overview",
-        },
-      });
-      panel.classList.add("studio-interactive");
-      panel.dataset.studioId = data.id;
-      this.panels.set(data.id, panel);
-      scene.append(panel);
-    }
+    this.reconcilePanels();
+    this.buildSpatialTools(scene);
     const exitPanel = this.entity("a-entity", {
       position: "3.9 1.7 -1.6",
       rotation: "0 -55 0",
@@ -165,7 +184,10 @@ export class StudioAdapter {
       scene.remove();
       scene.renderer?.dispose();
       scene.renderer?.forceContextLoss();
+      for (const preview of this.assetPreviews.values()) preview.dispose();
+      this.assetPreviews.clear();
       this.panels.clear();
+      this.spatialTools = [];
     });
 
     const ready = new Promise<void>((resolve, reject) => {
@@ -237,7 +259,7 @@ export class StudioAdapter {
     });
     observer.observe(this.host);
     this.scope.own(() => observer.disconnect());
-    this.callbacks.onSelect(this.document.entities[0]);
+    this.select(this.selectedId);
   }
 
   private entity(
@@ -262,23 +284,22 @@ export class StudioAdapter {
       );
     };
     scene.append(
-      this.entity("a-entity", { light: "type: ambient; color: #dce3ff; intensity: 1.4" }),
+      this.entity("a-entity", { light: "type: ambient; color: #ffffff; intensity: 1.8" }),
     );
     scene.append(
       this.entity("a-entity", {
-        light: "type: directional; color: #ffffff; intensity: 1.5",
+        light: "type: directional; color: #ffffff; intensity: 0.8",
         position: "1 5 3",
       }),
     );
-    box("0 -0.11 -1", 14, 0.2, 14, "#182237");
-    box("0 2.1 -4.6", 11, 4.2, 0.2, "#202a40");
-    box("-5.5 2.1 -0.1", 0.2, 4.2, 9, "#172135");
-    box("5.5 2.1 -0.1", 0.2, 4.2, 9, "#172135");
-    box("0 0.015 -2.5", 8, 0.02, 3.6, "#253047");
-    box("0 3.75 -4.45", 8.7, 0.035, 0.035, "#939ee8");
-    for (const x of [-4.4, -3.9, 3.9, 4.4]) box(`${x} 2.1 -4.4`, 0.025, 2.8, 0.04, "#45516d");
-    for (let z = -4; z <= 4; z += 2) box(`0 0.002 ${z}`, 11, 0.004, 0.01, "#2c3850");
-    for (let x = -4; x <= 4; x += 2) box(`${x} 0.002 0`, 0.01, 0.004, 10, "#2c3850");
+    box("0 -0.11 0", 64, 0.2, 64, "#e7ecf3");
+    box("0 2.1 -31.5", 64, 4.2, 0.2, "#f5f7fb");
+
+    box("0 0.015 -2.5", 8, 0.02, 3.6, "#f1f5fb");
+    box("0 3.75 -31.35", 40, 0.035, 0.035, "#b1ccfa");
+    for (const x of [-4.4, -3.9, 3.9, 4.4]) box(`${x} 2.1 -31.3`, 0.025, 2.8, 0.04, "#dfe4ec");
+    for (let z = -4; z <= 4; z += 2) box(`0 0.002 ${z}`, 11, 0.004, 0.01, "#dae1eb");
+    for (let x = -4; x <= 4; x += 2) box(`${x} 0.002 0`, 0.01, 0.004, 10, "#dae1eb");
   }
 
   private setMovement(enabled: boolean): void {
@@ -295,9 +316,164 @@ export class StudioAdapter {
     if (this.scope.signal.aborted) return;
     const entity = this.document.entities.find((item) => item.id === id);
     if (!entity) return;
+    this.selectedId = id;
     for (const [panelId, panel] of this.panels)
       panel.setAttribute("studio-panel", "selected", panelId === id);
-    this.callbacks.onSelect(entity);
+    this.callbacks.onSelect(
+      serializeSceneDocument(this.document).entities.find((item) => item.id === id)!,
+    );
+  }
+
+  /** Replace only scene data; the realm, camera and render loop stay owned. */
+  updateDocument(input: SceneDocument): void {
+    if (this.scope.signal.aborted) return;
+    const document = serializeSceneDocument(input);
+    if (document.projectId !== this.document.projectId)
+      throw new Error("Cannot replace a scene with another project's document.");
+    this.document = document;
+    if (!document.entities.some((entity) => entity.id === this.selectedId))
+      this.selectedId = document.entities[0].id;
+    for (const entity of document.entities)
+      if (!this.baseline.has(entity.id))
+        this.baseline.set(entity.id, XRTransformSchema.parse(entity.transform));
+    this.reconcilePanels();
+    this.select(this.selectedId);
+  }
+
+  updateTransform(id: string, input: XRTransform): boolean {
+    if (this.scope.signal.aborted || !this.editable) return false;
+    const entity = this.document.entities.find((item) => item.id === id);
+    if (!entity) return false;
+    const transform = XRTransformSchema.parse(input);
+    const next = this.serialize();
+    next.entities.find((item) => item.id === id)!.transform = transform;
+    this.updateDocument(next);
+    this.callbacks.onDocumentChange?.(this.serialize());
+    return true;
+  }
+
+  transformSelected(action: TransformAction): boolean {
+    if (this.scope.signal.aborted || !this.editable) return false;
+    const entity = this.document.entities.find((item) => item.id === this.selectedId);
+    return entity
+      ? this.updateTransform(entity.id, applyTransformAction(entity.transform, action))
+      : false;
+  }
+
+  resetTransform(id: string): boolean {
+    const transform = this.baseline.get(id);
+    return transform ? this.updateTransform(id, transform) : false;
+  }
+
+  setEditable(editable: boolean): void {
+    this.editable = editable;
+    for (const tool of this.spatialTools) {
+      tool.setAttribute("visible", editable);
+      tool.classList.toggle("studio-interactive", editable);
+    }
+  }
+
+  /** An explicit desktop focus frames an object; never force a headset's pose. */
+  focus(id: string): void {
+    this.select(id);
+    const panel = this.panels.get(id);
+    if (!panel || !this.camera || this.session || !this.realm) return;
+    const target = new this.realm.window.AFRAME.THREE.Vector3();
+    panel.object3D.getWorldPosition(target);
+    const THREE = this.realm.window.AFRAME.THREE;
+    const normal = new THREE.Vector3(0, 0, 1).applyQuaternion(
+      panel.object3D.getWorldQuaternion(new THREE.Quaternion()),
+    );
+    const framed = target
+      .clone()
+      .addScaledVector(normal, 3.2 * Math.max(1, panel.object3D.scale.x));
+    if (this.rig) this.rig.object3D.worldToLocal(framed);
+    this.camera.object3D.position.copy(framed);
+    this.camera.object3D.lookAt(target);
+    const controls = this.camera.components["look-controls"];
+    if (controls?.yawObject) controls.yawObject.rotation.y = this.camera.object3D.rotation.y;
+    if (controls?.pitchObject) controls.pitchObject.rotation.x = this.camera.object3D.rotation.x;
+    this.setMovement(false);
+  }
+
+  /** Load only after an explicit action; keep at most three decoded media previews. */
+  async previewAsset(id: string, url: string, mimeType: string): Promise<void> {
+    const entity = this.document.entities.find((item) => item.id === id);
+    const panel = this.panels.get(id);
+    if (this.scope.signal.aborted || !this.realm || !panel || !entity?.assetId) return;
+    if (entity.properties.mimeType !== mimeType)
+      throw new Error("The asset type does not match the authorized catalog.");
+    this.assetPreviews.get(id)?.dispose();
+    this.assetPreviews.delete(id);
+    if (this.assetPreviews.size >= 3) {
+      const oldest = this.assetPreviews.keys().next().value;
+      if (oldest) {
+        this.assetPreviews.get(oldest)?.dispose();
+        this.assetPreviews.delete(oldest);
+      }
+    }
+    const preview = startSpatialAssetPreview(
+      this.realm,
+      panel,
+      { assetId: entity.assetId, url, mimeType },
+      this.scope.signal,
+    );
+    this.assetPreviews.set(id, preview);
+    try {
+      await preview.ready;
+    } catch (error) {
+      if (this.assetPreviews.get(id) === preview) this.assetPreviews.delete(id);
+      throw error;
+    }
+  }
+
+  private reconcilePanels(): void {
+    if (!this.scene || !this.realm) return;
+    const ids = new Set(this.document.entities.map((entity) => entity.id));
+    for (const [id, panel] of this.panels)
+      if (!ids.has(id)) {
+        this.assetPreviews.get(id)?.dispose();
+        this.assetPreviews.delete(id);
+        panel.remove();
+        this.panels.delete(id);
+      }
+    for (const data of this.document.entities) {
+      let panel = this.panels.get(data.id);
+      if (!panel) {
+        panel = this.entity("a-entity", {});
+        panel.classList.add("studio-interactive");
+        panel.dataset.studioId = data.id;
+        this.panels.set(data.id, panel);
+        this.scene.append(panel);
+      }
+      panel.setAttribute("position", data.transform.position.join(" "));
+      panel.setAttribute("rotation", data.transform.rotation.join(" "));
+      panel.setAttribute("scale", data.transform.scale.join(" "));
+      panel.setAttribute("studio-panel", {
+        title: data.properties.title,
+        body: data.properties.body,
+        eyebrow: data.properties.eyebrow,
+        selected: data.id === this.selectedId,
+      });
+    }
+  }
+
+  private buildSpatialTools(scene: AFrameScene): void {
+    const controls = [
+      ...SPATIAL_TRANSFORM_ACTIONS.map(({ id, label }) => ({ id, label })),
+      { id: "reset", label: "Reset object" },
+    ];
+    for (const [index, control] of controls.entries()) {
+      const tool = this.entity("a-entity", {
+        position: `${-1.75 + (index % 6) * 0.7} ${0.7 - Math.floor(index / 6) * 0.4} -2.6`,
+        scale: "0.3 0.3 0.3",
+        "studio-panel": { title: control.label, body: "", eyebrow: "", compact: true },
+      });
+      tool.dataset.studioAction = control.id;
+      this.spatialTools.push(tool);
+      scene.append(tool);
+    }
+    this.setEditable(this.editable);
   }
 
   recenter(position: ViewingPosition = this.position): void {

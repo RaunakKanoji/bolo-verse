@@ -15,11 +15,10 @@ export async function loadAFrame(
   frame.title = "XR studio canvas";
   frame.allow = "xr-spatial-tracking; fullscreen";
   frame.allowFullscreen = true;
-  frame.style.cssText = "border:0;width:100%;height:100%;display:block;background:#111827;";
+  frame.style.cssText = "border:0;width:100%;height:100%;display:block;background:#f5f7fb;";
   // Only static markup enters this scaffold. Project text is passed through
   // typed component attributes after initialization, never HTML interpolation.
-  frame.srcdoc =
-    '<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111827}canvas:focus-visible{outline:2px solid #a5b4fc;outline-offset:-4px}</style></head><body></body></html>';
+  frame.srcdoc = `<!doctype html><html lang="en"><head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; img-src 'self' blob: data:; media-src 'self' blob:; connect-src 'self' blob: data:; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#f5f7fb}canvas:focus-visible{outline:2px solid #3478f6;outline-offset:-4px}</style></head><body></body></html>`;
   scope.own(() => frame.remove());
 
   return new Promise((resolve, reject) => {

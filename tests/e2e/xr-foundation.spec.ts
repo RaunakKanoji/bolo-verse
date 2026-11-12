@@ -5,11 +5,14 @@ test("loads the real A-Frame desktop studio without a headset or remote asset re
   const external: string[] = [];
   page.on("pageerror", error => failures.push(error.message));
   page.on("request", request => {
-    if (/^https?:/.test(request.url()) && !request.url().startsWith("http://127.0.0.1:3000")) external.push(request.url());
+    if (/^https?:/.test(request.url()) && new URL(request.url()).origin !== new URL(process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3000").origin) external.push(request.url());
   });
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/xr/preview");
-  await expect(page.getByRole("heading", { name: "XR foundation preview" })).toBeVisible();
+  await expect(page.getByRole("toolbar", { name: "Selected object tools" })).toBeVisible();
+  const bounds = await page.getByTestId("xr-workspace").boundingBox();
+  expect(bounds).toMatchObject({ x: 0, y: 0, width: 1440, height: 900 });
+  expect(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight)).toBe(true);
   await expect(page.getByTestId("xr-runtime-status")).toContainText(/ready|desktop/i, { timeout: 30000 });
   const studio = page.frameLocator('iframe[title="XR studio canvas"]');
   await expect(studio.locator("a-scene")).toHaveCount(1);
@@ -18,6 +21,11 @@ test("loads the real A-Frame desktop studio without a headset or remote asset re
   await expect(page.getByRole("button", { name: "Inspect Concept card", exact: true })).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByRole("button", { name: "Inspect project overview", exact: true })).toHaveAttribute("aria-pressed", "false");
   await expect(page.getByRole("complementary", { name: "Workspace companion" }).getByRole("heading", { name: "Concept card", exact: true })).toBeVisible();
+  const originalX = Number(await page.getByLabel("Position x", { exact: true }).textContent());
+  await page.getByRole("button", { name: "Move selected card right", exact: true }).click();
+  await expect(page.getByLabel("Position x", { exact: true })).toHaveText((originalX + 0.25).toFixed(2));
+  await page.getByRole("button", { name: "Move selected card left", exact: true }).click();
+  await expect(page.getByLabel("Position x", { exact: true })).toHaveText(originalX.toFixed(2));
   await expect(page.getByRole("button", { name: "Enter VR", exact: true })).toBeDisabled();
   await expect(page.getByTestId("xr-capability-status")).toContainText(/not available|not supported|unavailable|no immersive VR headset/i);
   await page.getByRole("button", { name: "Reset view", exact: true }).click();
@@ -76,7 +84,7 @@ test("XR route teardown leaves no active scene and supports reopening", async ({
   await expect(page.frameLocator('iframe[title="XR studio canvas"]').locator("a-scene canvas")).toBeVisible({ timeout: 30000 });
   await page.getByRole("link", { name: "Home", exact: true }).click();
   await expect(page.locator('iframe[title="XR studio canvas"]')).toHaveCount(0);
-  await page.getByRole("link", { name: "XR preview", exact: true }).click();
+  await page.getByRole("navigation", { name: "Studio navigation" }).getByRole("link", { name: "Spatial Studio", exact: true }).click();
   await expect(page.getByTestId("xr-runtime-status")).toContainText(/ready|desktop/i, { timeout: 30000 });
   await expect(page.locator('iframe[title="XR studio canvas"]')).toHaveCount(1);
   const reopened = page.frameLocator('iframe[title="XR studio canvas"]');
