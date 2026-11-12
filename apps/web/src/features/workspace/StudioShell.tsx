@@ -52,6 +52,7 @@ export default function StudioShell({
   const router = useRouter();
   const active = (href: string) =>
     pathname === href ||
+    (href === "/studio/create" && ["/create", "/studio/image"].includes(pathname)) ||
     (pathname === "/" && href === "/studio") ||
     (href === "/app/projects" && pathname.startsWith("/app/projects/"));
   useEffect(() => {

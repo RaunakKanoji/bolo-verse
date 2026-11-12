@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, type ReactNode } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { Box, Film, ImageIcon, Mic2, Sparkles, Upload } from "lucide-react";
@@ -27,6 +27,7 @@ type Props = {
   capabilityError: boolean;
   draft: ReturnType<typeof useCreativeDraft>;
   sourceDescription: string;
+  generationControls?: ReactNode;
   setMode(mode: CreativeMode): void;
   setPrompt(mode: CreativeMode, prompt: string): void;
   upload(file: File): void;
@@ -38,6 +39,7 @@ export function PromptPanel({
   capabilityError,
   draft,
   sourceDescription,
+  generationControls,
   setMode,
   setPrompt,
   upload,
@@ -89,16 +91,20 @@ export function PromptPanel({
             {document.prompts[document.mode].length}/{creativePromptLimit}
           </span>
         </div>
-        <label htmlFor="creative-model">Generation model</label>
-        <select id="creative-model" disabled aria-describedby="generation-availability">
-          <option>No model connected</option>
-        </select>
-        <p id="generation-availability" className={styles.supporting}>
-          {capability?.reason ??
-            (capabilityError
-              ? "The capability catalog is unavailable. Generation is disabled until support can be verified."
-              : "Checking generation capabilities. No generation model is active.")}
-        </p>
+        {!generationControls && (
+          <>
+            <label htmlFor="creative-model">Generation model</label>
+            <select id="creative-model" disabled aria-describedby="generation-availability">
+              <option>No model connected</option>
+            </select>
+            <p id="generation-availability" className={styles.supporting}>
+              {capability?.reason ??
+                (capabilityError
+                  ? "The capability catalog is unavailable. Generation is disabled until support can be verified."
+                  : "Checking generation capabilities. No generation model is active.")}
+            </p>
+          </>
+        )}
         {projectId ? (
           <div className={styles.draftActions}>
             <Button
@@ -174,17 +180,19 @@ export function PromptPanel({
           </small>
         </section>
       )}
-      <div className={styles.generateArea}>
-        <Button
-          className={styles.generateButton}
-          disabled
-          aria-describedby="generation-availability"
-        >
-          <Sparkles size={18} />
-          Generate {label === "3D" ? "3D asset" : label.toLowerCase()}
-        </Button>
-        <small>Generation is not connected. No job or charge is created.</small>
-      </div>
+      {generationControls ?? (
+        <div className={styles.generateArea}>
+          <Button
+            className={styles.generateButton}
+            disabled
+            aria-describedby="generation-availability"
+          >
+            <Sparkles size={18} />
+            Generate {label === "3D" ? "3D asset" : label.toLowerCase()}
+          </Button>
+          <small>Generation is not connected. No job or charge is created.</small>
+        </div>
+      )}
     </>
   );
 }

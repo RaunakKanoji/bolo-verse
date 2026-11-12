@@ -43,12 +43,14 @@ function Thumbnail({
   );
 }
 export function LocalFilmstrip({
+  showGenerationHistory = true,
   snapshots,
   image,
   url,
   sample,
   restore,
 }: {
+  showGenerationHistory?: boolean;
   snapshots: LocalSnapshot[];
   image: RefObject<HTMLImageElement | null>;
   url: string;
@@ -82,16 +84,18 @@ export function LocalFilmstrip({
           <p>Capture a local variant to revisit an edit. No variants yet.</p>
         )}
       </section>
-      <section className={styles.generationHistory} aria-label="Generation history">
-        <h2>
-          <Clock3 size={16} />
-          Generation history
-        </h2>
-        <p>
-          No generation jobs. Results will appear here when generation and asset storage are
-          connected.
-        </p>
-      </section>
+      {showGenerationHistory && (
+        <section className={styles.generationHistory} aria-label="Generation history">
+          <h2>
+            <Clock3 size={16} />
+            Generation history
+          </h2>
+          <p>
+            No generation jobs. Results will appear here when generation and asset storage are
+            connected.
+          </p>
+        </section>
+      )}
     </div>
   );
 }

@@ -1,12 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useAuth } from "@clerk/nextjs";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { useStore } from "zustand";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { CreationControls } from "@/features/creation/CreationControls";
+import { GenerationHistory } from "@/features/creation/GenerationHistory";
+import { useImageGeneration } from "@/features/creation/use-image-generation";
 import StudioShell from "@/features/workspace/StudioShell";
 import { useImageCanvas } from "@/features/workspace/useImageCanvas";
+import { createEmptyCreativeDraftDocument } from "@/lib/contracts/shape";
 import { createPlaygroundStore, type PlaygroundStore } from "./playground-state";
 import { exportImage, originalEdits } from "./image-processing";
 import { useCreativeCapabilities, useCreativeDraft } from "./use-creative-services";
@@ -18,12 +23,19 @@ import { EditingPanel } from "./EditingPanel";
 import { LocalFilmstrip } from "./LocalFilmstrip";
 import styles from "./playground.module.css";
 
-type Props = { assetId?: string; projectId?: string };
-function Workspace({ assetId, projectId, store }: Props & { store: PlaygroundStore }) {
+type Props = { assetId?: string; projectId?: string; authConfigured?: boolean };
+function Workspace({
+  assetId,
+  projectId,
+  store,
+  onAccessRevoked,
+}: Props & { store: PlaygroundStore; onAccessRevoked(): void }) {
   const state = useStore(store);
-  const image = useImageCanvas(assetId);
+  const [selectedAssetId, setSelectedAssetId] = useState<string>();
+  const image = useImageCanvas(selectedAssetId ?? assetId, onAccessRevoked);
+  const generation = useImageGeneration(projectId, onAccessRevoked);
   const capabilities = useCreativeCapabilities();
-  const draft = useCreativeDraft(projectId, store, JSON.stringify(state.document));
+  const draft = useCreativeDraft(projectId, store, JSON.stringify(state.document), onAccessRevoked);
   const [notice, setNotice] = useState("");
   const [exporting, setExporting] = useState(false);
   const exportingRef = useRef(false);
@@ -113,9 +125,19 @@ function Workspace({ assetId, projectId, store }: Props & { store: PlaygroundSto
               capabilityError={capabilities.isError}
               draft={draft}
               sourceDescription={sourceDescription}
+              generationControls={
+                <CreationControls
+                  generation={generation}
+                  mode={state.document.mode}
+                  prompt={state.document.prompts[state.document.mode]}
+                  projectId={projectId}
+                  canEdit={draft.canEdit && !draft.busy}
+                />
+              }
               setMode={state.setMode}
               setPrompt={state.setPrompt}
               upload={(file) => {
+                setSelectedAssetId(undefined);
                 image.setUpload(file);
                 state.resetSource();
                 setNotice("");
@@ -144,6 +166,7 @@ function Workspace({ assetId, projectId, store }: Props & { store: PlaygroundSto
             />
             {state.document.mode === "image" && (
               <LocalFilmstrip
+                showGenerationHistory={!projectId}
                 snapshots={state.snapshots}
                 image={image.image}
                 url={image.url}
@@ -151,7 +174,7 @@ function Workspace({ assetId, projectId, store }: Props & { store: PlaygroundSto
                 restore={state.restore}
               />
             )}
-            {state.document.mode !== "image" && (
+            {state.document.mode !== "image" && !projectId && (
               <section className={styles.generationHistory} aria-label="Generation history">
                 <h2>Generation history</h2>
                 <p>No generation jobs. This mode is not connected to a generation provider.</p>
@@ -159,6 +182,20 @@ function Workspace({ assetId, projectId, store }: Props & { store: PlaygroundSto
             )}
           </section>
           <ResponsivePanel label="Image editing" side="right">
+            {projectId && (
+              <GenerationHistory
+                generation={generation}
+                projectId={projectId}
+                canEdit={draft.canEdit && !draft.busy}
+                selectedAssetId={selectedAssetId}
+                select={(id) => {
+                  image.setUpload(null);
+                  setSelectedAssetId(id);
+                  state.resetSource();
+                  setNotice("");
+                }}
+              />
+            )}
             <EditingPanel
               mode={state.document.mode}
               edits={state.edits}
@@ -180,6 +217,7 @@ function Workspace({ assetId, projectId, store }: Props & { store: PlaygroundSto
   );
 }
 function ScopedPlayground(props: Props) {
+  const [revoked, setRevoked] = useState(false);
   const [store] = useState(createPlaygroundStore);
   const [client] = useState(
     () =>
@@ -190,6 +228,13 @@ function ScopedPlayground(props: Props) {
         },
       }),
   );
+  const onAccessRevoked = useCallback(() => {
+    store.getState().loadDocument(createEmptyCreativeDraftDocument());
+    store.getState().resetSource();
+    setRevoked(true);
+    void client.cancelQueries();
+    client.clear();
+  }, [store, client]);
   useEffect(
     () => () => {
       void client.cancelQueries();
@@ -197,13 +242,43 @@ function ScopedPlayground(props: Props) {
     },
     [client],
   );
+  if (revoked)
+    return (
+      <StudioShell title="Creative playground">
+        <p role="status">Your project access changed. Reopen an authorized project to continue.</p>
+        <Link href="/app/projects">Open projects</Link>
+      </StudioShell>
+    );
   return (
     <QueryClientProvider client={client}>
-      <Workspace {...props} store={store} />
+      <Workspace {...props} store={store} onAccessRevoked={onAccessRevoked} />
     </QueryClientProvider>
   );
 }
+function AuthenticatedPlayground(props: Props) {
+  const { isLoaded, sessionId } = useAuth();
+  if (!isLoaded)
+    return (
+      <StudioShell title="Creative playground">
+        <p role="status">Checking your workspace session…</p>
+      </StudioShell>
+    );
+  if (props.projectId && !sessionId)
+    return (
+      <StudioShell title="Creative playground">
+        <p role="status">Sign in again to open this private project.</p>
+        <Link href="/sign-in">Sign in</Link>
+      </StudioShell>
+    );
+  return (
+    <ScopedPlayground
+      key={`${sessionId ?? "anonymous"}:${props.projectId ?? "local"}:${props.assetId ?? "sample"}`}
+      {...props}
+    />
+  );
+}
 export default function CreativePlayground(props: Props) {
+  if (props.authConfigured) return <AuthenticatedPlayground {...props} />;
   return (
     <ScopedPlayground
       key={`${props.projectId ?? "local"}:${props.assetId ?? "sample"}`}
