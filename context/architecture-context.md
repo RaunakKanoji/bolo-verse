@@ -2,11 +2,13 @@
 
 ## Additive foundation
 
+The latest [unified architecture](../docs/architecture/system-overview.md) supersedes the earlier phase boundary. pnpm/Turborepo now orchestrates actual scene-schema, TypeScript-config and ESLint-config packages around the root Next application. Shared API/token directories remain language-neutral artifacts without JavaScript manifests. Native Xcode builds remain independent. The eventual `apps/web`/R3F `apps/spatial-web` move is a later functional migration, documented in ADR 0001.
+
 The Next.js App Router web app remains at the repository root. Relocating it to apps/web would add migration risk without changing the deliverable. `packages/api-contract` and `packages/design-tokens` hold language-neutral artifacts; `apps/visionos` contains the native Xcode app and testable Swift package. Swift is not a JavaScript workspace package.
 
 Server Components resolve private project context. Interactive editing is isolated under `src/features/playground`; a scoped Zustand store handles ephemeral editing state, React Hook Form handles prompts, and a per-workspace TanStack Query client handles capability/draft requests. Query data is not a shared module singleton. Prompts and local files are not persisted to browser storage. The only browser preference persisted is appearance.
 
-Keep the existing A-Frame iframe and original recording renderer isolated. Neither React Three Fiber nor a renderer migration is necessary for this phase. Motion, R3F and Drei are deferred until a feature requires them.
+Keep the existing A-Frame iframe and original recording renderer isolated. The latest target architecture selects R3F for the future custom editor, with A-Frame retained separately. Phase 1 adds no unused rendering dependencies. See ADR 0003 for renderer boundaries.
 
 ## Trust boundaries
 

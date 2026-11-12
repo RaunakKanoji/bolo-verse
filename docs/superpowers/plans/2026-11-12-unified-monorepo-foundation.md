@@ -94,32 +94,32 @@ Scene v1 remains `{sceneId,version:1,objects:[{id,assetId,position,rotation,scal
 
 Files: package.json, pnpm-workspace.yaml, turbo.json, .gitignore, tsconfig.json, eslint.config.mjs, next.config.ts; new package manifests/config files and `packages/scene-schema/src/index.ts`; existing spatial-scene module becomes a compatibility re-export.
 
-- [ ] Preserve exact v1 schema behavior and existing imports while moving the implementation to `@shape/scene-schema`.
-- [ ] Declare all internal dependencies as `workspace:*`; retain existing A-Frame override/build allowlist/release-age policies.
-- [ ] Keep root dev/build/test/db commands compatible. Add a single Turbo `check` orchestration command using registered root tasks, without command recursion.
-- [ ] Share strict TS options and ESLint rules through real config packages consumed by root and scene-schema. Keep app aliases/Next plugin/ignores at the app boundary.
-- [ ] Keep native files out of JS workspace globs. Configure `.turbo/cache` explicitly per worktree.
-- [ ] Preserve strict environment validation; Turbo must pass deployment markers and declared runtime configuration, without caching secret-dependent build outputs or database mutations.
-- [ ] Verify frozen install, actual workspace/task graph, schema fixture behavior, environment guards and cache behavior. Existing scene/SQL/native fixtures must continue passing unchanged.
+- [x] Preserve exact v1 schema behavior and existing imports while moving the implementation to `@shape/scene-schema`.
+- [x] Declare all internal dependencies as `workspace:*`; retain existing A-Frame override/build allowlist/release-age policies.
+- [x] Keep root dev/build/test/db commands compatible. Add a single Turbo `check` orchestration command using registered root tasks, without command recursion.
+- [x] Share strict TS options and ESLint rules through real config packages consumed by root and scene-schema. Keep app aliases/Next plugin/ignores at the app boundary.
+- [x] Keep native files out of JS workspace globs. Configure `.turbo/cache` explicitly per worktree.
+- [x] Preserve strict environment validation; Turbo must pass deployment markers and declared runtime configuration, without caching secret-dependent build outputs or database mutations.
+- [x] Verify frozen install, actual workspace/task graph, schema fixture behavior, environment guards and cache behavior. Existing scene/SQL/native fixtures must continue passing unchanged.
 
 ### 2. CI and executable architecture safeguards
 
 Files: `.github/workflows/quality.yml`, `scripts/ci/changed-platforms.mjs`, focused classifier/workspace tests.
 
-- [ ] Add a change-classification job with conservative fallback when the base is unavailable.
-- [ ] Run web and native jobs independently; skip Xcode for unrelated web-only edits while shared contracts/tokens/native files trigger it.
-- [ ] Test web-only/native/shared/workflow/initial-push cases. No untrusted event text interpolated as shell code.
-- [ ] Check actual package exports and task dependencies, deployed-demo guard, frozen lockfile, generated mirrors and native-copy drift.
+- [x] Add a change-classification job with conservative fallback when the base is unavailable.
+- [x] Run web and native jobs independently; skip Xcode for unrelated web-only edits while shared contracts/tokens/native files trigger it.
+- [x] Test web-only/native/shared/workflow/initial-push cases. No untrusted event text interpolated as shell code.
+- [x] Check actual package exports and task dependencies, deployed-demo guard, frozen lockfile, generated mirrors and native-copy drift.
 
 ### 3. Documentation and validation
 
 Files: requested architecture/platform/API/development documents, ADRs, README, AGENTS and both progress trackers; generator mirror updates.
 
-- [ ] Write domain inventory, scene compatibility, auth, voice and realtime boundaries with implemented/planned distinctions.
-- [ ] Document local setup/deployment and future directory moves; document measured test results and current limits.
-- [ ] Run baseline/full unit+SQL tests, lint/types, drift, production build and browser regressions. Run Swift fixtures/core tests for unchanged scene transport compatibility; native rendering code is unchanged.
-- [ ] Obtain an independent final architecture/security review and resolve material findings.
-- [ ] Commit coherent changes locally, preserve initial history and make the clean branch available in the main checkout. No deployment or push.
+- [x] Write domain inventory, scene compatibility, auth, voice and realtime boundaries with implemented/planned distinctions.
+- [x] Document local setup/deployment and future directory moves; document measured test results and current limits.
+- [x] Run baseline/full unit+SQL tests, lint/types, drift, production build and browser regressions. Run Swift fixtures/core tests for unchanged scene transport compatibility; native rendering code is unchanged.
+- [x] Obtain an independent final architecture/security review and resolve material findings.
+- [x] Commit coherent changes locally, preserve initial history and make the clean branch available in the main checkout. No deployment or push.
 
 ## Review focus
 
@@ -132,3 +132,9 @@ Files: requested architecture/platform/API/development documents, ADRs, README, 
 ## Subsequent milestones
 
 2: organization/project domain additions and typed clients using existing backend; 3: functional briefs/assets/conversations; 4: explicit scene v2/history/renderer interfaces; 5: actual R3F editor and canonical browser/native persistence slice; 6: deterministic shared command registry and native speech capture; 7: extend existing native renderer/sync; 8: authorized presence and review; 9: profiling, live account/device acceptance and deployment hardening. Each requires its own plan, reviewable implementation and evidence. Phase 1 does not claim the ten-step integrated MVP is complete.
+
+## Validation-driven scheduling decision
+
+The initial fully parallel Turbo run caused seven PostgreSQL setup hooks to time out under resource contention. Running the unchanged suite with four workers passed all 425 tests. Static gates now precede bounded test execution, followed by the production build; this preserves assertions and avoids simultaneous compiler/database startup pressure.
+
+Final local verification: `pnpm check` passed all 11 tasks, including 425 unit/PostgreSQL tests and the production build. All 32 production-browser cases, 48 Swift core tests and the shared Swift contract fixtures passed. Frozen installation, package cache reuse/invalidation and independent final review passed. See [delivery evidence](../../development/phase-1-status.md).

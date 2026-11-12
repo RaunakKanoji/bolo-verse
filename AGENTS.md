@@ -1,6 +1,6 @@
 # Shape Studio engineering guidance
 
-Read `context/project-overview.md`, `context/architecture-context.md` and the current `context/progress-tracker.md` first. The native brief in `docs/shape-studio/SPATIAL_MASTER_SPEC.md` extends the existing web foundation; follow `docs/shape-studio/native-architecture.md` for the additive SwiftUI/RealityKit app. Generation orchestration and complete collaboration remain unimplemented. Preserve existing web/XR/recording functionality and distinguish implemented, tested and externally unverified behavior in both trackers.
+Read `context/project-overview.md`, `context/architecture-context.md` and `context/progress-tracker.md` first. The latest unified prompt is `docs/product/UNIFIED_PLATFORM_SPEC.md`; the active architecture and phased plan are linked from `docs/architecture/system-overview.md`. Phase 1 establishes real workspace boundaries around the existing apps. Preserve web/XR/recording/native behavior; R3F editing, organizations and realtime remain later functional slices.
 
 - Use Next.js App Router, strict TypeScript, Tailwind/shadcn, A-Frame/WebXR, Clerk, Neon/Drizzle, private R2 and pnpm. Keep the original direct Three.js recording lab isolated; use AFRAME.THREE within the XR runtime to avoid mixing engine versions.
 - Keep credentials, identity verification, tenant authorization, database access and signing server-only. Every private read/mutation checks authorization; never introduce a public test-auth bypass.
@@ -11,6 +11,7 @@ Read `context/project-overview.md`, `context/architecture-context.md` and the cu
 - Use focused behavioral tests; run lint, typecheck, tests, production build and relevant browser flows before claiming completion.
 - Commit the lockfile and reviewable SQL migrations. Never commit credentials, private media, node_modules or generated test/build output.
 - Native Swift is independent of pnpm. Keep generated contracts/tokens synchronized with `native:check`; compile the checked-in Xcode project and run Swift tests for native changes. Maintain one session observer and one volume render owner; cancel or discard stale private results. Never claim simulator/device verification from source inspection alone.
+- Run `pnpm check` for the JavaScript workspace graph. Keep runtime scene definitions in `@shape/scene-schema`, without renderer/server imports; preserve the strict v1 wire format until a separately versioned migration. Native builds must remain independent of unrelated web changes. Do not add empty packages or put Swift files in JS workspace packages.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

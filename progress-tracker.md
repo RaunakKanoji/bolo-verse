@@ -2,7 +2,11 @@
 
 Updated 2026-11-12 (Asia/Kolkata).
 
-## Current scope: Shape Studio Spatial native foundation
+## Current scope: unified platform audit and monorepo foundation
+
+The [unified prompt](docs/product/UNIFIED_PLATFORM_SPEC.md) governs the latest increment. Audit and phased implementation plan were committed first (`2e5f2b1`). Phase 1 introduces actual pnpm packages for scene schemas and shared configuration, a pinned Turbo check graph, safe environment diagnostics, independent path-aware native CI and architecture/platform/development documentation. The root Next app, A-Frame workspace and native app are preserved. See [active phases](context/progress-tracker.md) and [system overview](docs/architecture/system-overview.md). Phase 1 is locally verified: 425 unit/PostgreSQL tests, 32 production Chromium cases, 48 Swift core tests, Swift contract fixtures and the full lint/type/build graph passed. See [files, decisions and verification](docs/development/phase-1-status.md). R3F, organizations, realtime and the complete integrated MVP remain later milestones. Implementation commits: `8795545` (workspace/contracts) and `84389cb` (CI). Work is local on `feat/unified-monorepo-foundation`; no remote push or deployment.
+
+## Preserved scope: Shape Studio Spatial native foundation
 
 The [native master specification](docs/shape-studio/SPATIAL_MASTER_SPEC.md) extends the existing web foundation. A native SwiftUI/RealityKit app now shares authorized projects, assets, private drafts and canonical scenes with the backend. The increment includes bounded USDZ viewing/manipulation and an explicit immersive study. Validation: 394 web/API tests, 48 Swift core tests, 32 production-browser cases, six native simulator tests, and simulator/unsigned device-target compilation. See [native execution evidence and open acceptance](docs/shape-studio/native-validation.md) and [setup](apps/visionos/README.md). Live authentication/storage, generation orchestration, conversion, full collaboration and physical-device acceptance remain open.
 
