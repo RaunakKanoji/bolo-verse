@@ -13,7 +13,11 @@ export function requireMutationOrigin(request: Request) {
   }
 }
 
-export async function readMutationJson<T extends z.ZodType>(request: Request, schema: T): Promise<z.infer<T>> {
+export async function readMutationJson<T extends z.ZodType>(request: Request, schema: T, options: { maxBytes?: number } = {}): Promise<z.infer<T>> {
+  // Larger multilingual draft documents opt in explicitly; all existing callers
+  // retain the 16 KiB limit. Callers cannot remove the transport bound.
+  const maxBytes = options.maxBytes ?? MAX_JSON_BYTES;
+  if (!Number.isSafeInteger(maxBytes) || maxBytes < 1 || maxBytes > 32_768) throw new Error("Invalid JSON byte limit.");
   if (request.headers.get("content-type")?.split(";", 1)[0].trim().toLowerCase() !== "application/json") {
     throw new BoundaryError(415, "INVALID_INPUT", "Send this request as application/json.");
   }
@@ -21,7 +25,7 @@ export async function readMutationJson<T extends z.ZodType>(request: Request, sc
   if (contentLength !== null && !/^\d+$/.test(contentLength)) {
     throw new BoundaryError(400, "INVALID_INPUT", "The request body length is invalid.");
   }
-  if (contentLength !== null && Number(contentLength) > MAX_JSON_BYTES) {
+  if (contentLength !== null && Number(contentLength) > maxBytes) {
     throw new BoundaryError(413, "INVALID_INPUT", "The request body is too large.");
   }
   if (!request.body) throw new BoundaryError(400, "INVALID_INPUT", "A JSON request body is required.");
@@ -36,7 +40,7 @@ export async function readMutationJson<T extends z.ZodType>(request: Request, sc
       const chunk = await reader.read();
       if (chunk.done) break;
       bytes += chunk.value.byteLength;
-      if (bytes > MAX_JSON_BYTES) {
+      if (bytes > maxBytes) {
         throw new BoundaryError(413, "INVALID_INPUT", "The request body is too large.");
       }
       text += decoder.decode(chunk.value, { stream: true });

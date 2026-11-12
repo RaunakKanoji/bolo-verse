@@ -1,0 +1,145 @@
+[
+  {
+    "schema": "CreativeDraftSnapshot",
+    "value": {
+      "projectId": "c842b5e5-8453-4a67-9c88-87f8e9e7b110",
+      "revision": 0,
+      "document": {
+        "schemaVersion": 1,
+        "mode": "image",
+        "prompts": {
+          "image": "",
+          "video": "",
+          "audio": "",
+          "model3d": ""
+        }
+      },
+      "updatedAt": null,
+      "canEdit": false
+    }
+  },
+  {
+    "schema": "CreativeDraftResponse",
+    "value": {
+      "ok": true,
+      "data": {
+        "draft": {
+          "projectId": "c842b5e5-8453-4a67-9c88-87f8e9e7b110",
+          "revision": 42,
+          "document": {
+            "schemaVersion": 1,
+            "mode": "model3d",
+            "prompts": {
+              "image": "A lavender bottle",
+              "video": "Orbit slowly",
+              "audio": "नमस्ते 🎙️",
+              "model3d": "A ceramic bowl\nStudio lighting"
+            }
+          },
+          "updatedAt": "2026-11-12T08:30:00.123Z",
+          "canEdit": true
+        }
+      },
+      "requestId": "fixture-request"
+    }
+  },
+  {
+    "schema": "AssetListResponse",
+    "value": {
+      "ok": true,
+      "data": {
+        "assets": [
+          {
+            "id": "e21386ae-51f4-44d9-991b-2e89e981bd96",
+            "projectId": "c842b5e5-8453-4a67-9c88-87f8e9e7b110",
+            "mimeType": "audio/wav",
+            "byteSize": 9007199254740991,
+            "width": null,
+            "height": null,
+            "durationSeconds": 1.25,
+            "createdAt": "2026-11-12T08:30:00Z",
+            "contentUrl": null
+          }
+        ],
+        "hasMore": false
+      },
+      "requestId": "fixture-request"
+    }
+  },
+  {
+    "schema": "ProjectListResponse",
+    "value": {
+      "ok": true,
+      "data": {
+        "projects": [
+          {
+            "id": "c842b5e5-8453-4a67-9c88-87f8e9e7b110",
+            "name": "Ceramics campaign",
+            "objective": "Create a product launch",
+            "sample": false,
+            "createdAt": "2026-11-12T08:30:00Z"
+          }
+        ]
+      },
+      "requestId": "fixture-request"
+    }
+  },
+  {
+    "schema": "UpdateProject",
+    "value": {
+      "objective": "Revise the product brief"
+    }
+  },
+  {
+    "schema": "ErrorResponse",
+    "value": {
+      "ok": false,
+      "error": {
+        "code": "CONFLICT",
+        "message": "The saved draft changed.",
+        "retryable": false
+      },
+      "requestId": "fixture-request"
+    }
+  },
+  {
+    "schema": "CreativeCapabilitiesResponse",
+    "value": {
+      "ok": true,
+      "data": {
+        "schemaVersion": 1,
+        "modes": [
+          {
+            "id": "image",
+            "label": "Image",
+            "availability": "not_implemented",
+            "reason": "Generation is not connected.",
+            "settings": []
+          },
+          {
+            "id": "video",
+            "label": "Video",
+            "availability": "not_implemented",
+            "reason": "Generation is not connected.",
+            "settings": []
+          },
+          {
+            "id": "audio",
+            "label": "Audio",
+            "availability": "not_implemented",
+            "reason": "Generation is not connected.",
+            "settings": []
+          },
+          {
+            "id": "model3d",
+            "label": "3D",
+            "availability": "not_implemented",
+            "reason": "Generation is not connected.",
+            "settings": []
+          }
+        ]
+      },
+      "requestId": "fixture-request"
+    }
+  }
+]
