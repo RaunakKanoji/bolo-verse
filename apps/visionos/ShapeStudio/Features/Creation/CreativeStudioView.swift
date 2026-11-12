@@ -86,7 +86,7 @@ struct CreativeStudioView: View {
                 .frame(maxWidth: .infinity, minHeight: 120).accessibilityHidden(true)
             Text("Open media in its own window, or inspect a supported USDZ in a volume.").foregroundStyle(.secondary)
             Button("Browse project assets", systemImage: "square.stack") { openWindow(id: "assets") }.disabled(projectID == nil)
-            Button("Open product volume", systemImage: "cube") { openWindow(id: "product-volume"); openWindow(id: "spatial-controls") }
+            Button("Open product volume", systemImage: "cube") { openWindow(id: "spatial-controls"); openWindow(id: "product-volume") }
             Text("Generation history will appear when the shared backend supports generation jobs. No sample output is presented as a completed request.").font(.caption).foregroundStyle(.secondary)
         }
     }

@@ -81,7 +81,7 @@ struct AssetLibraryView: View {
                 guard sessionRevision == dependencies.authentication.session.revision,
                       projectID == dependencies.projects?.selectedProject?.id else { return }
                 if coordinator.spatial.projectAssetID == asset.id {
-                    openWindow(id: "product-volume"); openWindow(id: "spatial-controls")
+                    openWindow(id: "spatial-controls"); openWindow(id: "product-volume")
                 } else { loadError = coordinator.spatial.errorMessage }
             } catch is CancellationError { }
             catch { if !Task.isCancelled { loadError = error.localizedDescription } }

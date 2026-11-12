@@ -26,3 +26,9 @@ Project controls load a revision without altering the current object. Applying t
 ## Verification
 
 Core tests exercise invalid transforms, bounds, cumulative gesture deltas, history, local serialization, ZIP metadata/texture rejection, canonical basis conversion, stable identity and preservation of other objects. Swift 6 typechecking against the installed visionOS 26 SDK is separate from simulator/device acceptance. Actual gaze/pinch ergonomics, VoiceOver operation, comfort, GPU memory, and headset performance require device validation.
+
+## Window ownership and recovery
+
+The main workspace, volume and inspector use unique visionOS 26 `Window` scenes. Repeated `openWindow(id:)` requests bring the existing scene forward instead of creating another view that competes for the shared RealityKit root. Keep the renderer ownership guard in place. The transient volume/inspector opt out of restoration and default launch; the workspace is the main launch scene. Both auxiliaries provide an explicit route back to the workspace. This follows [Apple window-opening semantics](https://developer.apple.com/documentation/swiftui/openwindowaction) and [scene restoration guidance](https://developer.apple.com/documentation/visionos/embedding-controls-in-an-immersive-space).
+
+Volume appearance acquires the renderer lease; disappearance releases it. The RealityView creation/update closures attach the root only while that view owns the lease, so a retained view can restore its model after reopening. The UI regression verifies initial model accessibility/hittability and window recovery. A strict expected failure tracks the reopened-model accessibility snapshot issue; display capture independently confirms rendered geometry. See the native validation notes for that limitation.

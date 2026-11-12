@@ -6,6 +6,7 @@ import simd
 
 struct SpatialInspectorView: View {
     @Bindable var workspace: SpatialWorkspace
+    @Environment(\.openWindow) private var openWindow
     @State private var importingModel = false
     @State private var importingScene = false
     @State private var exportingScene = false
@@ -18,6 +19,8 @@ struct SpatialInspectorView: View {
 
     var body: some View {
         Form {
+            Button("Open Workspace", systemImage: "rectangle") { openWindow(id: "workspace") }
+                .accessibilityIdentifier("inspector-open-workspace")
             Section(workspace.projectAssetID == nil ? "Local product studio" : "Project product studio") {
                 Text(workspace.title).font(.headline)
                 Text(workspace.status).foregroundStyle(.secondary)

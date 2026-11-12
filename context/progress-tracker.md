@@ -2,6 +2,12 @@
 
 Updated 12 November 2026 (Asia/Kolkata). Current scope: Phase 0 audit and Phase 1 monorepo foundation from the [unified platform prompt](../docs/product/UNIFIED_PLATFORM_SPEC.md). See the [system overview](../docs/architecture/system-overview.md) and [committed plan](../docs/superpowers/plans/2026-11-12-unified-monorepo-foundation.md).
 
+## Native simulator window recovery — 12 November 2026
+
+Fixed repeated product opening creating empty duplicate windows. The workspace, product volume and inspector now use unique windows; launch presents the workspace, and both auxiliary windows include **Open Workspace**. Volume renderer ownership is acquired/released with appearance/disappearance, and **Close volume** returns to the workspace.
+
+Verification: six simulator UI tests and three hosted RealityKit tests completed with zero unexpected failures. One reopened-model accessibility assertion remains a strict expected failure: display capture confirms the model renders, but its automation accessibility entry is missing after reopening. All 48 Swift core tests and native artifact drift checks passed. Physical-device and live-service acceptance remain open. See [native validation](../docs/shape-studio/native-validation.md) for evidence and limitations.
+
 ## Unified platform phases
 
 | Phase | Status | Scope / next work |

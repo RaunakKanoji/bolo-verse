@@ -6,12 +6,13 @@ struct ShapeStudioApp: App {
     @State private var coordinator = AppCoordinator()
 
     var body: some Scene {
-        WindowGroup("Shape Studio", id: "workspace") {
+        Window("Shape Studio", id: "workspace") {
             WorkspaceView()
                 .environment(dependencies).environment(coordinator)
                 .task { dependencies.startSessionObservation(coordinator: coordinator) }
         }
         .defaultSize(width: 1120, height: 760)
+        .defaultLaunchBehavior(.presented)
 
         WindowGroup("Projects", id: "projects") {
             ProjectsView().environment(dependencies).environment(coordinator)
@@ -36,19 +37,23 @@ struct ShapeStudioApp: App {
             UnavailableModule(title: "Client review", symbol: "checkmark.bubble", detail: "Native review, comments and approval actions will connect to the shared backend when those versioned services are available. No local example represents client approval.")
         }.defaultSize(width: 720, height: 620)
 
-        WindowGroup("Spatial controls", id: "spatial-controls") {
+        Window("Spatial controls", id: "spatial-controls") {
             SpatialInspectorView(workspace: coordinator.spatial)
                 .frame(minWidth: 420, minHeight: 520)
                 .environment(dependencies).environment(coordinator)
                 .task { dependencies.startSessionObservation(coordinator: coordinator) }
         }.defaultSize(width: 520, height: 740)
+        .restorationBehavior(.disabled)
+        .defaultLaunchBehavior(.suppressed)
 
-        WindowGroup("Product volume", id: "product-volume") {
+        Window("Product volume", id: "product-volume") {
             ProductVolumeView(workspace: coordinator.spatial)
                 .task { dependencies.startSessionObservation(coordinator: coordinator) }
         }
         .windowStyle(.volumetric)
         .defaultSize(width: 0.8, height: 0.8, depth: 0.8, in: .meters)
+        .restorationBehavior(.disabled)
+        .defaultLaunchBehavior(.suppressed)
 
         ImmersiveSpace(id: "CreativeEnvironment") {
             CreativeEnvironmentView().environment(coordinator)

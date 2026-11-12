@@ -9,6 +9,8 @@ A native SwiftUI/RealityKit application for visionOS 26+, with a checked-in Xcod
 3. For live sign-in, choose a unique bundle identifier/signing team, enable Clerk Native API and register the actual Apple App ID prefix/bundle ID in that Clerk instance. Never put backend secrets or session tokens in the app configuration.
 4. Apply the shared backend migrations through `0005_spatial_scenes.sql` in your intended database. No live database was migrated during implementation.
 
+The workspace, product volume and spatial inspector each use one native window. Opening them again brings the existing window forward. Use **Open Workspace** in the volume or inspector to return to the main screen, or **Close volume** to return and close the product view. The main workspace is the launch destination; transient product/inspector windows do not restore on app launch.
+
 ClerkKit is pinned to **1.5.8**. Releases 1.5.9 through 1.7.1 use `weak let`, which failed compilation on the installed Xcode 26.0.1 / Swift 6.2. This compatibility pin does not include subsequent SDK fixes; re-evaluate it with a newer Xcode and repeat authentication acceptance before release. No SDK source is patched.
 
 ## Implemented

@@ -81,8 +81,8 @@ struct WorkspaceView: View {
             Text("Inspect a local 3D study in a volume. Import your own USDZ from Spatial controls.")
                 .foregroundStyle(.secondary)
             Button("Open product volume", systemImage: "cube.transparent") {
-                openWindow(id: "product-volume")
                 openWindow(id: "spatial-controls")
+                openWindow(id: "product-volume")
             }.buttonStyle(.borderedProminent).accessibilityIdentifier("open-product-volume")
             Text("The included study is procedural sample geometry, not a generated or saved client asset.")
                 .font(.caption).foregroundStyle(.secondary)
