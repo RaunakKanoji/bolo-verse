@@ -1,64 +1,85 @@
 # BoloVerse
 
-A browser-based creative workspace for Indian MSME campaigns. This repository implements **M0: foundation and feasibility** from [the build specification](docs/BUILD_SPEC.md). Later milestones are intentionally not active.
+Voice-only VR product studio for Indian MSME creators. The full spec is in [CLAUDE.md](CLAUDE.md).
 
-The recording lab captures an actual Three.js portrait canvas and microphone stream, then provides local playback and download. It does not upload the recording or send audio to a provider. The public experiment uses an original procedural textile illustration, not private project data.
+**Status: M0 (scaffold).** You get a Vite multi-page app, the Supabase schema with RLS, storage and realtime, six Edge Function skeletons, and a **system-check page** at `/` that proves a phone can reach all of it.
+
+## Repo layout
+
+```
+src/index.html, main.js      system check (M0)
+src/shared/                  config.js, supabaseClient.js, commandSchema.js, diagnostics.js, theme.css
+src/{studio,upload,spectator,watch,approve,metrics}/   one page each (placeholders until their milestone)
+supabase/migrations/0001_init.sql   tables, RLS, buckets, storage policies, realtime
+supabase/functions/<name>/index.ts  join-session, stt, command, tts, claimcheck, reel-link
+supabase/functions/_shared/  cors, auth, rateLimit, handler, sarvam, gemini
+tests/                       vitest unit tests
+```
+
+## One-time setup
+
+You need Node 20+ and a free [Supabase](https://supabase.com) account. The Supabase CLI is a dev dependency, so run it with `npx supabase …`.
+
+1. **Install:** `npm install`
+2. **Create a Supabase project** in the dashboard. Note the *Project ref* (the `xxxx` in `https://xxxx.supabase.co`).
+3. **Enable anonymous sign-ins:** Dashboard → Authentication → Sign In / Providers → turn on **Allow anonymous sign-ins** → Save.
+4. **Link and push the schema:**
+   ```sh
+   npx supabase login
+   npx supabase link --project-ref <your-ref>
+   npx supabase db push
+   ```
+   Or paste `supabase/migrations/0001_init.sql` into Dashboard → SQL Editor → Run. This also creates the private `products` and `reels` buckets.
+5. **Edge Function secrets:** copy `supabase/functions/.env.example` to `supabase/functions/.env` and fill in `SARVAM_API_KEY`, `GEMINI_API_KEY` and `GEMINI_MODEL`. They can stay empty for M0, because the skeletons don't call providers yet. Then run:
+   ```sh
+   npx supabase secrets set --env-file supabase/functions/.env
+   ```
+6. **Deploy the functions:**
+   ```sh
+   npx supabase functions deploy
+   ```
+   This deploys all six. If it complains about Docker, add `--use-api`.
+7. **Frontend env:** copy `.env.example` to `.env`. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` from Dashboard → Project Settings → API (the *anon / publishable* key, never the service-role key).
 
 ## Run locally
 
-Use Node.js 24 or newer and npm (the lockfile is checked in).
-
 ```sh
-npm ci
-cp .env.example .env.local
-npm run dev
+npm run dev      # http://localhost:5173  (also printed with your LAN IP)
+npm test         # unit tests
+npm run build    # production build into dist/
 ```
 
-Open `http://localhost:3000`, then **Try local recording**. No provider credentials are needed for the public lab. Read the disclosure, consent, and record a five-second test. Allow the microphone when Chrome asks. Play/download the result before leaving: local takes do not survive reload or navigation.
+## Deploy (Vercel)
 
-For a production build:
+1. Push this repo to GitHub and import it in Vercel. `vercel.json` already sets the Vite build and the `dist` output.
+2. In Vercel → Settings → Environment Variables, add `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` and, optionally, `VITE_FUNCTIONS_URL`. Then redeploy.
+3. Set the CORS allow-list on the functions (recommended before the demo):
+   `npx supabase secrets set ALLOWED_ORIGINS=https://<your-app>.vercel.app,http://localhost:5173`
 
-```sh
-npm run build
-npm start
-```
+## Testing on an Android phone
 
-## Connect private projects
+The mic, motion sensors and Wake Lock only work in a **secure context**, meaning HTTPS or `localhost`. A phone opening `http://192.168.x.x:5173` is *not* secure. Use one of these:
 
-1. Create/configure a Clerk application. Set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` in `.env.local`; configure its allowed development/preview domains. Sign in with a real account. No test-auth bypass exists.
-2. Create a Neon development database. Set `DATABASE_URL`; optionally set `DATABASE_MIGRATION_URL` for a direct migration connection. Only the server receives these URLs.
-3. Review all three checked-in `drizzle/*.sql` migrations, then run `npm run db:migrate` against that development database. Never point an unreviewed migration at production.
-4. Visit `/app/projects`. An authenticated first visit creates a personal workspace and owner membership transactionally. Assigned projects appear there. Read endpoints independently check identity and membership.
-5. Optional fictional sample seed instructions are in [the demo runbook](docs/DEMO_RUNBOOK.md). Project creation/editing, assignment UI and client review arrive in later milestones.
+- **Vercel URL (easiest):** open `https://<your-app>.vercel.app/` in Chrome on the phone.
+- **USB port forwarding:** turn on USB debugging on the phone and plug it in. On the laptop, open `chrome://inspect/#devices` → *Port forwarding* → add `5173` → `localhost:5173` and tick *Enable port forwarding*. Then open `http://localhost:5173/` on the phone.
 
-An unconfigured private API returns an explicit failure, not sample project data. Clerk/Neon live operation requires real credentials and has not been proven by local tests. See [implementation status](docs/IMPLEMENTATION_STATUS.md).
+### Manual device test script (later milestones)
+1. Phone A in headset with wired earphones: 20 commands × 3 speakers → record on metrics page.
+2. Same with background noise (play crowd noise from a laptop).
+3. Full demo loop timed: Phone B capture → appears → 4 voice commands → 15 s reel → QR → watch on another phone.
+4. 20-minute endurance: battery, heat, fps.
+5. Network drop: turn Wi-Fi off mid-session → fallback messages, no freeze.
 
-## Checks
+## Security & Privacy (DPDP-aligned)
 
-```sh
-npm run lint
-npm run typecheck
-npm test
-npm run build
-npx playwright install chromium
-npm run test:e2e
-```
+- **Consent:** the studio asks for spoken consent before it processes any command (built in M2).
+- **Minimisation:** command audio is transcribed and discarded. Only the text transcript is logged. Reel audio is the creator's content and is stored privately.
+- **No secrets in the browser:** Sarvam and Gemini keys live only in Edge Function secrets.
+- **Access control:** RLS is on for every table, and only session members can read or write a session's rows and files. `msme_id` is set only by `join-session`. Only the MSME can approve a reel.
+- **Deletion:** deleting a session (creator only) cascades to its products, briefs, reels and logs.
+- Reels are watched through short-lived signed URLs only. Removing the watermark from approved reels is out of scope: approval hides the "Draft" badge only.
 
-Unit tests cover strict contracts, configuration, unavailable provider behavior and recording lifecycle. Integration tests run the SQL migration and authorized repositories against embedded PostgreSQL (PGlite). Playwright tests use a synthetic microphone with real browser recording; this does not measure real microphone quality or Android performance. E2E expects missing provider credentials; run it in a clean local environment without `.env.local` Clerk/Neon secrets.
-
-Database tooling: `npm run db:generate`, `npm run db:migrate`, `npm run db:seed`. Speech fixture evaluation and cached speech generation scripts will be introduced with M2; no fake generation command is provided in M0.
-
-## Phone testing and deployment
-
-Use an **HTTPS** preview for another device. A phone opening your computer's HTTP LAN IP is not equivalent to localhost and usually cannot use the microphone. Deploy this Next.js repository to a chosen Vercel project, set environment variables explicitly, and configure Clerk domains before testing private data. No deployment or cloud resource has been created by this initial local implementation.
-
-For M0, open `/studio/feasibility` in Android Chrome, consent, record, play back and download. Detailed steps and failure recovery are in [the runbook](docs/DEMO_RUNBOOK.md). The manifest provides installation hints; Chrome may offer **Add to home screen**. There is no service worker or offline cache of private responses/audio. Orientation and fullscreen hints do not prove headset readiness.
-
-## Documentation
-
-- [Progress tracker](progress-tracker.md) and [milestone evidence](docs/IMPLEMENTATION_STATUS.md)
-- [Architecture decisions](docs/DECISIONS.md)
-- [Provider/version/asset inventory](docs/INTEGRATIONS.md)
-- [Device runbook](docs/DEMO_RUNBOOK.md)
-
-M1 adds the stereo studio. Proceed only after the user says `next`.
+## Notes / to verify
+- Edge Functions use `verify_jwt = false` in `supabase/config.toml` and check the JWT in code (`_shared/auth.ts`), so CORS preflight works. Every call still needs a valid user JWT.
+- `_shared/rateLimit.ts` is in memory, per isolate, and best-effort.
+- `// VERIFY:` markers: Sarvam endpoint/field names, Gemini JSON-mode fields, VAD defaults, and whether `SUPABASE_ANON_KEY` is injected on projects using the new API keys.

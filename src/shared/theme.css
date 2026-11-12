@@ -1,0 +1,56 @@
+/* BoloVerse look and feel (§16): three colours, square corners, hairlines, no shadows. */
+:root {
+  --ink: #05070d;
+  --white: #f2f5fb;
+  --cobalt: #3b74ff;
+  --pale: #8fb6ff;
+  --hair: 1px solid rgba(242, 245, 251, 0.18);
+  --font-head: 'Syne', system-ui, sans-serif;
+  --font-body: 'Hanken Grotesk', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; border-radius: 0; }
+
+html, body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+main { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; }
+
+h1, h2 { font-family: var(--font-head); font-weight: 700; letter-spacing: -0.01em; margin: 0 0 8px; }
+h1 { font-size: 2rem; }
+h2 { font-size: 1.15rem; margin-top: 28px; }
+
+.label, code, .mono { font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.04em; }
+.label { text-transform: uppercase; color: var(--pale); }
+.muted { color: var(--pale); }
+
+a { color: var(--pale); }
+
+.btn {
+  display: inline-block; width: 100%; padding: 18px 20px; margin: 8px 0;
+  background: var(--cobalt); color: var(--white); border: 0;
+  font: 600 1.1rem var(--font-head); text-align: center; text-decoration: none; cursor: pointer;
+}
+.btn.ghost { background: transparent; border: var(--hair); }
+
+.checks { list-style: none; padding: 0; margin: 0; border-top: var(--hair); }
+.checks li {
+  display: grid; grid-template-columns: 1.6em 1fr auto; gap: 8px; align-items: baseline;
+  padding: 10px 0; border-bottom: var(--hair);
+}
+.checks .mark { font-family: var(--font-mono); }
+.checks .detail { grid-column: 2 / 4; font-family: var(--font-mono); font-size: 0.75rem; color: var(--pale); word-break: break-word; }
+.checks .ms { font-family: var(--font-mono); font-size: 0.75rem; color: var(--pale); }
+.ok .mark { color: var(--pale); }
+.fail .mark, .fail .name { color: var(--white); text-decoration: underline wavy var(--cobalt); }
+
+.links { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.links a { display: block; padding: 14px; border: var(--hair); color: var(--white); text-decoration: none; font-family: var(--font-mono); font-size: 0.85rem; }

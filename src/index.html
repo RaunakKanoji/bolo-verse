@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#05070d" />
+  <title>BoloVerse</title>
+  <link rel="icon" href="/icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600&family=JetBrains+Mono:wght@400;600&family=Syne:wght@700&display=swap" />
+  <link rel="stylesheet" href="./shared/theme.css" />
+</head>
+<body>
+  <main>
+    <p class="label">BoloVerse · M0 scaffold</p>
+    <h1>System check</h1>
+    <p class="muted">Open this page on the Android phone. Every row should show ✓.</p>
+
+    <h2>Backend</h2>
+    <ul class="checks" id="backend"></ul>
+
+    <h2>This device</h2>
+    <ul class="checks" id="device"></ul>
+
+    <button class="btn ghost" id="rerun" type="button">Run checks again</button>
+
+    <h2>Pages</h2>
+    <nav class="links">
+      <a href="/studio/">/studio</a>
+      <a href="/upload/">/upload</a>
+      <a href="/spectator/">/spectator</a>
+      <a href="/watch/">/watch</a>
+      <a href="/approve/">/approve</a>
+      <a href="/metrics/">/metrics</a>
+    </nav>
+  </main>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
