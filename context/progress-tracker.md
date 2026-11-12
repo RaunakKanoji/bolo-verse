@@ -12,6 +12,8 @@ Final local verification passed: all 14 `pnpm check` tasks, 523 tests across 54 
 
 No live account/provider/storage calls, billed requests, cloud deletions, live migrations, deployment or physical-device verification occurred. Native source behavior is retained; the native image-generation UI remains later work. The new worker and cleanup commands must be scheduled/configured before rollout. Existing native accessibility/live/device gates stay open. Concept images under `output/` and unrelated local files are excluded from these commits.
 
+Local integration: `feat/cross-platform-creator-workflows` merged into `main` at `19ff5c29`, preserving planning `876d63b0`, backend `9fa561a`, studio `783e85b` and delivery documentation `c9c83342`. The merge tree exactly matched the verified feature tree. Fresh post-merge `pnpm test` passed all 523 tests in 54 files. Feature branch and existing native worktree were preserved; no remote push occurred.
+
 ## Main integration — 12 November 2026
 
 All five completed development branches are merged into local `main` in dependency order, with separate merge commits and their original commits preserved. The feature branches and the separate native worktree remain available.

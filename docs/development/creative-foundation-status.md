@@ -57,4 +57,4 @@ Branch: `feat/cross-platform-creator-workflows`, based on local `main` at `29669
 - `9fa561a` — private image APIs, durable jobs/cleanup, migrations, dependencies and generated contracts.
 - `783e85b` — connected studio, privacy teardown and browser coverage.
 
-Documentation records acceptance and operational gates separately. Merge into local `main` preserves these commits. No remote push is part of this increment. Unrelated `.gitignore`/`context/feature-specs` changes and generated concept output are preserved outside these commits.
+Documentation records acceptance and operational gates separately. Merged into local `main` with merge commit `19ff5c29`, preserving these commits. The merged tree matched the verified feature branch exactly; a fresh post-merge `pnpm test` passed all 523 tests in 54 files. Temporary production servers on ports 3170/3171 were stopped. No remote push is part of this increment. Unrelated `.gitignore`/`context/feature-specs` changes and generated concept output are preserved outside these commits.
