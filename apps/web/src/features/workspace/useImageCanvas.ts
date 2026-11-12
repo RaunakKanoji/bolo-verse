@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { CreationAccessError } from "@/features/creation/creation-http";
 import { MAX_PREVIEW_BYTES, validatePreviewAsset } from "@/lib/contracts/xr-assets";
 
 /** Prepare a local URL only after the image passes the canvas import boundary. */
@@ -18,7 +19,7 @@ export async function createValidatedCanvasImageUrl(input: Blob, signal: AbortSi
   return URL.createObjectURL(input);
 }
 
-export function useImageCanvas(assetId?: string) {
+export function useImageCanvas(assetId?: string, onAccessRevoked?: () => void) {
   const [upload, setUpload] = useState<File | null>(null);
   const [revision, setRevision] = useState(0);
   const [loaded, setLoaded] = useState<{
@@ -52,6 +53,10 @@ export function useImageCanvas(assetId?: string) {
             signal: abort.signal,
             cache: "no-store",
           });
+          if (response.status === 401 || response.status === 403) {
+            onAccessRevoked?.();
+            throw new CreationAccessError(response.status);
+          }
           if (!response.ok)
             throw new Error("This project image is unavailable. Check access and try again.");
           const blob = await response.blob();
@@ -94,7 +99,7 @@ export function useImageCanvas(assetId?: string) {
       image.current = null;
       if (owned) URL.revokeObjectURL(owned);
     };
-  }, [assetId, upload, revision]);
+  }, [assetId, upload, revision, onAccessRevoked]);
   return {
     image,
     url,

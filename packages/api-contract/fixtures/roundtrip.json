@@ -285,5 +285,72 @@
         ]
       }
     }
+  },
+  {
+    "schema": "FinalizeImageUpload",
+    "value": {}
+  },
+  {
+    "schema": "CancelImageGeneration",
+    "value": {}
+  },
+  {
+    "schema": "CreateImageUpload",
+    "value": {
+      "projectId": "c1000000-0000-4000-8000-000000000001",
+      "idempotencyKey": "c1000000-0000-4000-8000-000000000001",
+      "fileName": "reference.png",
+      "mimeType": "image/png",
+      "byteSize": 128,
+      "checksumSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  },
+  {
+    "schema": "CreateImageGeneration",
+    "value": {
+      "projectId": "c1000000-0000-4000-8000-000000000001",
+      "idempotencyKey": "c1000000-0000-4000-8000-000000000001",
+      "prompt": "ALTÉR — lumière",
+      "modelId": "gemini-3.1-flash-image",
+      "aspectRatio": "16:9",
+      "referenceAssetId": null
+    }
+  },
+  {
+    "schema": "ImageGenerationResponse",
+    "value": {
+      "ok": true,
+      "requestId": "fixture",
+      "data": {
+        "job": {
+          "id": "c1000000-0000-4000-8000-000000000001",
+          "projectId": "c1000000-0000-4000-8000-000000000001",
+          "status": "queued",
+          "prompt": "ALTÉR — lumière",
+          "modelId": "gemini-3.1-flash-image",
+          "aspectRatio": "16:9",
+          "referenceAssetId": null,
+          "outputAssetId": null,
+          "errorCode": null,
+          "errorMessage": null,
+          "createdAt": "2026-11-12T10:00:00Z",
+          "updatedAt": "2026-11-12T10:00:00Z"
+        }
+      }
+    }
+  },
+  {
+    "schema": "ImageGenerationCapabilitiesResponse",
+    "value": {
+      "ok": true,
+      "requestId": "fixture",
+      "data": {
+        "availability": "unconfigured",
+        "reason": "Image generation is unconfigured.",
+        "models": [],
+        "maxReferenceBytes": 10485760,
+        "maxPromptCharacters": 4000
+      }
+    }
   }
 ]

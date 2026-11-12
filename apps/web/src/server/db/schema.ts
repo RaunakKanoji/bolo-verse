@@ -329,7 +329,7 @@ type ProcessingResult = { assetId?: string; artifactVersionId?: string; contentV
 export const processingJobs = pgTable("processing_jobs", {
   id: id(),
   projectId: uuid("project_id").notNull().references(() => projects.id, { onDelete: "restrict" }),
-  kind: text("kind", { enum: ["render", "claim_check", "cutout"] }).notNull(),
+  kind: text("kind", { enum: ["render", "claim_check", "cutout", "image_generation"] }).notNull(),
   idempotencyKey: text("idempotency_key").notNull(),
   providerJobId: text("provider_job_id"),
   status: jobStatus("status").default("queued").notNull(),
@@ -341,6 +341,7 @@ export const processingJobs = pgTable("processing_jobs", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 }, (table) => [
   unique("processing_jobs_operation_uq").on(table.projectId, table.kind, table.idempotencyKey),
+  unique("processing_jobs_id_project_uq").on(table.id, table.projectId),
   check("job_idempotency_key_bounded", sql`char_length(${table.idempotencyKey}) BETWEEN 1 AND 128`),
   index("processing_jobs_project_status_idx").on(table.projectId, table.status),
   check("job_attempts_nonnegative", sql`${table.attempts} >= 0`),

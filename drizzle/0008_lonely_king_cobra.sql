@@ -1,0 +1,1 @@
+ALTER TABLE "asset_upload_sessions" ADD COLUMN "final_deleted_at" timestamp with time zone;

@@ -17,6 +17,27 @@ export function createShapeClient(fetcher: typeof fetch = fetch) {
     return payload as T;
   }
   return {
+    getImageGenerationCapabilities(signal?: AbortSignal): Promise<Models.ImageGenerationCapabilitiesResponse> {
+      return request(`/api/v1/creation/capabilities`, { method: "GET", signal });
+    },
+    createImageUpload(body: Models.CreateImageUpload, signal?: AbortSignal): Promise<Models.ImageUploadResponse> {
+      return request(`/api/v1/assets/upload-session`, { method: "POST", signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    },
+    finalizeImageUpload(uploadId: string, body: Models.FinalizeImageUpload, signal?: AbortSignal): Promise<Models.FinalizedImageUploadResponse> {
+      return request(`/api/v1/assets/upload-session/${encodeURIComponent(uploadId)}/finalize`, { method: "POST", signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    },
+    createImageGeneration(body: Models.CreateImageGeneration, signal?: AbortSignal): Promise<Models.ImageGenerationResponse> {
+      return request(`/api/v1/generations`, { method: "POST", signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    },
+    listImageGenerations(projectId: string, signal?: AbortSignal): Promise<Models.ImageGenerationListResponse> {
+      return request(`/api/v1/projects/${encodeURIComponent(projectId)}/generations`, { method: "GET", signal });
+    },
+    getImageGeneration(jobId: string, signal?: AbortSignal): Promise<Models.ImageGenerationResponse> {
+      return request(`/api/v1/generations/${encodeURIComponent(jobId)}`, { method: "GET", signal });
+    },
+    cancelImageGeneration(jobId: string, body: Models.CancelImageGeneration, signal?: AbortSignal): Promise<Models.ImageGenerationResponse> {
+      return request(`/api/v1/generations/${encodeURIComponent(jobId)}/cancel`, { method: "POST", signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    },
     getSpatialScene(projectId: string, signal?: AbortSignal): Promise<Models.SpatialSceneResponse> {
       return request(`/api/v1/projects/${encodeURIComponent(projectId)}/spatial-scene`, { method: "GET", signal });
     },

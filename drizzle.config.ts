@@ -5,7 +5,7 @@ loadEnvConfig(process.cwd());
 const migrationUrl = process.env.DATABASE_MIGRATION_URL || process.env.DATABASE_URL;
 
 export default defineConfig({
-  schema: "./apps/web/src/server/db/schema.ts",
+  schema: ["./apps/web/src/server/db/schema.ts", "./apps/web/src/server/db/creation-schema.ts"],
   out: "./drizzle",
   dialect: "postgresql",
   ...(migrationUrl ? { dbCredentials: { url: migrationUrl } } : {}),

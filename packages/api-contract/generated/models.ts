@@ -1,6 +1,218 @@
 // Generated from openapi.json. Do not edit.
 // DTO types only; server Zod schemas enforce constraints.
 
+export type CreateImageUpload = {
+  projectId: string;
+  idempotencyKey: string;
+  fileName: string;
+  mimeType: "image/png" | "image/jpeg" | "image/webp";
+  byteSize: number;
+  checksumSha256: string;
+};
+
+export type FinalizeImageUpload = Record<string, never>;
+
+export type ImageUploadSession = {
+  id: string;
+  projectId: string;
+  assetId: string;
+  expiresAt: string;
+  uploadUrl: string;
+  uploadContentType: "image/png" | "image/jpeg" | "image/webp";
+};
+
+export type ImageUploadResult = {
+  upload: {
+  id: string;
+  projectId: string;
+  assetId: string;
+  expiresAt: string;
+  uploadUrl: string;
+  uploadContentType: "image/png" | "image/jpeg" | "image/webp";
+};
+};
+
+export type FinalizedImageUploadResult = {
+  asset: {
+  id: string;
+  projectId: string;
+  mimeType: string;
+  byteSize: number;
+  width: (number | null);
+  height: (number | null);
+  durationSeconds: (number | null);
+  createdAt: string;
+  nativeContentUrl: (string | null);
+  contentUrl: (string | null);
+};
+};
+
+export type ImageGenerationCapabilities = {
+  availability: "configured" | "unconfigured";
+  reason: string;
+  models: Array<{
+  id: "gemini-3.1-flash-image" | "gemini-3-pro-image" | "gemini-2.5-flash-image";
+  label: string;
+  aspectRatios: Array<"1:1" | "16:9" | "4:5" | "9:16">;
+  referenceImage: boolean;
+}>;
+  maxReferenceBytes: number;
+  maxPromptCharacters: number;
+};
+
+export type CreateImageGeneration = {
+  projectId: string;
+  idempotencyKey: string;
+  prompt: string;
+  modelId: "gemini-3.1-flash-image" | "gemini-3-pro-image" | "gemini-2.5-flash-image";
+  aspectRatio: "1:1" | "16:9" | "4:5" | "9:16";
+  referenceAssetId: (string | null);
+};
+
+export type CancelImageGeneration = Record<string, never>;
+
+export type ImageGenerationJob = {
+  id: string;
+  projectId: string;
+  status: "queued" | "processing" | "ready" | "failed" | "cancelled";
+  prompt: string;
+  modelId: "gemini-3.1-flash-image" | "gemini-3-pro-image" | "gemini-2.5-flash-image";
+  aspectRatio: "1:1" | "16:9" | "4:5" | "9:16";
+  referenceAssetId: (string | null);
+  outputAssetId: (string | null);
+  errorCode: (string | null);
+  errorMessage: (string | null);
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ImageGenerationResult = {
+  job: {
+  id: string;
+  projectId: string;
+  status: "queued" | "processing" | "ready" | "failed" | "cancelled";
+  prompt: string;
+  modelId: "gemini-3.1-flash-image" | "gemini-3-pro-image" | "gemini-2.5-flash-image";
+  aspectRatio: "1:1" | "16:9" | "4:5" | "9:16";
+  referenceAssetId: (string | null);
+  outputAssetId: (string | null);
+  errorCode: (string | null);
+  errorMessage: (string | null);
+  createdAt: string;
+  updatedAt: string;
+};
+};
+
+export type ImageGenerationList = {
+  jobs: Array<{
+  id: string;
+  projectId: string;
+  status: "queued" | "processing" | "ready" | "failed" | "cancelled";
+  prompt: string;
+  modelId: "gemini-3.1-flash-image" | "gemini-3-pro-image" | "gemini-2.5-flash-image";
+  aspectRatio: "1:1" | "16:9" | "4:5" | "9:16";
+  referenceAssetId: (string | null);
+  outputAssetId: (string | null);
+  errorCode: (string | null);
+  errorMessage: (string | null);
+  createdAt: string;
+  updatedAt: string;
+}>;
+};
+
+export type ImageUploadResponse = {
+  ok: true;
+  data: {
+  upload: {
+  id: string;
+  projectId: string;
+  assetId: string;
+  expiresAt: string;
+  uploadUrl: string;
+  uploadContentType: "image/png" | "image/jpeg" | "image/webp";
+};
+};
+  requestId: string;
+};
+
+export type FinalizedImageUploadResponse = {
+  ok: true;
+  data: {
+  asset: {
+  id: string;
+  projectId: string;
+  mimeType: string;
+  byteSize: number;
+  width: (number | null);
+  height: (number | null);
+  durationSeconds: (number | null);
+  createdAt: string;
+  nativeContentUrl: (string | null);
+  contentUrl: (string | null);
+};
+};
+  requestId: string;
+};
+
+export type ImageGenerationCapabilitiesResponse = {
+  ok: true;
+  data: {
+  availability: "configured" | "unconfigured";
+  reason: string;
+  models: Array<{
+  id: "gemini-3.1-flash-image" | "gemini-3-pro-image" | "gemini-2.5-flash-image";
+  label: string;
+  aspectRatios: Array<"1:1" | "16:9" | "4:5" | "9:16">;
+  referenceImage: boolean;
+}>;
+  maxReferenceBytes: number;
+  maxPromptCharacters: number;
+};
+  requestId: string;
+};
+
+export type ImageGenerationResponse = {
+  ok: true;
+  data: {
+  job: {
+  id: string;
+  projectId: string;
+  status: "queued" | "processing" | "ready" | "failed" | "cancelled";
+  prompt: string;
+  modelId: "gemini-3.1-flash-image" | "gemini-3-pro-image" | "gemini-2.5-flash-image";
+  aspectRatio: "1:1" | "16:9" | "4:5" | "9:16";
+  referenceAssetId: (string | null);
+  outputAssetId: (string | null);
+  errorCode: (string | null);
+  errorMessage: (string | null);
+  createdAt: string;
+  updatedAt: string;
+};
+};
+  requestId: string;
+};
+
+export type ImageGenerationListResponse = {
+  ok: true;
+  data: {
+  jobs: Array<{
+  id: string;
+  projectId: string;
+  status: "queued" | "processing" | "ready" | "failed" | "cancelled";
+  prompt: string;
+  modelId: "gemini-3.1-flash-image" | "gemini-3-pro-image" | "gemini-2.5-flash-image";
+  aspectRatio: "1:1" | "16:9" | "4:5" | "9:16";
+  referenceAssetId: (string | null);
+  outputAssetId: (string | null);
+  errorCode: (string | null);
+  errorMessage: (string | null);
+  createdAt: string;
+  updatedAt: string;
+}>;
+};
+  requestId: string;
+};
+
 export type CanonicalSpatialObject = {
   id: string;
   assetId: string;

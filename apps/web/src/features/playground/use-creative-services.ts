@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { CreationAccessError } from "@/features/creation/creation-http";
 import { apiResultSchema } from "@/lib/contracts/api";
 import {
   CreativeCapabilitiesSchema,
@@ -28,14 +29,17 @@ async function request(url: string, options: RequestInit = {}, upstream?: AbortS
   if (upstream?.aborted) abort();
   const timer = setTimeout(abort, 15_000);
   try {
-    return (await (
-      await fetch(url, {
-        ...options,
-        cache: "no-store",
-        credentials: "same-origin",
-        signal: controller.signal,
-      })
-    ).json()) as unknown;
+    const response = await fetch(url, {
+      ...options,
+      cache: "no-store",
+      credentials: "same-origin",
+      signal: controller.signal,
+    });
+    if (response.status === 401 || response.status === 403)
+      throw new CreationAccessError(response.status);
+    const result: unknown = await response.json();
+    controller.signal.throwIfAborted();
+    return result;
   } finally {
     clearTimeout(timer);
     upstream?.removeEventListener("abort", abort);
@@ -63,6 +67,7 @@ export function useCreativeDraft(
   projectId: string | undefined,
   store: PlaygroundStore,
   serialized: string,
+  onAccessRevoked?: () => void,
 ) {
   const client = useQueryClient();
   const [baseline, setBaseline] = useState(() => JSON.stringify(store.getState().document));
@@ -103,7 +108,10 @@ export function useCreativeDraft(
           if (live) apply(draft);
         })
         .catch((reason) => {
-          if (live) setError(friendly(reason));
+          if (live) {
+            if (reason instanceof CreationAccessError) onAccessRevoked?.();
+            setError(friendly(reason));
+          }
         })
         .finally(() => {
           if (live) setBusy(false);
@@ -214,6 +222,7 @@ export function useCreativeDraft(
       }
     } catch (reason) {
       if (active.current) {
+        if (reason instanceof CreationAccessError) onAccessRevoked?.();
         setError(friendly(reason));
         setConflict(reason instanceof DraftError && reason.code === "CONFLICT");
       }
@@ -243,7 +252,10 @@ export function useCreativeDraft(
         setNotice("Saved prompt draft loaded.");
       }
     } catch (reason) {
-      if (active.current) setError(friendly(reason));
+      if (active.current) {
+        if (reason instanceof CreationAccessError) onAccessRevoked?.();
+        setError(friendly(reason));
+      }
     } finally {
       pending.current = null;
       if (active.current) setBusy(false);

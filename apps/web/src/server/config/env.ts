@@ -21,7 +21,7 @@ const ServerEnvSchema = z.object({
   R2_SECRET_ACCESS_KEY: optionalText, R2_BUCKET: optionalText,
   SARVAM_API_KEY: optionalText, SARVAM_STT_MODEL: optionalText, SARVAM_TTS_MODEL: optionalText,
   SARVAM_TTS_SPEAKER_EN: optionalText, SARVAM_TTS_SPEAKER_HI: optionalText, SARVAM_TTS_SPEAKER_KN: optionalText,
-  GEMINI_API_KEY: optionalText, GEMINI_MODEL: optionalText,
+  GEMINI_API_KEY: optionalText, GEMINI_MODEL: optionalText, GEMINI_IMAGE_MODEL: optionalText,
   SHOTSTACK_API_KEY: optionalText,
   SHOTSTACK_ENV: z.preprocess(blankToUndefined, z.enum(["sandbox", "production"]).optional()),
   APP_MODE: z.preprocess(blankToUndefined, z.enum(["live", "demo"]).default("live")),
