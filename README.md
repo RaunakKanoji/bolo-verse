@@ -1,6 +1,6 @@
-# BoloVerse · Browser XR Creator Studio
+# Shape Studio · Creative Workspace
 
-A creative workspace built with Next.js, React, A-Frame/WebXR, Clerk and Neon/Drizzle. The [current specification](docs/XR_BROWSER_STUDIO_SPEC.md) extends the existing app with editable spatial layouts, authorized project content, protected asset previews and a bounded Gemini/Sarvam assistant. Desktop 3D is the baseline; immersive VR is offered when the browser reports support. AR detection is implemented, but AR scene entry is not enabled.
+An incremental web and native spatial foundation for creative production. The [Shape Studio audit and plan](docs/shape-studio/phase-0-plan.md) scopes this delivery to shared contracts, private project drafts, semantic tokens and the initial four-mode web playground. Existing projects, browser XR, text/speech adapters and recording tools remain available. The native Xcode application and functional media generation are later phases.
 
 ## Run locally
 
@@ -12,7 +12,7 @@ cp .env.example .env.local
 pnpm dev
 ```
 
-Open `http://localhost:3000/xr/preview`. This public sample requires no provider credentials, uses clearly labeled original sample content and saves nothing. Select panels, move/rotate/scale them with the inspector, drag to look, and use W/A/S/D while the canvas has focus.
+Open `http://localhost:3000/studio/create` for the creative playground or `/xr/preview` for the spatial sample. This public sample requires no provider credentials, uses clearly labeled original sample content and saves nothing. Select panels, move/rotate/scale them with the inspector, drag to look, and use W/A/S/D while the canvas has focus.
 
 If port 3000 is occupied, run `pnpm dev --port 3001` and use that port consistently in the browser and environment configuration. The development/build scripts copy the pinned A-Frame bundle and license to ignored `public/vendor/aframe/`; the scene does not depend on a script CDN.
 
@@ -29,7 +29,7 @@ The dashboard at `/` and `/studio` uses authorized project data or clearly label
 
 1. Configure a real Clerk application and set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`. Configure the corresponding development/preview domains.
 2. Set a Neon `DATABASE_URL`. Set `DATABASE_MIGRATION_URL` when a separate direct migration connection is needed; otherwise it falls back to `DATABASE_URL`.
-3. Review all **four** SQL migrations in `drizzle/`, then run `pnpm db:migrate`. Migration `0003_xr_workspaces.sql` adds the project layout table.
+3. Review all **five** SQL migrations in `drizzle/`, then run `pnpm db:migrate`. Migration `0003_xr_workspaces.sql` adds project layouts; `0004` adds private creative drafts and append-only review decisions.
 4. Set `NEXT_PUBLIC_APP_URL` to the exact browser origin. `ALLOWED_ORIGINS` can list additional trusted origins separated by commas. `localhost` and `127.0.0.1` are different origins.
 5. Sign in, visit `/app/projects`, create a project and open `/studio`. Choose **Open Spatial Studio**, then your project.
 
@@ -51,6 +51,9 @@ These are implemented network adapters. Environment readiness does not prove a s
 pnpm format:check
 pnpm lint
 pnpm typecheck
+pnpm tokens:check
+pnpm contracts:check
+pnpm contracts:test:swift # requires Swift 6+
 pnpm test
 pnpm build
 pnpm exec playwright install chromium
@@ -70,3 +73,11 @@ PGlite integration tests execute the actual PostgreSQL queries with the identity
 - [Implementation plan](docs/superpowers/plans/2026-11-12-functional-xr-studio.md) and [device runbook](docs/DEMO_RUNBOOK.md)
 
 Only desktop Chromium behavior has browser-test evidence here. Physical headset checks and a hosted deployment remain outstanding. The manifest provides installation hints; there is no service worker or offline cache of private responses/audio. Native visionOS is future work.
+
+## Shape Studio foundation
+
+- [Project context and current scope](context/project-overview.md), [architecture](context/architecture-context.md), [progress](context/progress-tracker.md), [implementation evidence and limits](docs/shape-studio/implementation-status.md).
+- [OpenAPI and generated TypeScript/Swift contracts](packages/api-contract/README.md), [semantic tokens](packages/design-tokens/README.md).
+- [Native/provider research](docs/shape-studio/native-provider-research.md) and [visionOS roadmap](apps/visionos/README.md).
+
+Open an authorized project and choose **Open Creative Studio** to explicitly save a private prompt draft. `/api/v1` exposes safe project/asset projections and conflict-aware drafts; original API paths remain compatible. Local images and edit variants are not uploaded. Generate is disabled for all four modes until Phase 3 connects durable jobs, provider calls and private output storage.

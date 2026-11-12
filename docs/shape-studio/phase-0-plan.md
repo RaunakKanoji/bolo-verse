@@ -39,10 +39,10 @@ Alternatives considered: wholesale monorepo relocation and renderer replacement 
 ## 4. Implementation milestones
 
 - [x] Phase 0: inspect repository and document audit, architecture, gaps, files, risks and tests before broad implementation.
-- [ ] Phase 1A: shared strict contracts, versioned authorized routes, capability catalog and persisted creative drafts; add SQL migration/tests for draft isolation/CAS and immutable decisions.
-- [ ] Phase 1B: OpenAPI/TypeScript/Swift generation and shared semantic light/dark tokens; verify generated artifacts and coordinate fixtures.
-- [ ] Initial Phase 2: Shape Studio shell and three-column playground. Image/Video/Audio/3D preserve separate prompts. Generate is disabled with a precise reason while no end-to-end generation provider is implemented. Unsupported settings are absent or explicitly unavailable. Existing real image adjustment/export remains usable.
-- [ ] Validation: lint/types/full SQL+unit suite, contract drift, Swift checks, production build, desktop/mobile/dark/keyboard browser flows, real export pixels and existing XR/recording regressions; independent review and local Conventional Commits.
+- [x] Phase 1A: shared strict contracts, versioned authorized routes, capability catalog and persisted creative drafts; add SQL migration/tests for draft isolation/CAS and immutable decisions.
+- [x] Phase 1B: OpenAPI/TypeScript/Swift generation and shared semantic light/dark tokens; verify generated artifacts and coordinate fixtures.
+- [x] Initial Phase 2: Shape Studio shell and three-column playground. Image/Video/Audio/3D preserve separate prompts. Generate is disabled with a precise reason while no end-to-end generation provider is implemented. Unsupported settings are absent or explicitly unavailable. Existing real image adjustment/export remains usable.
+- [x] Validation: lint/types/full SQL+unit suite, contract drift, Swift checks, production build, desktop/mobile/dark/keyboard browser flows, real export pixels and existing XR/recording regressions; independent review and local Conventional Commits.
 
 Phase 3 implements one verified generation provider with durable jobs, private output storage, history and retry/cancellation. Phase 4 adds the infinite canvas/conversation flow. Phase 5 adds client collaboration/approval/delivery. Phase 6 creates the native application and validates Clerk auth. Phase 7 implements RealityKit volumes/immersive scenes. Phase 8 profiles devices and completes accessibility/production acceptance.
 

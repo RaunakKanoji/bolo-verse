@@ -1,8 +1,12 @@
-# BoloVerse progress tracker
+# Shape Studio progress tracker
 
 Updated 2026-11-12 (Asia/Kolkata).
 
-## Current scope: functional browser XR studio
+## Current scope: Shape Studio foundation and initial web playground
+
+The new cross-platform brief supersedes the prior browser-only scope. Follow the [seven-part audit/plan](docs/shape-studio/phase-0-plan.md) and [active phase tracker](context/progress-tracker.md). Phase 1 and initial Phase 2 are implemented and locally verified: 349 unit/PostgreSQL tests, 32 browser cases across the full run and targeted rerun, Swift contract checks, lint/types/formatting and production build pass. Later generation, collaboration and native app phases remain planned. See [delivery evidence and limits](docs/shape-studio/implementation-status.md).
+
+## Preserved prior scope: functional browser XR studio
 
 The latest [master specification](docs/XR_BROWSER_STUDIO_SPEC.md) supersedes the earlier Phase 1 boundary. Work follows the [repository audit and plan](docs/superpowers/plans/2026-11-12-functional-xr-studio.md). Historical [M0](docs/M0_IMPLEMENTATION_STATUS.md) and [Phase 1](docs/XR_PHASE1_IMPLEMENTATION_STATUS.md) evidence is preserved.
 
