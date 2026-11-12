@@ -13,7 +13,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      application: ${{ steps.platforms.outputs.application }}
+      native: ${{ steps.platforms.outputs.native }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Select platform checks
+        id: platforms
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          CI_HEAD_SHA: ${{ github.sha }}
+        run: node scripts/ci/changed-platforms.mjs
   application:
+    needs: changes
+    if: needs.changes.outputs.application == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -27,17 +48,12 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm format:check
-      - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm tokens:check
-      - run: pnpm contracts:check
-      - run: pnpm native:check
-      - run: pnpm test
-      - run: pnpm build
+      - run: pnpm check
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e
   swift-contracts:
+    needs: changes
+    if: needs.changes.outputs.native == 'true'
     runs-on: macos-26
     timeout-minutes: 25
     steps:
