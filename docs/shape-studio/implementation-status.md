@@ -1,5 +1,7 @@
 # Shape Studio foundation implementation status
 
+This document preserves the initial web-foundation handoff. The subsequent native implementation and current cross-platform verification are documented in [native validation](native-validation.md).
+
 12 November 2026 (Asia/Kolkata). This delivery implements the scoped Phase 1 and initial Phase 2 from the [audit and plan](phase-0-plan.md). It does not claim the complete web or visionOS MVP.
 
 ## Delivered behavior

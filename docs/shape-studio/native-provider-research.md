@@ -1,6 +1,6 @@
 # Native and provider research
 
-Reviewed 12 November 2026 against primary sources. Documentation verification is not account access, billing, integration, simulator UI or physical-device verification.
+Initial web-foundation research, reviewed 12 November 2026 against primary sources. The subsequent native implementation and tested Clerk compatibility pin are documented in [native architecture](native-architecture.md) and [validation](native-validation.md). Documentation verification is not account access, billing, integration, simulator UI or physical-device verification.
 
 ## Native architecture and authentication
 
