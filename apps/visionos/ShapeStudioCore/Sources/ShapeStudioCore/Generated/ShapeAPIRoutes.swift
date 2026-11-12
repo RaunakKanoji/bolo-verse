@@ -6,6 +6,20 @@ public enum ShapeAPIRoutes {
   private static func segment(_ value: String) -> String {
     value.addingPercentEncoding(withAllowedCharacters: CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~"))!
   }
+  /// GET; response: ImageGenerationCapabilitiesResponse.
+  public static func getImageGenerationCapabilities() -> String { "/api/v1/creation/capabilities" }
+  /// POST; response: ImageUploadResponse; body: CreateImageUpload.
+  public static func createImageUpload() -> String { "/api/v1/assets/upload-session" }
+  /// POST; response: FinalizedImageUploadResponse; body: FinalizeImageUpload.
+  public static func finalizeImageUpload(uploadId: String) -> String { "/api/v1/assets/upload-session/\(segment(uploadId))/finalize" }
+  /// POST; response: ImageGenerationResponse; body: CreateImageGeneration.
+  public static func createImageGeneration() -> String { "/api/v1/generations" }
+  /// GET; response: ImageGenerationListResponse.
+  public static func listImageGenerations(projectId: String) -> String { "/api/v1/projects/\(segment(projectId))/generations" }
+  /// GET; response: ImageGenerationResponse.
+  public static func getImageGeneration(jobId: String) -> String { "/api/v1/generations/\(segment(jobId))" }
+  /// POST; response: ImageGenerationResponse; body: CancelImageGeneration.
+  public static func cancelImageGeneration(jobId: String) -> String { "/api/v1/generations/\(segment(jobId))/cancel" }
   /// GET; response: SpatialSceneResponse.
   public static func getSpatialScene(projectId: String) -> String { "/api/v1/projects/\(segment(projectId))/spatial-scene" }
   /// PUT; response: SpatialSceneResponse; body: SaveSpatialScene.

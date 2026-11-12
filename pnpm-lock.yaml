@@ -19,7 +19,7 @@ importers:
         version: 3.27.0(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
       '@clerk/nextjs':
         specifier: 7.9.25
-        version: 7.9.25(next@16.4.6(@babel/core@7.29.13)(@playwright/test@1.65.0)(@types/node@24.19.2)(react-dom@19.2.9(react@19.2.9))(react@19.2.9))(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
+        version: 7.9.25(next@16.4.6(@playwright/test@1.65.0)(@types/node@24.19.2)(react-dom@19.2.9(react@19.2.9))(react@19.2.9))(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
       '@electric-sql/pglite':
         specifier: 0.5.16
         version: 0.5.16
@@ -148,7 +148,7 @@ importers:
     dependencies:
       '@clerk/nextjs':
         specifier: 7.9.25
-        version: 7.9.25(next@16.4.6(@babel/core@7.29.13)(@playwright/test@1.65.0)(@types/node@24.19.2)(react-dom@19.2.9(react@19.2.9))(react@19.2.9))(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
+        version: 7.9.25(next@16.4.6(@playwright/test@1.65.0)(@types/node@24.19.2)(react-dom@19.2.9(react@19.2.9))(react@19.2.9))(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
       '@react-three/fiber':
         specifier: 9.5.0
         version: 9.5.0(@types/react@19.3.0)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(three@0.187.0)
@@ -210,12 +210,15 @@ importers:
       '@aws-sdk/client-s3':
         specifier: 3.1165.0
         version: 3.1165.0
+      '@aws-sdk/s3-request-presigner':
+        specifier: 3.1165.0
+        version: 3.1165.0
       '@clerk/backend':
         specifier: 3.27.0
         version: 3.27.0(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
       '@clerk/nextjs':
         specifier: 7.9.25
-        version: 7.9.25(next@16.4.6(@babel/core@7.29.13)(@playwright/test@1.65.0)(@types/node@24.19.2)(react-dom@19.2.9(react@19.2.9))(react@19.2.9))(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
+        version: 7.9.25(next@16.4.6(@playwright/test@1.65.0)(@types/node@24.19.2)(react-dom@19.2.9(react@19.2.9))(react@19.2.9))(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
       '@neondatabase/serverless':
         specifier: 1.2.0
         version: 1.2.0
@@ -261,6 +264,9 @@ importers:
       server-only:
         specifier: 0.0.1
         version: 0.0.1
+      sharp:
+        specifier: 0.35.5
+        version: 0.35.5(@types/node@24.19.2)
       tailwind-merge:
         specifier: 3.7.0
         version: 3.7.0
@@ -406,6 +412,10 @@ packages:
 
   '@aws-sdk/nested-clients@3.998.3':
     resolution: {integrity: sha512-acHTTzMB13CU6dU4sxABYExMI3PQM2zStWH2MiUwJp/7QKTrLg2f7mbzSXoegW2kYOk2tdqQYagsZrWB8Xv7eA==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/s3-request-presigner@3.1165.0':
+    resolution: {integrity: sha512-UxiU48TtdqtpwouOYBCfkZ0T5XEggwnrSvzSAkFt57TmnW2Z5NJsmenjDopKl0jub742g90U1Ih6si8IogAv5Q==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/signature-v4-multi-region@3.996.52':
@@ -3793,6 +3803,15 @@ snapshots:
       '@smithy/types': 4.20.0
       tslib: 2.9.1
 
+  '@aws-sdk/s3-request-presigner@3.1165.0':
+    dependencies:
+      '@aws-sdk/core': 3.981.0
+      '@aws-sdk/signature-v4-multi-region': 3.996.52
+      '@aws-sdk/types': 3.975.1
+      '@smithy/core': 3.40.0
+      '@smithy/types': 4.20.0
+      tslib: 2.9.1
+
   '@aws-sdk/signature-v4-multi-region@3.996.52':
     dependencies:
       '@aws-sdk/types': 3.975.1
@@ -3931,7 +3950,7 @@ snapshots:
       - react
       - react-dom
 
-  '@clerk/nextjs@7.9.25(next@16.4.6(@babel/core@7.29.13)(@playwright/test@1.65.0)(@types/node@24.19.2)(react-dom@19.2.9(react@19.2.9))(react@19.2.9))(react-dom@19.2.9(react@19.2.9))(react@19.2.9)':
+  '@clerk/nextjs@7.9.25(next@16.4.6(@playwright/test@1.65.0)(@types/node@24.19.2)(react-dom@19.2.9(react@19.2.9))(react@19.2.9))(react-dom@19.2.9(react@19.2.9))(react@19.2.9)':
     dependencies:
       '@clerk/backend': 3.27.0(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
       '@clerk/react': 6.18.6(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
@@ -4267,8 +4286,7 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
-  '@img/colour@1.1.0':
-    optional: true
+  '@img/colour@1.1.0': {}
 
   '@img/sharp-darwin-arm64@0.35.5':
     optionalDependencies:
@@ -6423,7 +6441,6 @@ snapshots:
       '@img/sharp-win32-ia32': 0.35.5
       '@img/sharp-win32-x64': 0.35.5
       '@types/node': 24.19.2
-    optional: true
 
   shebang-command@2.0.0:
     dependencies:

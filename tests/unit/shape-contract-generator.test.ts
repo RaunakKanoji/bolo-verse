@@ -2,6 +2,11 @@ import { describe, expect, it } from "vitest";
 import { generateModels } from "../../scripts/lib/contract-generator";
 
 describe("language-neutral model generation", () => {
+  it("represents an empty closed request as an empty record instead of the permissive TypeScript object type", () => {
+    const result = generateModels({ EmptyRequest: { type: "object", properties: {}, additionalProperties: false } });
+    expect(result.typescript).toContain("export type EmptyRequest = Record<string, never>;");
+    expect(result.swift).toContain("public struct EmptyRequest");
+  });
   it("refuses unsupported schema shapes rather than widening their types", () => {
     for (const schema of [{ type: "object", additionalProperties: { type: "string" } }, { oneOf: [{ type: "string" }, { type: "number" }] }, { type: "string", strangeKeyword: true }]) {
       expect(() => generateModels({ Bad: schema })).toThrow();

@@ -9,6 +9,1692 @@ private struct ShapeAnyCodingKey: CodingKey {
   init?(intValue: Int) { return nil }
 }
 
+public enum CreateImageUploadMimeType: String, Codable, Sendable {
+  case `value0` = "image/png"
+  case `value1` = "image/jpeg"
+  case `value2` = "image/webp"
+}
+
+public struct CreateImageUpload: Codable, Sendable {
+  public var `projectId`: String
+  public var `idempotencyKey`: String
+  public var `fileName`: String
+  public var `mimeType`: CreateImageUploadMimeType
+  public var `byteSize`: Int64
+  public var `checksumSha256`: String
+
+  public init(`projectId`: String, `idempotencyKey`: String, `fileName`: String, `mimeType`: CreateImageUploadMimeType, `byteSize`: Int64, `checksumSha256`: String) {
+    self.`projectId` = `projectId`
+    self.`idempotencyKey` = `idempotencyKey`
+    self.`fileName` = `fileName`
+    self.`mimeType` = `mimeType`
+    self.`byteSize` = `byteSize`
+    self.`checksumSha256` = `checksumSha256`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `projectId`
+    case `idempotencyKey`
+    case `fileName`
+    case `mimeType`
+    case `byteSize`
+    case `checksumSha256`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["projectId", "idempotencyKey", "fileName", "mimeType", "byteSize", "checksumSha256"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown CreateImageUpload property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`projectId` = try container.decode(String.self, forKey: .`projectId`)
+    self.`idempotencyKey` = try container.decode(String.self, forKey: .`idempotencyKey`)
+    self.`fileName` = try container.decode(String.self, forKey: .`fileName`)
+    self.`mimeType` = try container.decode(CreateImageUploadMimeType.self, forKey: .`mimeType`)
+    self.`byteSize` = try container.decode(Int64.self, forKey: .`byteSize`)
+    self.`checksumSha256` = try container.decode(String.self, forKey: .`checksumSha256`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`projectId`, forKey: .`projectId`)
+    try container.encode(self.`idempotencyKey`, forKey: .`idempotencyKey`)
+    try container.encode(self.`fileName`, forKey: .`fileName`)
+    try container.encode(self.`mimeType`, forKey: .`mimeType`)
+    try container.encode(self.`byteSize`, forKey: .`byteSize`)
+    try container.encode(self.`checksumSha256`, forKey: .`checksumSha256`)
+  }
+}
+
+public struct FinalizeImageUpload: Codable, Sendable {
+
+
+  public init() {
+
+  }
+
+  private typealias CodingKeys = ShapeAnyCodingKey
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set([])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown FinalizeImageUpload property"))
+    }
+
+
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    _ = encoder.container(keyedBy: CodingKeys.self)
+
+  }
+}
+
+public enum ImageUploadSessionUploadContentType: String, Codable, Sendable {
+  case `value0` = "image/png"
+  case `value1` = "image/jpeg"
+  case `value2` = "image/webp"
+}
+
+public struct ImageUploadSession: Codable, Sendable {
+  public var `id`: String
+  public var `projectId`: String
+  public var `assetId`: String
+  public var `expiresAt`: String
+  public var `uploadUrl`: String
+  public var `uploadContentType`: ImageUploadSessionUploadContentType
+
+  public init(`id`: String, `projectId`: String, `assetId`: String, `expiresAt`: String, `uploadUrl`: String, `uploadContentType`: ImageUploadSessionUploadContentType) {
+    self.`id` = `id`
+    self.`projectId` = `projectId`
+    self.`assetId` = `assetId`
+    self.`expiresAt` = `expiresAt`
+    self.`uploadUrl` = `uploadUrl`
+    self.`uploadContentType` = `uploadContentType`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `projectId`
+    case `assetId`
+    case `expiresAt`
+    case `uploadUrl`
+    case `uploadContentType`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["id", "projectId", "assetId", "expiresAt", "uploadUrl", "uploadContentType"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageUploadSession property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`id` = try container.decode(String.self, forKey: .`id`)
+    self.`projectId` = try container.decode(String.self, forKey: .`projectId`)
+    self.`assetId` = try container.decode(String.self, forKey: .`assetId`)
+    self.`expiresAt` = try container.decode(String.self, forKey: .`expiresAt`)
+    self.`uploadUrl` = try container.decode(String.self, forKey: .`uploadUrl`)
+    self.`uploadContentType` = try container.decode(ImageUploadSessionUploadContentType.self, forKey: .`uploadContentType`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`id`, forKey: .`id`)
+    try container.encode(self.`projectId`, forKey: .`projectId`)
+    try container.encode(self.`assetId`, forKey: .`assetId`)
+    try container.encode(self.`expiresAt`, forKey: .`expiresAt`)
+    try container.encode(self.`uploadUrl`, forKey: .`uploadUrl`)
+    try container.encode(self.`uploadContentType`, forKey: .`uploadContentType`)
+  }
+}
+
+public enum ImageUploadResultUploadUploadContentType: String, Codable, Sendable {
+  case `value0` = "image/png"
+  case `value1` = "image/jpeg"
+  case `value2` = "image/webp"
+}
+
+public struct ImageUploadResultUpload: Codable, Sendable {
+  public var `id`: String
+  public var `projectId`: String
+  public var `assetId`: String
+  public var `expiresAt`: String
+  public var `uploadUrl`: String
+  public var `uploadContentType`: ImageUploadResultUploadUploadContentType
+
+  public init(`id`: String, `projectId`: String, `assetId`: String, `expiresAt`: String, `uploadUrl`: String, `uploadContentType`: ImageUploadResultUploadUploadContentType) {
+    self.`id` = `id`
+    self.`projectId` = `projectId`
+    self.`assetId` = `assetId`
+    self.`expiresAt` = `expiresAt`
+    self.`uploadUrl` = `uploadUrl`
+    self.`uploadContentType` = `uploadContentType`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `projectId`
+    case `assetId`
+    case `expiresAt`
+    case `uploadUrl`
+    case `uploadContentType`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["id", "projectId", "assetId", "expiresAt", "uploadUrl", "uploadContentType"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageUploadResultUpload property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`id` = try container.decode(String.self, forKey: .`id`)
+    self.`projectId` = try container.decode(String.self, forKey: .`projectId`)
+    self.`assetId` = try container.decode(String.self, forKey: .`assetId`)
+    self.`expiresAt` = try container.decode(String.self, forKey: .`expiresAt`)
+    self.`uploadUrl` = try container.decode(String.self, forKey: .`uploadUrl`)
+    self.`uploadContentType` = try container.decode(ImageUploadResultUploadUploadContentType.self, forKey: .`uploadContentType`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`id`, forKey: .`id`)
+    try container.encode(self.`projectId`, forKey: .`projectId`)
+    try container.encode(self.`assetId`, forKey: .`assetId`)
+    try container.encode(self.`expiresAt`, forKey: .`expiresAt`)
+    try container.encode(self.`uploadUrl`, forKey: .`uploadUrl`)
+    try container.encode(self.`uploadContentType`, forKey: .`uploadContentType`)
+  }
+}
+
+public struct ImageUploadResult: Codable, Sendable {
+  public var `upload`: ImageUploadResultUpload
+
+  public init(`upload`: ImageUploadResultUpload) {
+    self.`upload` = `upload`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `upload`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["upload"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageUploadResult property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`upload` = try container.decode(ImageUploadResultUpload.self, forKey: .`upload`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`upload`, forKey: .`upload`)
+  }
+}
+
+public struct FinalizedImageUploadResultAsset: Codable, Sendable {
+  public var `id`: String
+  public var `projectId`: String
+  public var `mimeType`: String
+  public var `byteSize`: Int64
+  public var `width`: Int64?
+  public var `height`: Int64?
+  public var `durationSeconds`: Double?
+  public var `createdAt`: String
+  public var `nativeContentUrl`: String?
+  public var `contentUrl`: String?
+
+  public init(`id`: String, `projectId`: String, `mimeType`: String, `byteSize`: Int64, `width`: Int64?, `height`: Int64?, `durationSeconds`: Double?, `createdAt`: String, `nativeContentUrl`: String?, `contentUrl`: String?) {
+    self.`id` = `id`
+    self.`projectId` = `projectId`
+    self.`mimeType` = `mimeType`
+    self.`byteSize` = `byteSize`
+    self.`width` = `width`
+    self.`height` = `height`
+    self.`durationSeconds` = `durationSeconds`
+    self.`createdAt` = `createdAt`
+    self.`nativeContentUrl` = `nativeContentUrl`
+    self.`contentUrl` = `contentUrl`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `projectId`
+    case `mimeType`
+    case `byteSize`
+    case `width`
+    case `height`
+    case `durationSeconds`
+    case `createdAt`
+    case `nativeContentUrl`
+    case `contentUrl`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["id", "projectId", "mimeType", "byteSize", "width", "height", "durationSeconds", "createdAt", "nativeContentUrl", "contentUrl"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown FinalizedImageUploadResultAsset property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`id` = try container.decode(String.self, forKey: .`id`)
+    self.`projectId` = try container.decode(String.self, forKey: .`projectId`)
+    self.`mimeType` = try container.decode(String.self, forKey: .`mimeType`)
+    self.`byteSize` = try container.decode(Int64.self, forKey: .`byteSize`)
+    self.`width` = try container.decode(Int64?.self, forKey: .`width`)
+    self.`height` = try container.decode(Int64?.self, forKey: .`height`)
+    self.`durationSeconds` = try container.decode(Double?.self, forKey: .`durationSeconds`)
+    self.`createdAt` = try container.decode(String.self, forKey: .`createdAt`)
+    self.`nativeContentUrl` = try container.decode(String?.self, forKey: .`nativeContentUrl`)
+    self.`contentUrl` = try container.decode(String?.self, forKey: .`contentUrl`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`id`, forKey: .`id`)
+    try container.encode(self.`projectId`, forKey: .`projectId`)
+    try container.encode(self.`mimeType`, forKey: .`mimeType`)
+    try container.encode(self.`byteSize`, forKey: .`byteSize`)
+    try container.encode(self.`width`, forKey: .`width`)
+    try container.encode(self.`height`, forKey: .`height`)
+    try container.encode(self.`durationSeconds`, forKey: .`durationSeconds`)
+    try container.encode(self.`createdAt`, forKey: .`createdAt`)
+    try container.encode(self.`nativeContentUrl`, forKey: .`nativeContentUrl`)
+    try container.encode(self.`contentUrl`, forKey: .`contentUrl`)
+  }
+}
+
+public struct FinalizedImageUploadResult: Codable, Sendable {
+  public var `asset`: FinalizedImageUploadResultAsset
+
+  public init(`asset`: FinalizedImageUploadResultAsset) {
+    self.`asset` = `asset`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `asset`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["asset"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown FinalizedImageUploadResult property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`asset` = try container.decode(FinalizedImageUploadResultAsset.self, forKey: .`asset`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`asset`, forKey: .`asset`)
+  }
+}
+
+public enum ImageGenerationCapabilitiesAvailability: String, Codable, Sendable {
+  case `configured` = "configured"
+  case `unconfigured` = "unconfigured"
+}
+
+public enum ImageGenerationCapabilitiesModelsItemId: String, Codable, Sendable {
+  case `value0` = "gemini-3.1-flash-image"
+  case `gemini3ProImage` = "gemini-3-pro-image"
+  case `value2` = "gemini-2.5-flash-image"
+}
+
+public enum ImageGenerationCapabilitiesModelsItemAspectRatiosItem: String, Codable, Sendable {
+  case `value0` = "1:1"
+  case `value1` = "16:9"
+  case `value2` = "4:5"
+  case `value3` = "9:16"
+}
+
+public struct ImageGenerationCapabilitiesModelsItem: Codable, Sendable {
+  public var `id`: ImageGenerationCapabilitiesModelsItemId
+  public var `label`: String
+  public var `aspectRatios`: [ImageGenerationCapabilitiesModelsItemAspectRatiosItem]
+  public var `referenceImage`: Bool
+
+  public init(`id`: ImageGenerationCapabilitiesModelsItemId, `label`: String, `aspectRatios`: [ImageGenerationCapabilitiesModelsItemAspectRatiosItem], `referenceImage`: Bool) {
+    self.`id` = `id`
+    self.`label` = `label`
+    self.`aspectRatios` = `aspectRatios`
+    self.`referenceImage` = `referenceImage`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `label`
+    case `aspectRatios`
+    case `referenceImage`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["id", "label", "aspectRatios", "referenceImage"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageGenerationCapabilitiesModelsItem property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`id` = try container.decode(ImageGenerationCapabilitiesModelsItemId.self, forKey: .`id`)
+    self.`label` = try container.decode(String.self, forKey: .`label`)
+    self.`aspectRatios` = try container.decode([ImageGenerationCapabilitiesModelsItemAspectRatiosItem].self, forKey: .`aspectRatios`)
+    self.`referenceImage` = try container.decode(Bool.self, forKey: .`referenceImage`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`id`, forKey: .`id`)
+    try container.encode(self.`label`, forKey: .`label`)
+    try container.encode(self.`aspectRatios`, forKey: .`aspectRatios`)
+    try container.encode(self.`referenceImage`, forKey: .`referenceImage`)
+  }
+}
+
+public struct ImageGenerationCapabilities: Codable, Sendable {
+  public var `availability`: ImageGenerationCapabilitiesAvailability
+  public var `reason`: String
+  public var `models`: [ImageGenerationCapabilitiesModelsItem]
+  public var `maxReferenceBytes`: Int64
+  public var `maxPromptCharacters`: Int64
+
+  public init(`availability`: ImageGenerationCapabilitiesAvailability, `reason`: String, `models`: [ImageGenerationCapabilitiesModelsItem], `maxReferenceBytes`: Int64, `maxPromptCharacters`: Int64) {
+    self.`availability` = `availability`
+    self.`reason` = `reason`
+    self.`models` = `models`
+    self.`maxReferenceBytes` = `maxReferenceBytes`
+    self.`maxPromptCharacters` = `maxPromptCharacters`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `availability`
+    case `reason`
+    case `models`
+    case `maxReferenceBytes`
+    case `maxPromptCharacters`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["availability", "reason", "models", "maxReferenceBytes", "maxPromptCharacters"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageGenerationCapabilities property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`availability` = try container.decode(ImageGenerationCapabilitiesAvailability.self, forKey: .`availability`)
+    self.`reason` = try container.decode(String.self, forKey: .`reason`)
+    self.`models` = try container.decode([ImageGenerationCapabilitiesModelsItem].self, forKey: .`models`)
+    self.`maxReferenceBytes` = try container.decode(Int64.self, forKey: .`maxReferenceBytes`)
+    self.`maxPromptCharacters` = try container.decode(Int64.self, forKey: .`maxPromptCharacters`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`availability`, forKey: .`availability`)
+    try container.encode(self.`reason`, forKey: .`reason`)
+    try container.encode(self.`models`, forKey: .`models`)
+    try container.encode(self.`maxReferenceBytes`, forKey: .`maxReferenceBytes`)
+    try container.encode(self.`maxPromptCharacters`, forKey: .`maxPromptCharacters`)
+  }
+}
+
+public enum CreateImageGenerationModelId: String, Codable, Sendable {
+  case `value0` = "gemini-3.1-flash-image"
+  case `gemini3ProImage` = "gemini-3-pro-image"
+  case `value2` = "gemini-2.5-flash-image"
+}
+
+public enum CreateImageGenerationAspectRatio: String, Codable, Sendable {
+  case `value0` = "1:1"
+  case `value1` = "16:9"
+  case `value2` = "4:5"
+  case `value3` = "9:16"
+}
+
+public struct CreateImageGeneration: Codable, Sendable {
+  public var `projectId`: String
+  public var `idempotencyKey`: String
+  public var `prompt`: String
+  public var `modelId`: CreateImageGenerationModelId
+  public var `aspectRatio`: CreateImageGenerationAspectRatio
+  public var `referenceAssetId`: String?
+
+  public init(`projectId`: String, `idempotencyKey`: String, `prompt`: String, `modelId`: CreateImageGenerationModelId, `aspectRatio`: CreateImageGenerationAspectRatio, `referenceAssetId`: String?) {
+    self.`projectId` = `projectId`
+    self.`idempotencyKey` = `idempotencyKey`
+    self.`prompt` = `prompt`
+    self.`modelId` = `modelId`
+    self.`aspectRatio` = `aspectRatio`
+    self.`referenceAssetId` = `referenceAssetId`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `projectId`
+    case `idempotencyKey`
+    case `prompt`
+    case `modelId`
+    case `aspectRatio`
+    case `referenceAssetId`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["projectId", "idempotencyKey", "prompt", "modelId", "aspectRatio", "referenceAssetId"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown CreateImageGeneration property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`projectId` = try container.decode(String.self, forKey: .`projectId`)
+    self.`idempotencyKey` = try container.decode(String.self, forKey: .`idempotencyKey`)
+    self.`prompt` = try container.decode(String.self, forKey: .`prompt`)
+    self.`modelId` = try container.decode(CreateImageGenerationModelId.self, forKey: .`modelId`)
+    self.`aspectRatio` = try container.decode(CreateImageGenerationAspectRatio.self, forKey: .`aspectRatio`)
+    self.`referenceAssetId` = try container.decode(String?.self, forKey: .`referenceAssetId`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`projectId`, forKey: .`projectId`)
+    try container.encode(self.`idempotencyKey`, forKey: .`idempotencyKey`)
+    try container.encode(self.`prompt`, forKey: .`prompt`)
+    try container.encode(self.`modelId`, forKey: .`modelId`)
+    try container.encode(self.`aspectRatio`, forKey: .`aspectRatio`)
+    try container.encode(self.`referenceAssetId`, forKey: .`referenceAssetId`)
+  }
+}
+
+public struct CancelImageGeneration: Codable, Sendable {
+
+
+  public init() {
+
+  }
+
+  private typealias CodingKeys = ShapeAnyCodingKey
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set([])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown CancelImageGeneration property"))
+    }
+
+
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    _ = encoder.container(keyedBy: CodingKeys.self)
+
+  }
+}
+
+public enum ImageGenerationJobStatus: String, Codable, Sendable {
+  case `queued` = "queued"
+  case `processing` = "processing"
+  case `ready` = "ready"
+  case `failed` = "failed"
+  case `cancelled` = "cancelled"
+}
+
+public enum ImageGenerationJobModelId: String, Codable, Sendable {
+  case `value0` = "gemini-3.1-flash-image"
+  case `gemini3ProImage` = "gemini-3-pro-image"
+  case `value2` = "gemini-2.5-flash-image"
+}
+
+public enum ImageGenerationJobAspectRatio: String, Codable, Sendable {
+  case `value0` = "1:1"
+  case `value1` = "16:9"
+  case `value2` = "4:5"
+  case `value3` = "9:16"
+}
+
+public struct ImageGenerationJob: Codable, Sendable {
+  public var `id`: String
+  public var `projectId`: String
+  public var `status`: ImageGenerationJobStatus
+  public var `prompt`: String
+  public var `modelId`: ImageGenerationJobModelId
+  public var `aspectRatio`: ImageGenerationJobAspectRatio
+  public var `referenceAssetId`: String?
+  public var `outputAssetId`: String?
+  public var `errorCode`: String?
+  public var `errorMessage`: String?
+  public var `createdAt`: String
+  public var `updatedAt`: String
+
+  public init(`id`: String, `projectId`: String, `status`: ImageGenerationJobStatus, `prompt`: String, `modelId`: ImageGenerationJobModelId, `aspectRatio`: ImageGenerationJobAspectRatio, `referenceAssetId`: String?, `outputAssetId`: String?, `errorCode`: String?, `errorMessage`: String?, `createdAt`: String, `updatedAt`: String) {
+    self.`id` = `id`
+    self.`projectId` = `projectId`
+    self.`status` = `status`
+    self.`prompt` = `prompt`
+    self.`modelId` = `modelId`
+    self.`aspectRatio` = `aspectRatio`
+    self.`referenceAssetId` = `referenceAssetId`
+    self.`outputAssetId` = `outputAssetId`
+    self.`errorCode` = `errorCode`
+    self.`errorMessage` = `errorMessage`
+    self.`createdAt` = `createdAt`
+    self.`updatedAt` = `updatedAt`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `projectId`
+    case `status`
+    case `prompt`
+    case `modelId`
+    case `aspectRatio`
+    case `referenceAssetId`
+    case `outputAssetId`
+    case `errorCode`
+    case `errorMessage`
+    case `createdAt`
+    case `updatedAt`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["id", "projectId", "status", "prompt", "modelId", "aspectRatio", "referenceAssetId", "outputAssetId", "errorCode", "errorMessage", "createdAt", "updatedAt"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageGenerationJob property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`id` = try container.decode(String.self, forKey: .`id`)
+    self.`projectId` = try container.decode(String.self, forKey: .`projectId`)
+    self.`status` = try container.decode(ImageGenerationJobStatus.self, forKey: .`status`)
+    self.`prompt` = try container.decode(String.self, forKey: .`prompt`)
+    self.`modelId` = try container.decode(ImageGenerationJobModelId.self, forKey: .`modelId`)
+    self.`aspectRatio` = try container.decode(ImageGenerationJobAspectRatio.self, forKey: .`aspectRatio`)
+    self.`referenceAssetId` = try container.decode(String?.self, forKey: .`referenceAssetId`)
+    self.`outputAssetId` = try container.decode(String?.self, forKey: .`outputAssetId`)
+    self.`errorCode` = try container.decode(String?.self, forKey: .`errorCode`)
+    self.`errorMessage` = try container.decode(String?.self, forKey: .`errorMessage`)
+    self.`createdAt` = try container.decode(String.self, forKey: .`createdAt`)
+    self.`updatedAt` = try container.decode(String.self, forKey: .`updatedAt`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`id`, forKey: .`id`)
+    try container.encode(self.`projectId`, forKey: .`projectId`)
+    try container.encode(self.`status`, forKey: .`status`)
+    try container.encode(self.`prompt`, forKey: .`prompt`)
+    try container.encode(self.`modelId`, forKey: .`modelId`)
+    try container.encode(self.`aspectRatio`, forKey: .`aspectRatio`)
+    try container.encode(self.`referenceAssetId`, forKey: .`referenceAssetId`)
+    try container.encode(self.`outputAssetId`, forKey: .`outputAssetId`)
+    try container.encode(self.`errorCode`, forKey: .`errorCode`)
+    try container.encode(self.`errorMessage`, forKey: .`errorMessage`)
+    try container.encode(self.`createdAt`, forKey: .`createdAt`)
+    try container.encode(self.`updatedAt`, forKey: .`updatedAt`)
+  }
+}
+
+public enum ImageGenerationResultJobStatus: String, Codable, Sendable {
+  case `queued` = "queued"
+  case `processing` = "processing"
+  case `ready` = "ready"
+  case `failed` = "failed"
+  case `cancelled` = "cancelled"
+}
+
+public enum ImageGenerationResultJobModelId: String, Codable, Sendable {
+  case `value0` = "gemini-3.1-flash-image"
+  case `gemini3ProImage` = "gemini-3-pro-image"
+  case `value2` = "gemini-2.5-flash-image"
+}
+
+public enum ImageGenerationResultJobAspectRatio: String, Codable, Sendable {
+  case `value0` = "1:1"
+  case `value1` = "16:9"
+  case `value2` = "4:5"
+  case `value3` = "9:16"
+}
+
+public struct ImageGenerationResultJob: Codable, Sendable {
+  public var `id`: String
+  public var `projectId`: String
+  public var `status`: ImageGenerationResultJobStatus
+  public var `prompt`: String
+  public var `modelId`: ImageGenerationResultJobModelId
+  public var `aspectRatio`: ImageGenerationResultJobAspectRatio
+  public var `referenceAssetId`: String?
+  public var `outputAssetId`: String?
+  public var `errorCode`: String?
+  public var `errorMessage`: String?
+  public var `createdAt`: String
+  public var `updatedAt`: String
+
+  public init(`id`: String, `projectId`: String, `status`: ImageGenerationResultJobStatus, `prompt`: String, `modelId`: ImageGenerationResultJobModelId, `aspectRatio`: ImageGenerationResultJobAspectRatio, `referenceAssetId`: String?, `outputAssetId`: String?, `errorCode`: String?, `errorMessage`: String?, `createdAt`: String, `updatedAt`: String) {
+    self.`id` = `id`
+    self.`projectId` = `projectId`
+    self.`status` = `status`
+    self.`prompt` = `prompt`
+    self.`modelId` = `modelId`
+    self.`aspectRatio` = `aspectRatio`
+    self.`referenceAssetId` = `referenceAssetId`
+    self.`outputAssetId` = `outputAssetId`
+    self.`errorCode` = `errorCode`
+    self.`errorMessage` = `errorMessage`
+    self.`createdAt` = `createdAt`
+    self.`updatedAt` = `updatedAt`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `projectId`
+    case `status`
+    case `prompt`
+    case `modelId`
+    case `aspectRatio`
+    case `referenceAssetId`
+    case `outputAssetId`
+    case `errorCode`
+    case `errorMessage`
+    case `createdAt`
+    case `updatedAt`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["id", "projectId", "status", "prompt", "modelId", "aspectRatio", "referenceAssetId", "outputAssetId", "errorCode", "errorMessage", "createdAt", "updatedAt"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageGenerationResultJob property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`id` = try container.decode(String.self, forKey: .`id`)
+    self.`projectId` = try container.decode(String.self, forKey: .`projectId`)
+    self.`status` = try container.decode(ImageGenerationResultJobStatus.self, forKey: .`status`)
+    self.`prompt` = try container.decode(String.self, forKey: .`prompt`)
+    self.`modelId` = try container.decode(ImageGenerationResultJobModelId.self, forKey: .`modelId`)
+    self.`aspectRatio` = try container.decode(ImageGenerationResultJobAspectRatio.self, forKey: .`aspectRatio`)
+    self.`referenceAssetId` = try container.decode(String?.self, forKey: .`referenceAssetId`)
+    self.`outputAssetId` = try container.decode(String?.self, forKey: .`outputAssetId`)
+    self.`errorCode` = try container.decode(String?.self, forKey: .`errorCode`)
+    self.`errorMessage` = try container.decode(String?.self, forKey: .`errorMessage`)
+    self.`createdAt` = try container.decode(String.self, forKey: .`createdAt`)
+    self.`updatedAt` = try container.decode(String.self, forKey: .`updatedAt`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`id`, forKey: .`id`)
+    try container.encode(self.`projectId`, forKey: .`projectId`)
+    try container.encode(self.`status`, forKey: .`status`)
+    try container.encode(self.`prompt`, forKey: .`prompt`)
+    try container.encode(self.`modelId`, forKey: .`modelId`)
+    try container.encode(self.`aspectRatio`, forKey: .`aspectRatio`)
+    try container.encode(self.`referenceAssetId`, forKey: .`referenceAssetId`)
+    try container.encode(self.`outputAssetId`, forKey: .`outputAssetId`)
+    try container.encode(self.`errorCode`, forKey: .`errorCode`)
+    try container.encode(self.`errorMessage`, forKey: .`errorMessage`)
+    try container.encode(self.`createdAt`, forKey: .`createdAt`)
+    try container.encode(self.`updatedAt`, forKey: .`updatedAt`)
+  }
+}
+
+public struct ImageGenerationResult: Codable, Sendable {
+  public var `job`: ImageGenerationResultJob
+
+  public init(`job`: ImageGenerationResultJob) {
+    self.`job` = `job`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `job`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["job"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageGenerationResult property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`job` = try container.decode(ImageGenerationResultJob.self, forKey: .`job`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`job`, forKey: .`job`)
+  }
+}
+
+public enum ImageGenerationListJobsItemStatus: String, Codable, Sendable {
+  case `queued` = "queued"
+  case `processing` = "processing"
+  case `ready` = "ready"
+  case `failed` = "failed"
+  case `cancelled` = "cancelled"
+}
+
+public enum ImageGenerationListJobsItemModelId: String, Codable, Sendable {
+  case `value0` = "gemini-3.1-flash-image"
+  case `gemini3ProImage` = "gemini-3-pro-image"
+  case `value2` = "gemini-2.5-flash-image"
+}
+
+public enum ImageGenerationListJobsItemAspectRatio: String, Codable, Sendable {
+  case `value0` = "1:1"
+  case `value1` = "16:9"
+  case `value2` = "4:5"
+  case `value3` = "9:16"
+}
+
+public struct ImageGenerationListJobsItem: Codable, Sendable {
+  public var `id`: String
+  public var `projectId`: String
+  public var `status`: ImageGenerationListJobsItemStatus
+  public var `prompt`: String
+  public var `modelId`: ImageGenerationListJobsItemModelId
+  public var `aspectRatio`: ImageGenerationListJobsItemAspectRatio
+  public var `referenceAssetId`: String?
+  public var `outputAssetId`: String?
+  public var `errorCode`: String?
+  public var `errorMessage`: String?
+  public var `createdAt`: String
+  public var `updatedAt`: String
+
+  public init(`id`: String, `projectId`: String, `status`: ImageGenerationListJobsItemStatus, `prompt`: String, `modelId`: ImageGenerationListJobsItemModelId, `aspectRatio`: ImageGenerationListJobsItemAspectRatio, `referenceAssetId`: String?, `outputAssetId`: String?, `errorCode`: String?, `errorMessage`: String?, `createdAt`: String, `updatedAt`: String) {
+    self.`id` = `id`
+    self.`projectId` = `projectId`
+    self.`status` = `status`
+    self.`prompt` = `prompt`
+    self.`modelId` = `modelId`
+    self.`aspectRatio` = `aspectRatio`
+    self.`referenceAssetId` = `referenceAssetId`
+    self.`outputAssetId` = `outputAssetId`
+    self.`errorCode` = `errorCode`
+    self.`errorMessage` = `errorMessage`
+    self.`createdAt` = `createdAt`
+    self.`updatedAt` = `updatedAt`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `projectId`
+    case `status`
+    case `prompt`
+    case `modelId`
+    case `aspectRatio`
+    case `referenceAssetId`
+    case `outputAssetId`
+    case `errorCode`
+    case `errorMessage`
+    case `createdAt`
+    case `updatedAt`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["id", "projectId", "status", "prompt", "modelId", "aspectRatio", "referenceAssetId", "outputAssetId", "errorCode", "errorMessage", "createdAt", "updatedAt"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageGenerationListJobsItem property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`id` = try container.decode(String.self, forKey: .`id`)
+    self.`projectId` = try container.decode(String.self, forKey: .`projectId`)
+    self.`status` = try container.decode(ImageGenerationListJobsItemStatus.self, forKey: .`status`)
+    self.`prompt` = try container.decode(String.self, forKey: .`prompt`)
+    self.`modelId` = try container.decode(ImageGenerationListJobsItemModelId.self, forKey: .`modelId`)
+    self.`aspectRatio` = try container.decode(ImageGenerationListJobsItemAspectRatio.self, forKey: .`aspectRatio`)
+    self.`referenceAssetId` = try container.decode(String?.self, forKey: .`referenceAssetId`)
+    self.`outputAssetId` = try container.decode(String?.self, forKey: .`outputAssetId`)
+    self.`errorCode` = try container.decode(String?.self, forKey: .`errorCode`)
+    self.`errorMessage` = try container.decode(String?.self, forKey: .`errorMessage`)
+    self.`createdAt` = try container.decode(String.self, forKey: .`createdAt`)
+    self.`updatedAt` = try container.decode(String.self, forKey: .`updatedAt`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`id`, forKey: .`id`)
+    try container.encode(self.`projectId`, forKey: .`projectId`)
+    try container.encode(self.`status`, forKey: .`status`)
+    try container.encode(self.`prompt`, forKey: .`prompt`)
+    try container.encode(self.`modelId`, forKey: .`modelId`)
+    try container.encode(self.`aspectRatio`, forKey: .`aspectRatio`)
+    try container.encode(self.`referenceAssetId`, forKey: .`referenceAssetId`)
+    try container.encode(self.`outputAssetId`, forKey: .`outputAssetId`)
+    try container.encode(self.`errorCode`, forKey: .`errorCode`)
+    try container.encode(self.`errorMessage`, forKey: .`errorMessage`)
+    try container.encode(self.`createdAt`, forKey: .`createdAt`)
+    try container.encode(self.`updatedAt`, forKey: .`updatedAt`)
+  }
+}
+
+public struct ImageGenerationList: Codable, Sendable {
+  public var `jobs`: [ImageGenerationListJobsItem]
+
+  public init(`jobs`: [ImageGenerationListJobsItem]) {
+    self.`jobs` = `jobs`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `jobs`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["jobs"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageGenerationList property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`jobs` = try container.decode([ImageGenerationListJobsItem].self, forKey: .`jobs`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`jobs`, forKey: .`jobs`)
+  }
+}
+
+public enum ImageUploadResponseOk: Codable, Sendable {
+  case value
+  public init(from decoder: any Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == true else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Unexpected boolean literal") }
+    self = .value
+  }
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.singleValueContainer()
+    try container.encode(true)
+  }
+}
+
+public enum ImageUploadResponseDataUploadUploadContentType: String, Codable, Sendable {
+  case `value0` = "image/png"
+  case `value1` = "image/jpeg"
+  case `value2` = "image/webp"
+}
+
+public struct ImageUploadResponseDataUpload: Codable, Sendable {
+  public var `id`: String
+  public var `projectId`: String
+  public var `assetId`: String
+  public var `expiresAt`: String
+  public var `uploadUrl`: String
+  public var `uploadContentType`: ImageUploadResponseDataUploadUploadContentType
+
+  public init(`id`: String, `projectId`: String, `assetId`: String, `expiresAt`: String, `uploadUrl`: String, `uploadContentType`: ImageUploadResponseDataUploadUploadContentType) {
+    self.`id` = `id`
+    self.`projectId` = `projectId`
+    self.`assetId` = `assetId`
+    self.`expiresAt` = `expiresAt`
+    self.`uploadUrl` = `uploadUrl`
+    self.`uploadContentType` = `uploadContentType`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `projectId`
+    case `assetId`
+    case `expiresAt`
+    case `uploadUrl`
+    case `uploadContentType`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["id", "projectId", "assetId", "expiresAt", "uploadUrl", "uploadContentType"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageUploadResponseDataUpload property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`id` = try container.decode(String.self, forKey: .`id`)
+    self.`projectId` = try container.decode(String.self, forKey: .`projectId`)
+    self.`assetId` = try container.decode(String.self, forKey: .`assetId`)
+    self.`expiresAt` = try container.decode(String.self, forKey: .`expiresAt`)
+    self.`uploadUrl` = try container.decode(String.self, forKey: .`uploadUrl`)
+    self.`uploadContentType` = try container.decode(ImageUploadResponseDataUploadUploadContentType.self, forKey: .`uploadContentType`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`id`, forKey: .`id`)
+    try container.encode(self.`projectId`, forKey: .`projectId`)
+    try container.encode(self.`assetId`, forKey: .`assetId`)
+    try container.encode(self.`expiresAt`, forKey: .`expiresAt`)
+    try container.encode(self.`uploadUrl`, forKey: .`uploadUrl`)
+    try container.encode(self.`uploadContentType`, forKey: .`uploadContentType`)
+  }
+}
+
+public struct ImageUploadResponseData: Codable, Sendable {
+  public var `upload`: ImageUploadResponseDataUpload
+
+  public init(`upload`: ImageUploadResponseDataUpload) {
+    self.`upload` = `upload`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `upload`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["upload"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageUploadResponseData property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`upload` = try container.decode(ImageUploadResponseDataUpload.self, forKey: .`upload`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`upload`, forKey: .`upload`)
+  }
+}
+
+public struct ImageUploadResponse: Codable, Sendable {
+  public var `ok`: ImageUploadResponseOk
+  public var `data`: ImageUploadResponseData
+  public var `requestId`: String
+
+  public init(`ok`: ImageUploadResponseOk, `data`: ImageUploadResponseData, `requestId`: String) {
+    self.`ok` = `ok`
+    self.`data` = `data`
+    self.`requestId` = `requestId`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `ok`
+    case `data`
+    case `requestId`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["ok", "data", "requestId"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageUploadResponse property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`ok` = try container.decode(ImageUploadResponseOk.self, forKey: .`ok`)
+    self.`data` = try container.decode(ImageUploadResponseData.self, forKey: .`data`)
+    self.`requestId` = try container.decode(String.self, forKey: .`requestId`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`ok`, forKey: .`ok`)
+    try container.encode(self.`data`, forKey: .`data`)
+    try container.encode(self.`requestId`, forKey: .`requestId`)
+  }
+}
+
+public enum FinalizedImageUploadResponseOk: Codable, Sendable {
+  case value
+  public init(from decoder: any Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == true else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Unexpected boolean literal") }
+    self = .value
+  }
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.singleValueContainer()
+    try container.encode(true)
+  }
+}
+
+public struct FinalizedImageUploadResponseDataAsset: Codable, Sendable {
+  public var `id`: String
+  public var `projectId`: String
+  public var `mimeType`: String
+  public var `byteSize`: Int64
+  public var `width`: Int64?
+  public var `height`: Int64?
+  public var `durationSeconds`: Double?
+  public var `createdAt`: String
+  public var `nativeContentUrl`: String?
+  public var `contentUrl`: String?
+
+  public init(`id`: String, `projectId`: String, `mimeType`: String, `byteSize`: Int64, `width`: Int64?, `height`: Int64?, `durationSeconds`: Double?, `createdAt`: String, `nativeContentUrl`: String?, `contentUrl`: String?) {
+    self.`id` = `id`
+    self.`projectId` = `projectId`
+    self.`mimeType` = `mimeType`
+    self.`byteSize` = `byteSize`
+    self.`width` = `width`
+    self.`height` = `height`
+    self.`durationSeconds` = `durationSeconds`
+    self.`createdAt` = `createdAt`
+    self.`nativeContentUrl` = `nativeContentUrl`
+    self.`contentUrl` = `contentUrl`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `projectId`
+    case `mimeType`
+    case `byteSize`
+    case `width`
+    case `height`
+    case `durationSeconds`
+    case `createdAt`
+    case `nativeContentUrl`
+    case `contentUrl`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["id", "projectId", "mimeType", "byteSize", "width", "height", "durationSeconds", "createdAt", "nativeContentUrl", "contentUrl"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown FinalizedImageUploadResponseDataAsset property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`id` = try container.decode(String.self, forKey: .`id`)
+    self.`projectId` = try container.decode(String.self, forKey: .`projectId`)
+    self.`mimeType` = try container.decode(String.self, forKey: .`mimeType`)
+    self.`byteSize` = try container.decode(Int64.self, forKey: .`byteSize`)
+    self.`width` = try container.decode(Int64?.self, forKey: .`width`)
+    self.`height` = try container.decode(Int64?.self, forKey: .`height`)
+    self.`durationSeconds` = try container.decode(Double?.self, forKey: .`durationSeconds`)
+    self.`createdAt` = try container.decode(String.self, forKey: .`createdAt`)
+    self.`nativeContentUrl` = try container.decode(String?.self, forKey: .`nativeContentUrl`)
+    self.`contentUrl` = try container.decode(String?.self, forKey: .`contentUrl`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`id`, forKey: .`id`)
+    try container.encode(self.`projectId`, forKey: .`projectId`)
+    try container.encode(self.`mimeType`, forKey: .`mimeType`)
+    try container.encode(self.`byteSize`, forKey: .`byteSize`)
+    try container.encode(self.`width`, forKey: .`width`)
+    try container.encode(self.`height`, forKey: .`height`)
+    try container.encode(self.`durationSeconds`, forKey: .`durationSeconds`)
+    try container.encode(self.`createdAt`, forKey: .`createdAt`)
+    try container.encode(self.`nativeContentUrl`, forKey: .`nativeContentUrl`)
+    try container.encode(self.`contentUrl`, forKey: .`contentUrl`)
+  }
+}
+
+public struct FinalizedImageUploadResponseData: Codable, Sendable {
+  public var `asset`: FinalizedImageUploadResponseDataAsset
+
+  public init(`asset`: FinalizedImageUploadResponseDataAsset) {
+    self.`asset` = `asset`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `asset`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["asset"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown FinalizedImageUploadResponseData property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`asset` = try container.decode(FinalizedImageUploadResponseDataAsset.self, forKey: .`asset`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`asset`, forKey: .`asset`)
+  }
+}
+
+public struct FinalizedImageUploadResponse: Codable, Sendable {
+  public var `ok`: FinalizedImageUploadResponseOk
+  public var `data`: FinalizedImageUploadResponseData
+  public var `requestId`: String
+
+  public init(`ok`: FinalizedImageUploadResponseOk, `data`: FinalizedImageUploadResponseData, `requestId`: String) {
+    self.`ok` = `ok`
+    self.`data` = `data`
+    self.`requestId` = `requestId`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `ok`
+    case `data`
+    case `requestId`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["ok", "data", "requestId"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown FinalizedImageUploadResponse property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`ok` = try container.decode(FinalizedImageUploadResponseOk.self, forKey: .`ok`)
+    self.`data` = try container.decode(FinalizedImageUploadResponseData.self, forKey: .`data`)
+    self.`requestId` = try container.decode(String.self, forKey: .`requestId`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`ok`, forKey: .`ok`)
+    try container.encode(self.`data`, forKey: .`data`)
+    try container.encode(self.`requestId`, forKey: .`requestId`)
+  }
+}
+
+public enum ImageGenerationCapabilitiesResponseOk: Codable, Sendable {
+  case value
+  public init(from decoder: any Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == true else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Unexpected boolean literal") }
+    self = .value
+  }
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.singleValueContainer()
+    try container.encode(true)
+  }
+}
+
+public enum ImageGenerationCapabilitiesResponseDataAvailability: String, Codable, Sendable {
+  case `configured` = "configured"
+  case `unconfigured` = "unconfigured"
+}
+
+public enum ImageGenerationCapabilitiesResponseDataModelsItemId: String, Codable, Sendable {
+  case `value0` = "gemini-3.1-flash-image"
+  case `gemini3ProImage` = "gemini-3-pro-image"
+  case `value2` = "gemini-2.5-flash-image"
+}
+
+public enum ImageGenerationCapabilitiesResponseDataModelsItemAspectRatiosItem: String, Codable, Sendable {
+  case `value0` = "1:1"
+  case `value1` = "16:9"
+  case `value2` = "4:5"
+  case `value3` = "9:16"
+}
+
+public struct ImageGenerationCapabilitiesResponseDataModelsItem: Codable, Sendable {
+  public var `id`: ImageGenerationCapabilitiesResponseDataModelsItemId
+  public var `label`: String
+  public var `aspectRatios`: [ImageGenerationCapabilitiesResponseDataModelsItemAspectRatiosItem]
+  public var `referenceImage`: Bool
+
+  public init(`id`: ImageGenerationCapabilitiesResponseDataModelsItemId, `label`: String, `aspectRatios`: [ImageGenerationCapabilitiesResponseDataModelsItemAspectRatiosItem], `referenceImage`: Bool) {
+    self.`id` = `id`
+    self.`label` = `label`
+    self.`aspectRatios` = `aspectRatios`
+    self.`referenceImage` = `referenceImage`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `label`
+    case `aspectRatios`
+    case `referenceImage`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["id", "label", "aspectRatios", "referenceImage"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageGenerationCapabilitiesResponseDataModelsItem property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`id` = try container.decode(ImageGenerationCapabilitiesResponseDataModelsItemId.self, forKey: .`id`)
+    self.`label` = try container.decode(String.self, forKey: .`label`)
+    self.`aspectRatios` = try container.decode([ImageGenerationCapabilitiesResponseDataModelsItemAspectRatiosItem].self, forKey: .`aspectRatios`)
+    self.`referenceImage` = try container.decode(Bool.self, forKey: .`referenceImage`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`id`, forKey: .`id`)
+    try container.encode(self.`label`, forKey: .`label`)
+    try container.encode(self.`aspectRatios`, forKey: .`aspectRatios`)
+    try container.encode(self.`referenceImage`, forKey: .`referenceImage`)
+  }
+}
+
+public struct ImageGenerationCapabilitiesResponseData: Codable, Sendable {
+  public var `availability`: ImageGenerationCapabilitiesResponseDataAvailability
+  public var `reason`: String
+  public var `models`: [ImageGenerationCapabilitiesResponseDataModelsItem]
+  public var `maxReferenceBytes`: Int64
+  public var `maxPromptCharacters`: Int64
+
+  public init(`availability`: ImageGenerationCapabilitiesResponseDataAvailability, `reason`: String, `models`: [ImageGenerationCapabilitiesResponseDataModelsItem], `maxReferenceBytes`: Int64, `maxPromptCharacters`: Int64) {
+    self.`availability` = `availability`
+    self.`reason` = `reason`
+    self.`models` = `models`
+    self.`maxReferenceBytes` = `maxReferenceBytes`
+    self.`maxPromptCharacters` = `maxPromptCharacters`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `availability`
+    case `reason`
+    case `models`
+    case `maxReferenceBytes`
+    case `maxPromptCharacters`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["availability", "reason", "models", "maxReferenceBytes", "maxPromptCharacters"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageGenerationCapabilitiesResponseData property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`availability` = try container.decode(ImageGenerationCapabilitiesResponseDataAvailability.self, forKey: .`availability`)
+    self.`reason` = try container.decode(String.self, forKey: .`reason`)
+    self.`models` = try container.decode([ImageGenerationCapabilitiesResponseDataModelsItem].self, forKey: .`models`)
+    self.`maxReferenceBytes` = try container.decode(Int64.self, forKey: .`maxReferenceBytes`)
+    self.`maxPromptCharacters` = try container.decode(Int64.self, forKey: .`maxPromptCharacters`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`availability`, forKey: .`availability`)
+    try container.encode(self.`reason`, forKey: .`reason`)
+    try container.encode(self.`models`, forKey: .`models`)
+    try container.encode(self.`maxReferenceBytes`, forKey: .`maxReferenceBytes`)
+    try container.encode(self.`maxPromptCharacters`, forKey: .`maxPromptCharacters`)
+  }
+}
+
+public struct ImageGenerationCapabilitiesResponse: Codable, Sendable {
+  public var `ok`: ImageGenerationCapabilitiesResponseOk
+  public var `data`: ImageGenerationCapabilitiesResponseData
+  public var `requestId`: String
+
+  public init(`ok`: ImageGenerationCapabilitiesResponseOk, `data`: ImageGenerationCapabilitiesResponseData, `requestId`: String) {
+    self.`ok` = `ok`
+    self.`data` = `data`
+    self.`requestId` = `requestId`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `ok`
+    case `data`
+    case `requestId`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["ok", "data", "requestId"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageGenerationCapabilitiesResponse property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`ok` = try container.decode(ImageGenerationCapabilitiesResponseOk.self, forKey: .`ok`)
+    self.`data` = try container.decode(ImageGenerationCapabilitiesResponseData.self, forKey: .`data`)
+    self.`requestId` = try container.decode(String.self, forKey: .`requestId`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`ok`, forKey: .`ok`)
+    try container.encode(self.`data`, forKey: .`data`)
+    try container.encode(self.`requestId`, forKey: .`requestId`)
+  }
+}
+
+public enum ImageGenerationResponseOk: Codable, Sendable {
+  case value
+  public init(from decoder: any Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == true else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Unexpected boolean literal") }
+    self = .value
+  }
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.singleValueContainer()
+    try container.encode(true)
+  }
+}
+
+public enum ImageGenerationResponseDataJobStatus: String, Codable, Sendable {
+  case `queued` = "queued"
+  case `processing` = "processing"
+  case `ready` = "ready"
+  case `failed` = "failed"
+  case `cancelled` = "cancelled"
+}
+
+public enum ImageGenerationResponseDataJobModelId: String, Codable, Sendable {
+  case `value0` = "gemini-3.1-flash-image"
+  case `gemini3ProImage` = "gemini-3-pro-image"
+  case `value2` = "gemini-2.5-flash-image"
+}
+
+public enum ImageGenerationResponseDataJobAspectRatio: String, Codable, Sendable {
+  case `value0` = "1:1"
+  case `value1` = "16:9"
+  case `value2` = "4:5"
+  case `value3` = "9:16"
+}
+
+public struct ImageGenerationResponseDataJob: Codable, Sendable {
+  public var `id`: String
+  public var `projectId`: String
+  public var `status`: ImageGenerationResponseDataJobStatus
+  public var `prompt`: String
+  public var `modelId`: ImageGenerationResponseDataJobModelId
+  public var `aspectRatio`: ImageGenerationResponseDataJobAspectRatio
+  public var `referenceAssetId`: String?
+  public var `outputAssetId`: String?
+  public var `errorCode`: String?
+  public var `errorMessage`: String?
+  public var `createdAt`: String
+  public var `updatedAt`: String
+
+  public init(`id`: String, `projectId`: String, `status`: ImageGenerationResponseDataJobStatus, `prompt`: String, `modelId`: ImageGenerationResponseDataJobModelId, `aspectRatio`: ImageGenerationResponseDataJobAspectRatio, `referenceAssetId`: String?, `outputAssetId`: String?, `errorCode`: String?, `errorMessage`: String?, `createdAt`: String, `updatedAt`: String) {
+    self.`id` = `id`
+    self.`projectId` = `projectId`
+    self.`status` = `status`
+    self.`prompt` = `prompt`
+    self.`modelId` = `modelId`
+    self.`aspectRatio` = `aspectRatio`
+    self.`referenceAssetId` = `referenceAssetId`
+    self.`outputAssetId` = `outputAssetId`
+    self.`errorCode` = `errorCode`
+    self.`errorMessage` = `errorMessage`
+    self.`createdAt` = `createdAt`
+    self.`updatedAt` = `updatedAt`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `projectId`
+    case `status`
+    case `prompt`
+    case `modelId`
+    case `aspectRatio`
+    case `referenceAssetId`
+    case `outputAssetId`
+    case `errorCode`
+    case `errorMessage`
+    case `createdAt`
+    case `updatedAt`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["id", "projectId", "status", "prompt", "modelId", "aspectRatio", "referenceAssetId", "outputAssetId", "errorCode", "errorMessage", "createdAt", "updatedAt"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageGenerationResponseDataJob property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`id` = try container.decode(String.self, forKey: .`id`)
+    self.`projectId` = try container.decode(String.self, forKey: .`projectId`)
+    self.`status` = try container.decode(ImageGenerationResponseDataJobStatus.self, forKey: .`status`)
+    self.`prompt` = try container.decode(String.self, forKey: .`prompt`)
+    self.`modelId` = try container.decode(ImageGenerationResponseDataJobModelId.self, forKey: .`modelId`)
+    self.`aspectRatio` = try container.decode(ImageGenerationResponseDataJobAspectRatio.self, forKey: .`aspectRatio`)
+    self.`referenceAssetId` = try container.decode(String?.self, forKey: .`referenceAssetId`)
+    self.`outputAssetId` = try container.decode(String?.self, forKey: .`outputAssetId`)
+    self.`errorCode` = try container.decode(String?.self, forKey: .`errorCode`)
+    self.`errorMessage` = try container.decode(String?.self, forKey: .`errorMessage`)
+    self.`createdAt` = try container.decode(String.self, forKey: .`createdAt`)
+    self.`updatedAt` = try container.decode(String.self, forKey: .`updatedAt`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`id`, forKey: .`id`)
+    try container.encode(self.`projectId`, forKey: .`projectId`)
+    try container.encode(self.`status`, forKey: .`status`)
+    try container.encode(self.`prompt`, forKey: .`prompt`)
+    try container.encode(self.`modelId`, forKey: .`modelId`)
+    try container.encode(self.`aspectRatio`, forKey: .`aspectRatio`)
+    try container.encode(self.`referenceAssetId`, forKey: .`referenceAssetId`)
+    try container.encode(self.`outputAssetId`, forKey: .`outputAssetId`)
+    try container.encode(self.`errorCode`, forKey: .`errorCode`)
+    try container.encode(self.`errorMessage`, forKey: .`errorMessage`)
+    try container.encode(self.`createdAt`, forKey: .`createdAt`)
+    try container.encode(self.`updatedAt`, forKey: .`updatedAt`)
+  }
+}
+
+public struct ImageGenerationResponseData: Codable, Sendable {
+  public var `job`: ImageGenerationResponseDataJob
+
+  public init(`job`: ImageGenerationResponseDataJob) {
+    self.`job` = `job`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `job`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["job"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageGenerationResponseData property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`job` = try container.decode(ImageGenerationResponseDataJob.self, forKey: .`job`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`job`, forKey: .`job`)
+  }
+}
+
+public struct ImageGenerationResponse: Codable, Sendable {
+  public var `ok`: ImageGenerationResponseOk
+  public var `data`: ImageGenerationResponseData
+  public var `requestId`: String
+
+  public init(`ok`: ImageGenerationResponseOk, `data`: ImageGenerationResponseData, `requestId`: String) {
+    self.`ok` = `ok`
+    self.`data` = `data`
+    self.`requestId` = `requestId`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `ok`
+    case `data`
+    case `requestId`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["ok", "data", "requestId"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageGenerationResponse property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`ok` = try container.decode(ImageGenerationResponseOk.self, forKey: .`ok`)
+    self.`data` = try container.decode(ImageGenerationResponseData.self, forKey: .`data`)
+    self.`requestId` = try container.decode(String.self, forKey: .`requestId`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`ok`, forKey: .`ok`)
+    try container.encode(self.`data`, forKey: .`data`)
+    try container.encode(self.`requestId`, forKey: .`requestId`)
+  }
+}
+
+public enum ImageGenerationListResponseOk: Codable, Sendable {
+  case value
+  public init(from decoder: any Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    guard try container.decode(Bool.self) == true else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "Unexpected boolean literal") }
+    self = .value
+  }
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.singleValueContainer()
+    try container.encode(true)
+  }
+}
+
+public enum ImageGenerationListResponseDataJobsItemStatus: String, Codable, Sendable {
+  case `queued` = "queued"
+  case `processing` = "processing"
+  case `ready` = "ready"
+  case `failed` = "failed"
+  case `cancelled` = "cancelled"
+}
+
+public enum ImageGenerationListResponseDataJobsItemModelId: String, Codable, Sendable {
+  case `value0` = "gemini-3.1-flash-image"
+  case `gemini3ProImage` = "gemini-3-pro-image"
+  case `value2` = "gemini-2.5-flash-image"
+}
+
+public enum ImageGenerationListResponseDataJobsItemAspectRatio: String, Codable, Sendable {
+  case `value0` = "1:1"
+  case `value1` = "16:9"
+  case `value2` = "4:5"
+  case `value3` = "9:16"
+}
+
+public struct ImageGenerationListResponseDataJobsItem: Codable, Sendable {
+  public var `id`: String
+  public var `projectId`: String
+  public var `status`: ImageGenerationListResponseDataJobsItemStatus
+  public var `prompt`: String
+  public var `modelId`: ImageGenerationListResponseDataJobsItemModelId
+  public var `aspectRatio`: ImageGenerationListResponseDataJobsItemAspectRatio
+  public var `referenceAssetId`: String?
+  public var `outputAssetId`: String?
+  public var `errorCode`: String?
+  public var `errorMessage`: String?
+  public var `createdAt`: String
+  public var `updatedAt`: String
+
+  public init(`id`: String, `projectId`: String, `status`: ImageGenerationListResponseDataJobsItemStatus, `prompt`: String, `modelId`: ImageGenerationListResponseDataJobsItemModelId, `aspectRatio`: ImageGenerationListResponseDataJobsItemAspectRatio, `referenceAssetId`: String?, `outputAssetId`: String?, `errorCode`: String?, `errorMessage`: String?, `createdAt`: String, `updatedAt`: String) {
+    self.`id` = `id`
+    self.`projectId` = `projectId`
+    self.`status` = `status`
+    self.`prompt` = `prompt`
+    self.`modelId` = `modelId`
+    self.`aspectRatio` = `aspectRatio`
+    self.`referenceAssetId` = `referenceAssetId`
+    self.`outputAssetId` = `outputAssetId`
+    self.`errorCode` = `errorCode`
+    self.`errorMessage` = `errorMessage`
+    self.`createdAt` = `createdAt`
+    self.`updatedAt` = `updatedAt`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `id`
+    case `projectId`
+    case `status`
+    case `prompt`
+    case `modelId`
+    case `aspectRatio`
+    case `referenceAssetId`
+    case `outputAssetId`
+    case `errorCode`
+    case `errorMessage`
+    case `createdAt`
+    case `updatedAt`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["id", "projectId", "status", "prompt", "modelId", "aspectRatio", "referenceAssetId", "outputAssetId", "errorCode", "errorMessage", "createdAt", "updatedAt"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageGenerationListResponseDataJobsItem property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`id` = try container.decode(String.self, forKey: .`id`)
+    self.`projectId` = try container.decode(String.self, forKey: .`projectId`)
+    self.`status` = try container.decode(ImageGenerationListResponseDataJobsItemStatus.self, forKey: .`status`)
+    self.`prompt` = try container.decode(String.self, forKey: .`prompt`)
+    self.`modelId` = try container.decode(ImageGenerationListResponseDataJobsItemModelId.self, forKey: .`modelId`)
+    self.`aspectRatio` = try container.decode(ImageGenerationListResponseDataJobsItemAspectRatio.self, forKey: .`aspectRatio`)
+    self.`referenceAssetId` = try container.decode(String?.self, forKey: .`referenceAssetId`)
+    self.`outputAssetId` = try container.decode(String?.self, forKey: .`outputAssetId`)
+    self.`errorCode` = try container.decode(String?.self, forKey: .`errorCode`)
+    self.`errorMessage` = try container.decode(String?.self, forKey: .`errorMessage`)
+    self.`createdAt` = try container.decode(String.self, forKey: .`createdAt`)
+    self.`updatedAt` = try container.decode(String.self, forKey: .`updatedAt`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`id`, forKey: .`id`)
+    try container.encode(self.`projectId`, forKey: .`projectId`)
+    try container.encode(self.`status`, forKey: .`status`)
+    try container.encode(self.`prompt`, forKey: .`prompt`)
+    try container.encode(self.`modelId`, forKey: .`modelId`)
+    try container.encode(self.`aspectRatio`, forKey: .`aspectRatio`)
+    try container.encode(self.`referenceAssetId`, forKey: .`referenceAssetId`)
+    try container.encode(self.`outputAssetId`, forKey: .`outputAssetId`)
+    try container.encode(self.`errorCode`, forKey: .`errorCode`)
+    try container.encode(self.`errorMessage`, forKey: .`errorMessage`)
+    try container.encode(self.`createdAt`, forKey: .`createdAt`)
+    try container.encode(self.`updatedAt`, forKey: .`updatedAt`)
+  }
+}
+
+public struct ImageGenerationListResponseData: Codable, Sendable {
+  public var `jobs`: [ImageGenerationListResponseDataJobsItem]
+
+  public init(`jobs`: [ImageGenerationListResponseDataJobsItem]) {
+    self.`jobs` = `jobs`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `jobs`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["jobs"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageGenerationListResponseData property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`jobs` = try container.decode([ImageGenerationListResponseDataJobsItem].self, forKey: .`jobs`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`jobs`, forKey: .`jobs`)
+  }
+}
+
+public struct ImageGenerationListResponse: Codable, Sendable {
+  public var `ok`: ImageGenerationListResponseOk
+  public var `data`: ImageGenerationListResponseData
+  public var `requestId`: String
+
+  public init(`ok`: ImageGenerationListResponseOk, `data`: ImageGenerationListResponseData, `requestId`: String) {
+    self.`ok` = `ok`
+    self.`data` = `data`
+    self.`requestId` = `requestId`
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case `ok`
+    case `data`
+    case `requestId`
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let keys = try decoder.container(keyedBy: ShapeAnyCodingKey.self)
+    let allowed: Set<String> = Set(["ok", "data", "requestId"])
+    guard keys.allKeys.allSatisfy({ allowed.contains($0.stringValue) }) else {
+      throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown ImageGenerationListResponse property"))
+    }
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.`ok` = try container.decode(ImageGenerationListResponseOk.self, forKey: .`ok`)
+    self.`data` = try container.decode(ImageGenerationListResponseData.self, forKey: .`data`)
+    self.`requestId` = try container.decode(String.self, forKey: .`requestId`)
+  }
+
+  public func encode(to encoder: any Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.`ok`, forKey: .`ok`)
+    try container.encode(self.`data`, forKey: .`data`)
+    try container.encode(self.`requestId`, forKey: .`requestId`)
+  }
+}
+
 public struct CanonicalSpatialObject: Codable, Sendable {
   public var `id`: String
   public var `assetId`: String

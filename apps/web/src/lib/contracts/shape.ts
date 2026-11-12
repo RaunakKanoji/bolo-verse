@@ -1,3 +1,6 @@
+import { CreateImageUploadSchema, FinalizeImageUploadSchema, ImageUploadSessionSchema, ImageUploadResultSchema, FinalizedImageUploadResultSchema, ImageGenerationCapabilitiesSchema, CreateImageGenerationSchema, CancelImageGenerationSchema, ImageGenerationJobSchema, ImageGenerationResultSchema, ImageGenerationListSchema } from "./creation";
+import { AssetSummarySchema } from "./assets";
+export { AssetSummarySchema, type AssetSummary } from "./assets";
 import { z } from "zod";
 import { ApiErrorSchema, RequestIdSchema, ResourceIdSchema } from "./api";
 import { CreateProjectSchema, UpdateProjectSchema } from "./projects";
@@ -56,21 +59,6 @@ export const ProjectSummarySchema = z.strictObject({
 export type ProjectSummary = z.infer<typeof ProjectSummarySchema>;
 export const ProjectListSchema = z.strictObject({ projects: z.array(ProjectSummarySchema) });
 export const ProjectDetailSchema = z.strictObject({ project: ProjectSummarySchema });
-export const AssetSummarySchema = z.strictObject({
-  id: ResourceIdSchema,
-  projectId: ResourceIdSchema,
-  mimeType: z.string().min(1).max(160),
-  byteSize: z.int().min(0).max(Number.MAX_SAFE_INTEGER),
-  width: z.int().positive().nullable(),
-  height: z.int().positive().nullable(),
-  durationSeconds: z.number().nonnegative().nullable(),
-  createdAt: z.iso.datetime(),
-  nativeContentUrl: z.string().regex(/^\/api\/v1\/assets\/[0-9a-f-]{36}\/native-content$/).nullable()
-    .describe("Authenticated native USDZ download for model/vnd.usdz+zip assets up to 32 MiB; otherwise null. The server validates archive and texture bounds before delivery; no conversion or upload is provided."),
-  contentUrl: z.string().regex(/^\/api\/v1\/assets\/[0-9a-f-]{36}\/content$/).nullable()
-    .describe("Authenticated browser preview URL for supported MIME types up to 20 MiB; otherwise null. Not a general asset download."),
-});
-export type AssetSummary = z.infer<typeof AssetSummarySchema>;
 export const AssetListSchema = z.strictObject({ assets: z.array(AssetSummarySchema).max(100), hasMore: z.boolean() });
 
 function successEnvelope<T extends z.ZodType>(data: T) {
@@ -82,10 +70,31 @@ export const AssetListResponseSchema = successEnvelope(AssetListSchema);
 export const CreativeDraftResponseSchema = successEnvelope(CreativeDraftResultSchema);
 export const CreativeCapabilitiesResponseSchema = successEnvelope(CreativeCapabilitiesSchema);
 export const SpatialSceneResponseSchema = successEnvelope(SpatialSceneResultSchema);
+export const ImageUploadResponseSchema = successEnvelope(ImageUploadResultSchema);
+export const FinalizedImageUploadResponseSchema = successEnvelope(FinalizedImageUploadResultSchema);
+export const ImageGenerationCapabilitiesResponseSchema = successEnvelope(ImageGenerationCapabilitiesSchema);
+export const ImageGenerationResponseSchema = successEnvelope(ImageGenerationResultSchema);
+export const ImageGenerationListResponseSchema = successEnvelope(ImageGenerationListSchema);
 export const ShapeErrorResponseSchema = z.strictObject({ ok: z.literal(false), error: ApiErrorSchema, requestId: RequestIdSchema });
 
 /** Source registry for the language-neutral OpenAPI artifact and generated clients. */
 export const ShapeApiSchemas = {
+  CreateImageUpload: CreateImageUploadSchema,
+  FinalizeImageUpload: FinalizeImageUploadSchema,
+  ImageUploadSession: ImageUploadSessionSchema,
+  ImageUploadResult: ImageUploadResultSchema,
+  FinalizedImageUploadResult: FinalizedImageUploadResultSchema,
+  ImageGenerationCapabilities: ImageGenerationCapabilitiesSchema,
+  CreateImageGeneration: CreateImageGenerationSchema,
+  CancelImageGeneration: CancelImageGenerationSchema,
+  ImageGenerationJob: ImageGenerationJobSchema,
+  ImageGenerationResult: ImageGenerationResultSchema,
+  ImageGenerationList: ImageGenerationListSchema,
+  ImageUploadResponse: ImageUploadResponseSchema,
+  FinalizedImageUploadResponse: FinalizedImageUploadResponseSchema,
+  ImageGenerationCapabilitiesResponse: ImageGenerationCapabilitiesResponseSchema,
+  ImageGenerationResponse: ImageGenerationResponseSchema,
+  ImageGenerationListResponse: ImageGenerationListResponseSchema,
   CanonicalSpatialObject: CanonicalSpatialObjectSchema,
   CanonicalSpatialScene: CanonicalSpatialSceneSchema,
   SpatialSceneSnapshot: SpatialSceneSnapshotSchema,
@@ -116,6 +125,13 @@ export const ShapeApiSchemas = {
 } as const;
 
 export const ShapeApiOperations = [
+  { operationId: "getImageGenerationCapabilities", method: "get", path: "/api/v1/creation/capabilities", responseSchema: "ImageGenerationCapabilitiesResponse", summary: "Read configured image generation capabilities (not live verification)", security: "public" },
+  { operationId: "createImageUpload", method: "post", path: "/api/v1/assets/upload-session", responseSchema: "ImageUploadResponse", requestSchema: "CreateImageUpload", summary: "Reserve a private bounded image upload", security: "session", successStatus: 201 },
+  { operationId: "finalizeImageUpload", method: "post", path: "/api/v1/assets/upload-session/{uploadId}/finalize", responseSchema: "FinalizedImageUploadResponse", requestSchema: "FinalizeImageUpload", summary: "Validate and publish an immutable private image", security: "session", pathParameters: ["uploadId"] },
+  { operationId: "createImageGeneration", method: "post", path: "/api/v1/generations", responseSchema: "ImageGenerationResponse", requestSchema: "CreateImageGeneration", summary: "Queue an idempotent private image generation", security: "session", successStatus: 202 },
+  { operationId: "listImageGenerations", method: "get", path: "/api/v1/projects/{projectId}/generations", responseSchema: "ImageGenerationListResponse", summary: "Read your latest 50 private project image jobs", security: "session", pathParameters: ["projectId"] },
+  { operationId: "getImageGeneration", method: "get", path: "/api/v1/generations/{jobId}", responseSchema: "ImageGenerationResponse", summary: "Read your authorized private image job", security: "session", pathParameters: ["jobId"] },
+  { operationId: "cancelImageGeneration", method: "post", path: "/api/v1/generations/{jobId}/cancel", responseSchema: "ImageGenerationResponse", requestSchema: "CancelImageGeneration", summary: "Stop publication of your image job; provider billing may continue", security: "session", pathParameters: ["jobId"] },
   { operationId: "getSpatialScene", method: "get", path: "/api/v1/projects/{projectId}/spatial-scene", responseSchema: "SpatialSceneResponse", summary: "Read the authorized canonical project scene", security: "session", pathParameters: ["projectId"] },
   { operationId: "saveSpatialScene", method: "put", path: "/api/v1/projects/{projectId}/spatial-scene", responseSchema: "SpatialSceneResponse", requestSchema: "SaveSpatialScene", summary: "Save a canonical scene with an expected revision", security: "session", pathParameters: ["projectId"] },
   { operationId: "getCreativeCapabilities", method: "get", path: "/api/v1/capabilities", responseSchema: "CreativeCapabilitiesResponse", summary: "Read implemented creative-generation capabilities", security: "public" },
