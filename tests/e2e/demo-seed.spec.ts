@@ -54,9 +54,12 @@ test("demo is usable on a narrow viewport and loads the real A-Frame studio", as
   await expect(page.getByTestId("demo-spatial-host").locator("iframe")).toBeVisible({
     timeout: 45000,
   });
-  await expect(page.getByRole("status")).toContainText("Synthetic spatial studio ready", {
-    timeout: 45000,
-  });
+  await expect(page.getByRole("main").getByRole("status")).toContainText(
+    "Synthetic spatial studio ready",
+    {
+      timeout: 45000,
+    },
+  );
   await page
     .getByRole("navigation", { name: "Synthetic spatial panels" })
     .getByRole("button", { name: "Campaign storyboard", exact: true })

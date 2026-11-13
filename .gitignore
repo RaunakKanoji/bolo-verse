@@ -28,3 +28,6 @@ apps/visionos/Config/Local.xcconfig
 
 # Isolated synthetic seed development database
 .demo/
+
+# Local Clerk claim and setup state must never be published
+.clerk/

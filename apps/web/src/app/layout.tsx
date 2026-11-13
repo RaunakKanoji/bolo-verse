@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import AuthControls from "@/features/auth/AuthControls";
+import { clerkWebConfigured } from "@/lib/auth/configured";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Clapperboard, FlaskConical, FolderOpen, Glasses, House } from "lucide-react";
 import { AppearanceSync } from "@/features/workspace/Appearance";
@@ -28,10 +30,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Link href="/xr/hud" aria-label="Spatial workspace"><Glasses size={17} aria-hidden="true" /><span>Spatial workspace</span></Link>
         <Link href="/studio/feasibility" aria-label="Recording lab"><FlaskConical size={17} aria-hidden="true" /><span>Recording lab</span></Link>
       </nav>
+      <AuthControls />
     </header>
     <main id="main" className="main-shell">{children}</main>
     <footer className="footer"><span>Made for the stories behind small businesses.</span><span>Browser-based Spatial Studio</span></footer>
   </>;
-  const authConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && process.env.CLERK_SECRET_KEY);
-  return <html lang="en" data-shape-theme="dark"><body>{authConfigured ? <ClerkProvider><WorkspaceSessionProvider configured>{content}</WorkspaceSessionProvider></ClerkProvider> : <WorkspaceSessionProvider configured={false}>{content}</WorkspaceSessionProvider>}</body></html>;
+  const authConfigured = clerkWebConfigured(process.env);
+  return <html lang="en" data-shape-theme="dark"><body>{authConfigured ? <ClerkProvider signInUrl="/sign-in" signUpUrl="/sign-up" signInFallbackRedirectUrl="/workspace" signUpFallbackRedirectUrl="/workspace"><WorkspaceSessionProvider configured>{content}</WorkspaceSessionProvider></ClerkProvider> : <WorkspaceSessionProvider configured={false}>{content}</WorkspaceSessionProvider>}</body></html>;
 }

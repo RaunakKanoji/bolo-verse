@@ -80,3 +80,12 @@ body:has([data-studio-shell]) > .footer { display:none; }
 
 .appearance-control { display:flex; flex-wrap:wrap; align-items:center; gap:16px; }
 .appearance-control select { background:var(--surface); color:var(--text-primary); padding:10px 14px; border:1px solid var(--border-subtle); border-radius:var(--radius-control); }
+
+.auth-controls { display:flex; align-items:center; justify-content:flex-end; gap:12px; flex-wrap:wrap; }
+.auth-controls a { min-height:44px; display:inline-flex; align-items:center; padding:8px 12px; border:1px solid var(--border-subtle); border-radius:8px; color:var(--text-primary); white-space:nowrap; font-size:14px; }
+.auth-page { display:grid; justify-items:center; gap:18px; padding:36px 12px; text-align:center; }
+.auth-page h1 { font-size:clamp(26px,4vw,36px); margin:0; }
+.auth-page p { max-width:60ch; }
+@media(max-width:700px){ .auth-controls { width:100%; } }
+.topbar:has(.auth-controls) { flex-wrap: wrap; }
+.topbar:has(.auth-controls) nav { flex-wrap: wrap; justify-content: flex-end; }
