@@ -12,6 +12,18 @@ Persisted manifest validation returned no errors: 12 projects, 5 clients, 82 ass
 
 Vercel Production/Preview now have a sensitive `DATABASE_URL` targeting that isolated branch. Production deployment `dpl_CwQh3jjKuXxRgzouU8wJdSaVRbp4` reached READY using release `bfdf6577f615df7f20a9a2f350f9c673a9c6621b`. No secrets were committed. Fresh `pnpm check` passed all 14 tasks, including 849 tests and both app builds. Live browser checks cover Clerk forms, anonymous private API denial and the public synthetic workflow. The presenter's existing signed-in browser session and physical Vision Pro remain separate manual acceptance checks. Earlier local-only evidence below records the original implementation stage.
 
+## Live voice and editor activation — 2026-11-13
+
+Production speech settings use `saaras:v3` transcription and `bulbul:v3` speech playback, with English/Hindi/Kannada voices `ishita`/`shubh`/`ishita`. Gemini uses `gemini-3.5-flash-lite`. These are server settings; provider keys remain sensitive Vercel variables.
+
+An explicit one-time Vercel build probe returned HTTP 200 for Sarvam TTS, Sarvam STT and Gemini. The probe generated a short synthetic English utterance, transcribed its in-memory WAV and requested a minimal assistant reply. It stored no audio and introduced no public endpoint. This establishes live provider access; physical microphone capture, the user's signed-in browser flow, Hindi/Kannada speech and Vision Pro acceptance remain unverified.
+
+Use **Brainstorm → Voice** for dictation. The project legacy **XR assistant → Voice controls** provides consent-gated recording, transcript review, assistant replies and reviewed action proposals; actions still require Apply. Canonical R3F and Shotstack timeline voice commands were not added.
+
+The video editor has `ENABLE_EXTERNAL_EDITOR=true` and `SHOTSTACK_ENV=sandbox`. Preview/timeline editing and private draft saves are available independently of cloud rendering. The user explicitly chose to skip video export: R2 is absent and rendering remains correctly unavailable. No live Shotstack render was submitted.
+
+`scripts/verify-live-providers.ts` is an operator-only command, not an ordinary build step. The normal Vercel project build remains `pnpm build`; the live probe was selected through a single deployment's build override. Fresh workspace checks passed all 14 tasks and 849 tests; 49 focused speech/assistant/editor tests also passed.
+
 ## Audit and implementation
 
 The repository uses Next.js 16 App Router, strict TypeScript, pnpm, Neon/Drizzle, Clerk and private S3/R2 adapters. Existing workspace clients, projects, tasks, briefs, artifacts, conversations, content versions, review comments/decisions, command logs and XR workspaces are reused. No migration, package dependency, second authentication system or native wire-format change was added. Organizations and synthetic creator profiles are descriptive client/production metadata, not Clerk identities or new tenancy tables.
