@@ -26,15 +26,23 @@ test("public synthetic workflow connects briefs, conversations, scripts, storybo
   const frames = page.locator('a[aria-label^="Open Scene"] img');
   await expect(frames).toHaveCount(5);
   for (const frame of await frames.all())
-    expect(
-      await frame.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth === 640),
-    ).toBe(true);
+    await expect
+      .poll(() =>
+        frame.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth === 640),
+      )
+      .toBe(true);
   await page.getByRole("link", { name: "Content", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Content library", exact: true })).toBeVisible();
   await page
     .getByRole("navigation", { name: "Demo projects" })
     .getByRole("link", { name: /UrbanThread Winter Collection/ })
     .click();
+  await expect(
+    page.getByRole("region", { name: "Demo project detail" }).getByRole("heading", {
+      name: "UrbanThread Winter Collection",
+      exact: true,
+    }),
+  ).toBeVisible();
   await page.getByRole("link", { name: "Review & voice", exact: true }).click();
   await expect(
     page.getByText("The overall visual direction looks excellent.", { exact: false }),

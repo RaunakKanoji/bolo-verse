@@ -1,6 +1,16 @@
 # BoloVerse / Shape XR presentation dataset
 
-The no-login presentation opens at **`/demo`**. It is an explicitly labelled, public, read-only synthetic workspace, with a connected ChaiCraft brief → brainstorm → selected direction → script → five-frame storyboard → content → feedback journey. `/demo/xr` loads the existing real A-Frame runtime and saved layout transforms with fictional text panels. Private APIs retain their existing authentication and authorization. The user explicitly deferred Clerk setup for this presentation.
+The no-login presentation opens at **`/demo`**. It is an explicitly labelled, public, read-only synthetic workspace, with a connected ChaiCraft brief → brainstorm → selected direction → script → five-frame storyboard → content → feedback journey. `/demo/xr` loads the existing real A-Frame runtime and saved layout transforms with fictional text panels. Private APIs retain their existing authentication and authorization.
+
+## Hosted authenticated workspace — 2026-11-13
+
+The web release is deployed at **https://bolo-verse-web.vercel.app**. Clerk development authentication is configured. The presenter's real Clerk account owns the seeded personal workspace at `/workspace`; other accounts receive no access to those projects.
+
+The initial authenticated deployment lacked `DATABASE_URL`, so its workspace API could not load data. The repair created an isolated Neon development branch named `development/vision-pro-demo-2026-11-13` in the existing `space-studio` project. Its empty production parent was left unchanged. All twelve checked-in migrations were applied, then the existing `seedDemo` engine ran with the presenter subject resolved against the linked Clerk development instance. This was a guarded provisioning operation, with the exact development endpoint allowlisted and credentials supplied through private stdin. The package seed commands below remain local-only; production seed execution and runtime automatic enrollment remain disabled.
+
+Persisted manifest validation returned no errors: 12 projects, 5 clients, 82 assets, 20 brainstorm sessions and 48 tasks. A second seed run inserted nothing. Existing authorized workspace repositories returned the presenter's data and no projects for an unrelated subject. Actual overview metrics were 10 active projects, 0 pending access-grant reviews, 3 completed deliverables and 6 upcoming deadlines. Synthetic historical feedback is distinct from live review access grants.
+
+Vercel Production/Preview now have a sensitive `DATABASE_URL` targeting that isolated branch. Production deployment `dpl_CwQh3jjKuXxRgzouU8wJdSaVRbp4` reached READY using release `bfdf6577f615df7f20a9a2f350f9c673a9c6621b`. No secrets were committed. Fresh `pnpm check` passed all 14 tasks, including 849 tests and both app builds. Live browser checks cover Clerk forms, anonymous private API denial and the public synthetic workflow. The presenter's existing signed-in browser session and physical Vision Pro remain separate manual acceptance checks. Earlier local-only evidence below records the original implementation stage.
 
 ## Audit and implementation
 
