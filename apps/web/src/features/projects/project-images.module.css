@@ -1,0 +1,116 @@
+.library {
+  margin-block: 28px;
+  padding: 24px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 22px;
+  background: var(--glass-fill);
+}
+.library header {
+  display: flex;
+  gap: 20px;
+  align-items: start;
+  justify-content: space-between;
+}
+.library h2 {
+  margin: 0 0 8px;
+}
+.library p {
+  line-height: 1.5;
+}
+.library button {
+  padding: 9px 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+.library button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.library button:focus-visible,
+.library a:focus-visible,
+.library input:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 4px;
+}
+.library button[aria-pressed="true"] {
+  background: var(--accent-soft);
+  border-color: var(--accent-primary);
+}
+.upload {
+  padding-block: 16px;
+  border-block: 1px solid var(--border-subtle);
+}
+.upload label {
+  display: grid;
+  gap: 8px;
+  font-weight: 600;
+}
+.upload input {
+  max-width: 100%;
+}
+.upload p {
+  overflow-wrap: anywhere;
+}
+.upload progress {
+  margin-inline: 12px;
+  accent-color: var(--accent-primary);
+}
+.grid {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+}
+.grid li {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-width: 0;
+}
+.grid small {
+  color: var(--text-secondary);
+}
+.preview {
+  height: 160px;
+  display: grid;
+  place-items: center;
+  background: var(--canvas);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.error {
+  color: var(--destructive);
+}
+.selection {
+  padding: 12px;
+  background: var(--accent-soft);
+  border-radius: 12px;
+}
+.library nav {
+  display: flex;
+  gap: 12px;
+}
+@media (max-width: 600px) {
+  .library {
+    padding: 16px;
+  }
+  .library header {
+    display: block;
+  }
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .upload progress {
+    display: block;
+    margin: 12px 0;
+  }
+}

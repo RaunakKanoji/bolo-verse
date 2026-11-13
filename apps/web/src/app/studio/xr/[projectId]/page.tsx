@@ -13,5 +13,5 @@ export default async function ProjectXRPage({ params }: { params: Promise<{ proj
   let data: Awaited<ReturnType<typeof readXRWorkspace>>;
   try { data = await readXRWorkspace(await getCurrentSubject(), parsed.data); }
   catch (error) { return <ProjectAccessNotice state={projectAccessState(error)} />; }
-  return <XRWorkspace project={data.project} initialData={data} />;
+  return <XRWorkspace project={data.project} initialData={data} assistantSessionAware />;
 }

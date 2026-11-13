@@ -61,6 +61,14 @@ beforeEach(async () => {
 afterAll(async () => { vi.unstubAllEnvs(); await postgres.close(); });
 
 describe("native canonical scene API", () => {
+  it("lists only ready project assets for an authorized editor and denies other projects", async () => {
+    const response = await GET_ASSETS(request(editor), context());
+    expect(response.status).toBe(200);
+    const result = await response.json();
+    expect(result.data.assets.map((asset: { id: string }) => asset.id)).toEqual([assetId]);
+    expect(JSON.stringify(result)).not.toMatch(/objectKey|ownerClerkId|private\//);
+    expect((await GET_ASSETS(request(editor), context(otherProjectId))).status).toBe(403);
+  });
   it("returns stable empty revision zero without creating stored content", async () => {
     const response = await get();
     expect(response.status).toBe(200);

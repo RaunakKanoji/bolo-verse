@@ -1,0 +1,97 @@
+.history {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-subtle);
+}
+.history header,
+.actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+.history h2 {
+  font-size: 20px;
+}
+.versions {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.versions li {
+  padding: 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  overflow-wrap: anywhere;
+}
+.versions h3 {
+  margin-top: 0;
+}
+.versions time {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.dialog {
+  width: min(600px, calc(100vw - 32px));
+  max-height: calc(100dvh - 40px);
+  overflow: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 24px;
+  background: var(--surface);
+  color: var(--text-primary);
+}
+.dialog::backdrop {
+  background: #19132480;
+}
+.dialog fieldset {
+  border: 0;
+  padding: 0;
+  margin: 20px 0;
+  display: grid;
+  gap: 14px;
+}
+.dialog label {
+  display: grid;
+  gap: 6px;
+}
+.dialog input,
+.dialog textarea {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--canvas);
+  color: var(--text-primary);
+}
+.dialog button {
+  padding: 10px 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+.dialog button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.dialog :focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 3px;
+}
+@media (max-width: 600px) {
+  .history header {
+    display: block;
+  }
+  .versions {
+    grid-template-columns: 1fr;
+  }
+  .dialog {
+    padding: 16px;
+  }
+}

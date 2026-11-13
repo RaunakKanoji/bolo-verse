@@ -107,7 +107,7 @@ export default function ProjectForm({
           onChange={() => setSaved(false)}
         />
         <p>
-          Keep the goal clear. Detailed briefs, assets and scene editing follow in later phases.
+          Keep the goal clear. Add detailed requirements to the client brief on the project page.
         </p>
       </div>
       {error && (

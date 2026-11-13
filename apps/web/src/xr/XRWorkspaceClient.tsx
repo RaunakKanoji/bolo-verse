@@ -187,6 +187,7 @@ export default function XRWorkspaceClient(props: XRWorkspaceProps) {
     }
   }
   function command(input: XRCommand) {
+    if (!workspace.canEdit || workspace.busy) return;
     const parsed = XRCommandSchema.safeParse(input);
     if (!parsed.success) return;
     const action = parsed.data;
@@ -226,7 +227,7 @@ export default function XRWorkspaceClient(props: XRWorkspaceProps) {
             </strong>
             <span>
               {preview
-                ? "Public sample · nothing is saved"
+                ? "Legacy interaction sample · placeholder cards only"
                 : workspace.canEdit
                   ? `Project workspace · version ${workspace.version}`
                   : "Read-only project workspace"}
@@ -234,6 +235,11 @@ export default function XRWorkspaceClient(props: XRWorkspaceProps) {
           </div>
         </div>
         <div className={styles.toolbar}>
+          {preview && (
+            <Link href="/xr/hud" className={styles.primaryButton}>
+              Open spatial workspace <ArrowRight size={16} />
+            </Link>
+          )}
           <button
             type="button"
             className={styles.secondaryButton}
@@ -492,6 +498,9 @@ export default function XRWorkspaceClient(props: XRWorkspaceProps) {
               <AssistantPanel
                 key={project.id}
                 projectId={project.id}
+                contextKey={`${workspace.version}:${JSON.stringify(workspace.document)}`}
+                workspaceVersion={workspace.version}
+                sessionAware={props.assistantSessionAware}
                 disabled={!workspace.canEdit || workspace.busy}
                 onCommand={command}
               />

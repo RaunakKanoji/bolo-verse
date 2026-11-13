@@ -51,10 +51,26 @@ export function projectEditability(database: Database, subject: string) {
   );
 }
 
-export async function listAuthorizedProjects(subject: string) {
+/** Intake reference uploads do not grant creator or production capabilities. */
+export function projectIntakeSubmitter(database: Database, subject: string) {
+  return and(
+    eq(projects.createdByClerkId, subject),
+    sql`${projects.studioMetadata}->>'intakeVersion' = '1'`,
+    exists(database.select({ one: sql`1` }).from(projectMembers).where(and(
+      eq(projectMembers.projectId, projects.id), eq(projectMembers.clerkUserId, subject),
+      eq(projectMembers.role, "client"),
+    ))),
+  );
+}
+
+export function projectUploadability(database: Database, subject: string) {
+  return or(projectEditability(database, subject), projectIntakeSubmitter(database, subject));
+}
+
+export async function listAuthorizedProjects(subject: string, options: { editableOnly?: boolean } = {}) {
   return withDatabase(async (database) => {
     await bootstrapPersonalWorkspace(database, subject);
-    return database.select().from(projects).where(projectVisibility(database, subject)).orderBy(projects.createdAt);
+    return database.select().from(projects).where(options.editableOnly ? projectEditability(database, subject) : projectVisibility(database, subject)).orderBy(projects.createdAt);
   });
 }
 
@@ -83,7 +99,7 @@ export async function readProjectAccess(subject: string, projectId: string) {
   });
 }
 
-async function consumeProjectCreationBudget(database: Database, subject: string) {
+export async function consumeProjectCreationBudget(database: Database, subject: string) {
   const keyHash = createHash("sha256").update(`project-create:${subject}`).digest("hex");
   // One durable bucket per account/action; PostgreSQL serializes competing upserts.
   // Database time avoids disagreement between serverless instances.
@@ -117,7 +133,7 @@ export async function createAuthorizedProject(subject: string, input: CreateProj
 export async function updateAuthorizedProject(subject: string, projectId: string, input: UpdateProjectInput) {
   return withDatabase(async (database) => {
     // Keep the permission predicate in the write, so authorization and update are one statement.
-    const [project] = await database.update(projects).set(input).where(and(
+    const [project] = await database.update(projects).set({ ...input, revision: sql`${projects.revision} + 1`, updatedAt: sql`now()` }).where(and(
       eq(projects.id, projectId), projectEditability(database, subject),
     )).returning();
     if (!project) throw new BoundaryError(403, "FORBIDDEN", "You do not have permission to edit this project.");

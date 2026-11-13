@@ -1,4 +1,5 @@
 import "server-only";
+import { createHash } from "node:crypto";
 import { z } from "zod";
 import { BoundaryError } from "@/server/auth/errors";
 import { readXRAsset } from "@/server/db/xr-assets";
@@ -13,6 +14,8 @@ export async function readAuthorizedPreview(subject: string, request: Request, c
     if (!previewSupported(asset.mimeType, asset.byteSize)) throw new BoundaryError(415, "INVALID_INPUT", "This asset has no browser preview. Use the standard project workspace.");
     const data = await new R2PreviewReader().readObject({ objectKey: asset.objectKey, maxBytes: MAX_PREVIEW_BYTES, signal: request.signal });
     if (data.bytes.length !== asset.byteSize) throw new BoundaryError(503, "SERVICE_UNAVAILABLE", "The asset does not match its verified metadata.");
+    if (asset.checksumSha256 && createHash("sha256").update(data.bytes).digest("hex") !== asset.checksumSha256)
+      throw new BoundaryError(503, "SERVICE_UNAVAILABLE", "The asset does not match its verified metadata.");
     try { validatePreviewAsset(data.bytes, asset.mimeType); }
     catch (error) { throw new BoundaryError(415, "INVALID_INPUT", error instanceof Error ? error.message : "The asset cannot be previewed safely."); }
     // Storage may be slow: access or asset readiness can change while reading.

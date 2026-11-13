@@ -17,7 +17,7 @@ export async function readMutationJson<T extends z.ZodType>(request: Request, sc
   // Larger multilingual draft documents opt in explicitly; all existing callers
   // retain the 16 KiB limit. Callers cannot remove the transport bound.
   const maxBytes = options.maxBytes ?? MAX_JSON_BYTES;
-  if (!Number.isSafeInteger(maxBytes) || maxBytes < 1 || maxBytes > 32_768) throw new Error("Invalid JSON byte limit.");
+  if (!Number.isSafeInteger(maxBytes) || maxBytes < 1 || maxBytes > 131_072) throw new Error("Invalid JSON byte limit.");
   if (request.headers.get("content-type")?.split(";", 1)[0].trim().toLowerCase() !== "application/json") {
     throw new BoundaryError(415, "INVALID_INPUT", "Send this request as application/json.");
   }

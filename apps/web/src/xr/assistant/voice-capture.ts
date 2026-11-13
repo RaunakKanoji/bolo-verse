@@ -1,4 +1,5 @@
 import { XR_SPEECH_MAX_BYTES } from "@/lib/contracts/xr-assistant";
+import { claimMicrophone } from "@/lib/media/microphone-owner";
 
 type Recorder = EventTarget & {
   state: RecordingState;
@@ -38,11 +39,13 @@ export function browserVoiceDependencies(): CaptureDependencies {
 
 /** One explicit recording; disposal also owns late permission completion. */
 export class VoiceCapture {
+  private static owner: VoiceCapture | null = null;
   private cancelled = false;
   private started = false;
   private stream?: MediaStream;
   private recorder?: Recorder;
   private reject?: (reason: Error) => void;
+  private releaseMicrophone?: () => void;
   constructor(
     private readonly dependencies: CaptureDependencies,
     private readonly onRecording?: () => void,
@@ -50,8 +53,23 @@ export class VoiceCapture {
 
   async start(): Promise<Blob> {
     if (this.started) throw new Error("This voice recording has already started.");
-    this.started = true;
     if (this.cancelled) throw new DOMException("Voice recording cancelled", "AbortError");
+    if (VoiceCapture.owner)
+      throw new Error("The microphone is in use by another recording. Stop it or type a command.");
+    this.releaseMicrophone = claimMicrophone(this);
+    this.started = true;
+    VoiceCapture.owner = this;
+    try {
+      return await this.captureRecording();
+    } finally {
+      if (VoiceCapture.owner === this) VoiceCapture.owner = null;
+      this.reject = undefined;
+      this.releaseMicrophone?.();
+      this.releaseMicrophone = undefined;
+    }
+  }
+
+  private async captureRecording(): Promise<Blob> {
     const permission = this.dependencies.getUserMedia();
     this.stream = await new Promise<MediaStream>((resolve, reject) => {
       // getUserMedia itself has no AbortSignal. Settle the UI immediately,
@@ -154,5 +172,7 @@ export class VoiceCapture {
   cancel() {
     this.cancelled = true;
     this.reject?.(new DOMException("Voice recording cancelled", "AbortError"));
+    if (VoiceCapture.owner === this) VoiceCapture.owner = null;
+    this.releaseMicrophone?.();
   }
 }

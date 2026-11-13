@@ -5,21 +5,32 @@ test("dashboard has honest connection state and working creative navigation", as
 }, testInfo) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/");
+  await expect(page.getByRole("heading", { name: /^Good morning/ })).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Good things start with an idea." }),
+    page.getByRole("heading", { name: "Your creative workspace starts here.", exact: true }),
   ).toBeVisible();
+  await expect(page.getByLabel("Workspace overview").locator("strong")).toHaveText([
+    "—",
+    "—",
+    "—",
+    "—",
+  ]);
   await expect(
-    page.getByText("Illustrative campaign studies · these are not saved projects."),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("link", { name: "Connect your workspace", exact: true }),
-  ).toBeVisible();
+    page.getByRole("button", { name: "Create your first project", exact: true }),
+  ).toBeEnabled();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath("dashboard-desktop.png"), fullPage: true });
   await page
     .getByRole("navigation", { name: "Studio navigation" })
     .getByRole("link", { name: "Create", exact: true })
     .click();
+  await expect(page).toHaveURL(/\/create$/);
+  await expect(
+    page.getByRole("heading", { name: "Create something extraordinary.", exact: true }),
+  ).toBeVisible();
+  const imageEditor = page.getByRole("link", { name: "Start Image Design", exact: true });
+  await expect(imageEditor).toHaveAttribute("href", "/studio/create");
+  await imageEditor.click();
   await expect(page.getByRole("heading", { name: "Make it your own." })).toBeVisible();
   await expect(page.getByRole("img", { name: "Image adjustment preview" })).toBeVisible();
 });
@@ -158,5 +169,6 @@ test("playground preserves prompts and local variants across modes and guards un
     .getByRole("navigation", { name: "Studio navigation" })
     .getByRole("link", { name: "Projects", exact: true })
     .click();
-  await expect(page).not.toHaveURL(/\/studio\/create$/);
+  await expect(page).toHaveURL(/\/projects$/);
+  await expect(page.getByRole("heading", { name: "Your Projects", exact: true })).toBeVisible();
 });

@@ -8,7 +8,7 @@ const boundary = vi.hoisted(() => ({ subject: null as string | null, configured:
 vi.mock("@clerk/nextjs/server", () => ({ auth: async () => ({ userId: boundary.subject }) }));
 vi.mock("@/server/config/env", () => ({
   getServerEnv: () => boundary.configured
-    ? { CLERK_SECRET_KEY: "sk_test_configured", NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "pk_test_configured", DATABASE_URL: "postgres://test" }
+    ? { CLERK_SECRET_KEY: "sk_test_configured", NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "pk_test_configured", DATABASE_URL: "postgres://test", ALLOWED_ORIGINS: ["http://localhost:3000"] }
     : {},
 }));
 vi.mock("@/server/db/client", () => ({
@@ -16,10 +16,11 @@ vi.mock("@/server/db/client", () => ({
 }));
 
 import * as schema from "@/server/db/schema";
-import { bootstrapPersonalWorkspace } from "@/server/db/projects";
+import { bootstrapPersonalWorkspace, listAuthorizedProjects } from "@/server/db/projects";
 import { seedSampleProject } from "@/server/db/seed";
-import { GET as listProjects } from "@/app/api/projects/route";
-import { GET as readProject } from "@/app/api/projects/[id]/route";
+import { GET as listProjects, POST as createProject } from "@/app/api/projects/route";
+import { GET as readProject, PATCH as updateProject } from "@/app/api/projects/[id]/route";
+import { ProjectSummarySchema } from "@/lib/contracts/shape";
 
 const postgres = new PGlite();
 const database = drizzle(postgres, { schema });
@@ -47,7 +48,18 @@ beforeAll(async () => {
 beforeEach(() => { boundary.subject = owner; boundary.configured = true; });
 afterAll(async () => { await postgres.close(); });
 
+const publicProjectFields = ["createdAt", "id", "name", "objective", "sample"];
+function mutation(body: unknown, method = "POST", origin: string | null = "http://localhost:3000") {
+  return new Request("http://localhost:3000/api/projects", { method,
+    headers: { "Content-Type": "application/json", ...(origin ? { Origin: origin } : {}) }, body: JSON.stringify(body) });
+}
+
 describe("server project boundary with PostgreSQL repositories", () => {
+  it("offers only editable projects for the brainstorming chooser", async () => {
+    expect((await listAuthorizedProjects(owner, { editableOnly: true })).map((project) => project.id)).toContain(projectId);
+    expect(await listAuthorizedProjects(client, { editableOnly: true })).toEqual([]);
+    expect((await listAuthorizedProjects(outsider, { editableOnly: true })).map((project) => project.id)).toEqual([otherProjectId]);
+  });
   it("fails closed with 503 when credentials are absent", async () => {
     boundary.configured = false;
     const response = await listProjects();
@@ -87,6 +99,51 @@ describe("server project boundary with PostgreSQL repositories", () => {
     const response = await readProject(request, { params: Promise.resolve({ id: projectId }) });
     expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({ ok: true, data: { project: { id: projectId } } });
+  });
+
+  it("returns only compatible public project fields from legacy list and detail reads", async () => {
+    const listed = await (await listProjects()).json();
+    for (const project of listed.data.projects) {
+      expect(Object.keys(project).sort()).toEqual(publicProjectFields);
+      expect(ProjectSummarySchema.parse(project)).toEqual(project);
+    }
+    boundary.subject = client;
+    const detail = await (await readProject(request, { params: Promise.resolve({ id: projectId }) })).json();
+    expect(Object.keys(detail.data.project).sort()).toEqual(publicProjectFields);
+    expect(ProjectSummarySchema.parse(detail.data.project)).toEqual(detail.data.project);
+  });
+
+  it("creates, updates and reopens a legacy project with only public response fields", async () => {
+    const response = await createProject(mutation({ name: "Baseline project", objective: "Verify persisted reopen" }));
+    expect(response.status).toBe(201);
+    const created = (await response.json()).data.project;
+    expect(Object.keys(created).sort()).toEqual(publicProjectFields);
+    const context = { params: Promise.resolve({ id: created.id }) };
+    const updatedResponse = await updateProject(mutation({ objective: "Updated persisted objective" }, "PATCH"), context);
+    expect(updatedResponse.status).toBe(200);
+    const updated = (await updatedResponse.json()).data.project;
+    expect(Object.keys(updated).sort()).toEqual(publicProjectFields);
+    expect(ProjectSummarySchema.parse(updated)).toMatchObject({ id: created.id, name: "Baseline project", objective: "Updated persisted objective" });
+    expect((await (await readProject(request, context)).json()).data.project).toEqual(updated);
+    boundary.subject = outsider;
+    expect((await readProject(request, context)).status).toBe(403);
+  });
+
+  it("retains identity, Origin, strict input, body bounds and project authorization on legacy writes", async () => {
+    const context = { params: Promise.resolve({ id: projectId }) };
+    const before = await database.select().from(schema.projects);
+    for (const origin of [null, "https://attacker.invalid"]) {
+      expect((await createProject(mutation({ name: "Denied", objective: "Denied" }, "POST", origin))).status).toBe(403);
+    }
+    expect((await createProject(mutation({ name: "Denied", objective: "Denied", workspaceId: otherProjectId }))).status).toBe(400);
+    expect((await createProject(mutation({ name: "Denied", objective: "x".repeat(17_000) }))).status).toBe(413);
+    boundary.subject = client;
+    expect((await updateProject(mutation({ name: "Denied" }, "PATCH"), context)).status).toBe(403);
+    boundary.subject = outsider;
+    expect((await updateProject(mutation({ name: "Denied" }, "PATCH"), context)).status).toBe(403);
+    boundary.subject = null;
+    expect((await createProject(mutation({ name: "Denied", objective: "Denied" }))).status).toBe(401);
+    expect(await database.select().from(schema.projects)).toEqual(before);
   });
 
   it("rejects a malformed ID before a database lookup", async () => {

@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
   eulerXYZDegreesToQuaternion,
@@ -12,17 +13,15 @@ import type {
   ProjectSummary,
 } from "../../../../packages/api-contract/generated/models";
 import { assetPreviewKind, createSpatialApi, ShapeApiError } from "../lib/api";
+import { dispatchEditorCommand } from "./commands";
 import {
   beginSave,
   createEditorState,
   editObject,
   isDirty,
-  placeAsset,
-  redo,
   reloadScene,
   removeObject,
   resolveSave,
-  undo,
   type EditorState,
 } from "./state";
 
@@ -45,13 +44,19 @@ export function SpatialEditor(props: SpatialEditorProps) {
 }
 function EditorSession({
   project,
-  assets,
+  assets: initialAssets,
   snapshot,
-  hasMoreAssets = false,
+  hasMoreAssets: initialHasMore = false,
   fetcher = fetch,
 }: SpatialEditorProps) {
   const [state, setState] = useState(() => createEditorState(snapshot));
+  const [library, setLibrary] = useState({ assets: initialAssets, hasMore: initialHasMore });
+  const { assets, hasMore: hasMoreAssets } = library;
+  const [refreshingAssets, setRefreshingAssets] = useState(false);
+  const [assetNotice, setAssetNotice] = useState("");
+  const assetRequestRef = useRef<AbortController | null>(null);
   const stateRef = useRef(state);
+  const editorRef = useRef<HTMLElement | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mode, setMode] = useState<TransformMode>("move");
   const [notice, setNotice] = useState("");
@@ -76,10 +81,48 @@ function EditorSession({
       );
     }
   }
+  function dispatch(input: unknown) {
+    mutate((current) => {
+      const result = dispatchEditorCommand(
+        current,
+        input,
+        assets
+          .filter((asset) => asset.projectId === project.id && assetPreviewKind(asset))
+          .map(({ id }) => id),
+      );
+      if (result.selectedId !== undefined) setSelectedId(result.selectedId);
+      return result.state;
+    });
+  }
+  async function refreshAssets() {
+    if (assetRequestRef.current) return;
+    const controller = new AbortController();
+    assetRequestRef.current = controller;
+    setRefreshingAssets(true);
+    setAssetNotice("");
+    try {
+      const result = await createSpatialApi(fetcher).listAssets(project.id, controller.signal);
+      if (controller.signal.aborted || assetRequestRef.current !== controller) return;
+      setLibrary(result);
+      setAssetNotice("Ready assets refreshed. Scene edits are unchanged.");
+    } catch {
+      if (!controller.signal.aborted)
+        setAssetNotice(
+          "Assets could not be refreshed. Your scene and current library are retained. Check your connection and project access, then retry.",
+        );
+    } finally {
+      if (assetRequestRef.current === controller) {
+        assetRequestRef.current = null;
+        setRefreshingAssets(false);
+      }
+    }
+  }
   useEffect(
     () => () => {
       requestRef.current?.controller.abort();
       requestRef.current = null;
+      assetRequestRef.current?.abort();
+      assetRequestRef.current = null;
     },
     [],
   );
@@ -94,15 +137,23 @@ function EditorSession({
         event.preventDefault();
     };
     window.addEventListener("beforeunload", onUnload);
-    document.addEventListener("click", onLink);
+    document.addEventListener("click", onLink, true);
     return () => {
       window.removeEventListener("beforeunload", onUnload);
-      document.removeEventListener("click", onLink);
+      document.removeEventListener("click", onLink, true);
     };
   }, [dirty]);
 
   async function save() {
     if (requestRef.current) return;
+    const invalid = editorRef.current?.querySelector<HTMLInputElement>(
+      'input[aria-invalid="true"]',
+    );
+    if (invalid) {
+      invalid.focus();
+      setNotice("Correct the highlighted transform values before saving.");
+      return;
+    }
     const id = crypto.randomUUID();
     const controller = new AbortController();
     try {
@@ -182,7 +233,7 @@ function EditorSession({
               ? "All changes saved"
               : "Scene is up to date";
   return (
-    <main className="spatial-editor" data-testid="spatial-editor">
+    <main ref={editorRef} className="spatial-editor" data-testid="spatial-editor">
       <header className="studio-bar">
         <a className="shape-wordmark" href="/app/projects">
           shape
@@ -242,9 +293,23 @@ function EditorSession({
             <span>{assets.length}</span>
           </div>
           <p className="panel-description">Place ready assets in your scene.</p>
+          <p>
+            <a href={`/studio/create?projectId=${project.id}`}>Open Creative Studio</a> to upload a
+            project image, then refresh this library.
+          </p>
+          <button type="button" disabled={refreshingAssets} onClick={() => void refreshAssets()}>
+            {refreshingAssets ? "Refreshing assets…" : "Refresh assets"}
+          </button>
+          {assetNotice && (
+            <p role="status" className="empty-note">
+              {assetNotice}
+            </p>
+          )}
           {assets.length === 0 && (
             <p className="empty-note">
-              This project has no ready assets yet. Add assets from your project to begin.
+              This project has no ready assets yet. Add assets from your project to begin.{" "}
+              <Link href="/workspace/demo">Try the local procedural demo</Link> in a separate,
+              unsaved workspace.
             </p>
           )}
           <ul className="asset-list">
@@ -272,11 +337,16 @@ function EditorSession({
                   <button
                     type="button"
                     aria-label={`Place asset ${index + 1}`}
-                    disabled={!canEdit || !kind || state.document.objects.length >= 50 || reloading}
+                    disabled={
+                      !canEdit ||
+                      asset.projectId !== project.id ||
+                      !kind ||
+                      state.document.objects.length >= 50 ||
+                      reloading
+                    }
                     onClick={() => {
                       const id = crypto.randomUUID();
-                      mutate((current) => placeAsset(current, asset.id, id));
-                      setSelectedId(id);
+                      dispatch({ type: "PLACE_ASSET", assetId: asset.id, objectId: id });
                     }}
                   >
                     Place
@@ -340,14 +410,14 @@ function EditorSession({
               <button
                 type="button"
                 disabled={!canEdit || !state.past.length || reloading}
-                onClick={() => mutate(undo)}
+                onClick={() => dispatch({ type: "UNDO" })}
               >
                 Undo
               </button>
               <button
                 type="button"
                 disabled={!canEdit || !state.future.length || reloading}
-                onClick={() => mutate(redo)}
+                onClick={() => dispatch({ type: "REDO" })}
               >
                 Redo
               </button>
@@ -362,7 +432,9 @@ function EditorSession({
               canEdit={canEdit && !reloading}
               fetcher={fetcher}
               onSelect={setSelectedId}
-              onTransform={(id, patch) => mutate((current) => editObject(current, id, patch))}
+              onTransform={(id, patch) =>
+                dispatch({ type: "SET_TRANSFORM", objectId: id, transform: patch })
+              }
             />
           </div>
           {state.document.objects.length === 0 && (
@@ -379,6 +451,10 @@ function EditorSession({
         </section>
         <aside className="inspector-panel" aria-label="Object inspector">
           <h2>Inspector</h2>
+          <p className="panel-description">
+            Enter a number, then press Enter or move focus to apply. Save scene to keep your
+            changes.
+          </p>
           {selected ? (
             <>
               <p className="selection-name">
@@ -395,7 +471,11 @@ function EditorSession({
                   step={0.1}
                   unit="m"
                   onCommit={(value) =>
-                    mutate((current) => editObject(current, selected.id, { position: value }))
+                    dispatch({
+                      type: "SET_TRANSFORM",
+                      objectId: selected.id,
+                      transform: { position: value },
+                    })
                   }
                 />
                 <VectorFields
@@ -407,11 +487,11 @@ function EditorSession({
                   step={1}
                   unit="°"
                   onCommit={(value) =>
-                    mutate((current) =>
-                      editObject(current, selected.id, {
-                        rotation: eulerXYZDegreesToQuaternion(value),
-                      }),
-                    )
+                    dispatch({
+                      type: "SET_TRANSFORM",
+                      objectId: selected.id,
+                      transform: { rotation: eulerXYZDegreesToQuaternion(value) },
+                    })
                   }
                 />
                 <VectorFields
@@ -422,7 +502,11 @@ function EditorSession({
                   max={10}
                   step={0.1}
                   onCommit={(value) =>
-                    mutate((current) => editObject(current, selected.id, { scale: value }))
+                    dispatch({
+                      type: "SET_TRANSFORM",
+                      objectId: selected.id,
+                      transform: { scale: value },
+                    })
                   }
                 />
                 <label className="visibility-control">
@@ -469,7 +553,7 @@ function EditorSession({
   );
 }
 
-function VectorFields({
+export function VectorFields({
   label,
   values,
   min,

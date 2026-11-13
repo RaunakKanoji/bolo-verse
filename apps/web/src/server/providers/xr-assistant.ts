@@ -22,7 +22,7 @@ export interface XRAssistantProvider {
   respond(input: AssistantInput): Promise<XRAssistantResponse>;
 }
 const modelId = /^[a-zA-Z0-9._-]{1,100}$/;
-const hasGemini = (env: ServerEnv) =>
+export const hasGemini = (env: ServerEnv) =>
   Boolean(env.GEMINI_API_KEY && env.GEMINI_MODEL && modelId.test(env.GEMINI_MODEL));
 export const hasSarvamSTT = (env: ServerEnv) =>
   Boolean(env.SARVAM_API_KEY && ["saaras:v3", "saaras:v4"].includes(env.SARVAM_STT_MODEL ?? ""));

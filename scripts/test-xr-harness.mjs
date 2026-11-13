@@ -12,7 +12,7 @@ const result = await build({
   tsconfig: "apps/web/tsconfig.json", jsx: "automatic",
   // The harness has no Next router/compiler. Navigation is covered against the
   // real Next server; use an ordinary anchor only at this framework boundary.
-  alias: { "next/link": resolve(root, "tests/browser-fixtures/next-link.tsx") },
+  alias: { "next/link": resolve(root, "tests/browser-fixtures/next-link.tsx"), "@clerk/nextjs": resolve(root, "tests/browser-fixtures/voice-clerk.ts") },
   define: { "process.env.NODE_ENV": '"production"' },
   loader: { ".module.css": "local-css" },
   logLevel: "error",

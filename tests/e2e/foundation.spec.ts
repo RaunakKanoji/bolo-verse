@@ -1,11 +1,29 @@
 import { test, expect } from "@playwright/test";
 import { writeFile } from "node:fs/promises";
 
-test("home exposes a working recording experiment and honest project setup", async ({ page }) => {
+test("home exposes an empty real workspace, recording navigation and contextual projects", async ({
+  page,
+}) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: /Good things/ })).toBeVisible();
-  await page.getByRole("link", { name: "Open projects", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Connect your workspace" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^Good morning/ })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Your creative workspace starts here.", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("link", { name: "Record Content", exact: true })).toHaveAttribute(
+    "href",
+    "/recording-lab",
+  );
+  await page
+    .getByRole("navigation", { name: "Studio navigation" })
+    .getByRole("link", { name: "Projects", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/projects$/);
+  await expect(page.getByRole("heading", { name: "Your Projects", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "No projects yet", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "New Project", exact: true })).toBeEnabled();
+  await expect(
+    page.getByRole("heading", { name: "Connect your workspace", exact: true }),
+  ).toHaveCount(0);
 });
 
 test("unknown routes render the application 404 and can return home", async ({ page }) => {
@@ -13,12 +31,15 @@ test("unknown routes render the application 404 and can return home", async ({ p
   expect(response?.status()).toBe(404);
   await expect(page.getByRole("heading", { name: "This page isn’t available." })).toBeVisible();
   await page.getByRole("link", { name: "Back to home", exact: true }).click();
-  await expect(page.getByRole("heading", { name: /Good things/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^Good morning/ })).toBeVisible();
 });
 
-test("consent gates a real portrait recording with synthetic microphone input", async ({ page, browser }, testInfo) => {
+test("consent gates a real portrait recording with synthetic microphone input", async ({
+  page,
+  browser,
+}, testInfo) => {
   const graphicsErrors: string[] = [];
-  page.on("console", message => {
+  page.on("console", (message) => {
     if (/WebGL.*INVALID_OPERATION/.test(message.text())) graphicsErrors.push(message.text());
   });
   await page.goto("/studio/feasibility");
@@ -27,7 +48,9 @@ test("consent gates a real portrait recording with synthetic microphone input", 
   await page.getByRole("checkbox", { name: "I agree to record my microphone locally" }).check();
   await expect(record).toBeEnabled();
   await record.click();
-  await expect(page.getByText("Local recording ready — not saved", { exact: true })).toBeVisible({ timeout: 30000 });
+  await expect(page.getByText("Local recording ready — not saved", { exact: true })).toBeVisible({
+    timeout: 30000,
+  });
   const video = page.getByLabel("Local recording playback");
   await expect(video).toBeVisible();
   await expect.poll(() => video.evaluate((node: HTMLVideoElement) => node.videoWidth)).toBe(720);
@@ -36,14 +59,22 @@ test("consent gates a real portrait recording with synthetic microphone input", 
     await node.play();
     const capture = (node as HTMLVideoElement & { captureStream(): MediaStream }).captureStream();
     const audioTracks = capture.getAudioTracks().length;
-    capture.getTracks().forEach(track => track.stop());
-    return { width: node.videoWidth, height: node.videoHeight, bytes: blob.size, mime: blob.type, audioTracks };
+    capture.getTracks().forEach((track) => track.stop());
+    return {
+      width: node.videoWidth,
+      height: node.videoHeight,
+      bytes: blob.size,
+      mime: blob.type,
+      audioTracks,
+    };
   });
   expect(media.height).toBe(1280);
   expect(media.bytes).toBeGreaterThan(1000);
   expect(media.mime).toMatch(/^video\/(webm|mp4)/);
   expect(media.audioTracks).toBe(1);
-  await expect.poll(() => video.evaluate((node: HTMLVideoElement) => node.currentTime)).toBeGreaterThan(0.1);
+  await expect
+    .poll(() => video.evaluate((node: HTMLVideoElement) => node.currentTime))
+    .toBeGreaterThan(0.1);
   const decodedFrame = await video.evaluate((node: HTMLVideoElement) => {
     const canvas = document.createElement("canvas");
     canvas.width = node.videoWidth;
@@ -70,7 +101,16 @@ test("consent gates a real portrait recording with synthetic microphone input", 
   expect(download.suggestedFilename()).toMatch(/\.(webm|mp4)$/);
   await download.saveAs(testInfo.outputPath(download.suggestedFilename()));
   await testInfo.attach("recording-evidence", {
-    body: JSON.stringify({ ...media, browser: browser.version(), input: "Chromium synthetic microphone", hardware: "Not a physical Android test" }, null, 2),
+    body: JSON.stringify(
+      {
+        ...media,
+        browser: browser.version(),
+        input: "Chromium synthetic microphone",
+        hardware: "Not a physical Android test",
+      },
+      null,
+      2,
+    ),
     contentType: "application/json",
   });
   expect(graphicsErrors).toEqual([]);

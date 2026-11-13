@@ -16,6 +16,8 @@ import * as schema from "@/server/db/schema";
 import { bootstrapPersonalWorkspace } from "@/server/db/projects";
 import { POST as RESERVE } from "@/app/api/v1/assets/upload-session/route";
 import { POST as FINALIZE } from "@/app/api/v1/assets/upload-session/[uploadId]/finalize/route";
+import { GET as PREVIEW } from "@/app/api/v1/assets/[assetId]/content/route";
+import { GET as CATALOG } from "@/app/api/v1/projects/[projectId]/assets/route";
 const postgres = new PGlite(), database = drizzle(postgres, { schema });
 const projectId = "a1000000-0000-4000-8000-000000000001", otherProjectId = "a1000000-0000-4000-8000-000000000002";
 const owner = "image_owner", editor = "image_editor", client = "image_client", outsider = "image_outsider";
@@ -53,16 +55,72 @@ beforeEach(async () => {
       if (objects.has(key)) throw { name: "PreconditionFailed", $metadata: { httpStatusCode: 412 } };
       objects.set(key, { bytes: new Uint8Array(command.input.Body), mimeType: command.input.ContentType }); return {};
     }
-    const object = objects.get(key); if (!object) throw new Error("NoSuchKey");
+    const object = objects.get(key); if (!object) throw { name: "NoSuchKey", $metadata: { httpStatusCode: 404 } };
     return storedObject(object);
   });
-  await postgres.exec("TRUNCATE workspaces CASCADE");
+  await postgres.exec("TRUNCATE workspaces, rate_limit_buckets CASCADE");
   const workspace = await bootstrapPersonalWorkspace(database, owner), other = await bootstrapPersonalWorkspace(database, outsider);
   await database.insert(schema.projects).values([{ id: projectId, workspaceId: workspace.id, name: "Images", objective: "Private ingestion", createdByClerkId: owner }, { id: otherProjectId, workspaceId: other.id, name: "Foreign", objective: "Unrelated", createdByClerkId: outsider }]);
   await database.insert(schema.projectMembers).values([{ projectId, clerkUserId: editor, role: "editor" }, { projectId, clerkUserId: client, role: "client" }]);
 });
 afterAll(async () => { vi.unstubAllEnvs(); await postgres.close(); });
 describe("private image ingestion", () => {
+  it("concurrent finalize calls converge on one immutable ready asset", async () => {
+    const upload = await staged();
+    const responses = await Promise.all([finalize(upload.uploadId), finalize(upload.uploadId)]);
+    expect(responses.map((response) => response.status)).toEqual([200, 200]);
+    const results = await Promise.all(responses.map((response) => response.json()));
+    expect(results[0].data.asset.id).toBe(results[1].data.asset.id);
+    expect(await database.select().from(schema.assets)).toHaveLength(1);
+    expect((await database.select().from(schema.assets))[0].status).toBe("ready");
+    expect(storage.send.mock.calls.filter(([command]) => command.constructor.name === "PutObjectCommand").every(([command]) => command.input.IfNoneMatch === "*")).toBe(true);
+  });
+  it("bounds reservation writes without relying on a browser quota", async () => {
+    for (let index = 0; index < 20; index++) expect((await reserve()).status).toBe(201);
+    expect((await reserve()).status).toBe(429);
+    const rows = await database.select().from(schema.assets);
+    expect(rows).toHaveLength(20);
+    expect(rows.every((asset) => asset.status === "staging")).toBe(true);
+    expect(storage.send).not.toHaveBeenCalled();
+  });
+  it("reports an incomplete upload without publishing and accepts retry after the object arrives", async () => {
+    const upload = await staged();
+    objects.delete(upload.key);
+    const missing = await finalize(upload.uploadId);
+    expect(missing.status).toBe(409);
+    expect((await missing.json()).error.message).toMatch(/incomplete/i);
+    expect((await database.select().from(schema.assets))[0].status).toBe("staging");
+    objects.set(upload.key, { bytes, mimeType: "image/png" });
+    expect((await finalize(upload.uploadId)).status).toBe(200);
+  });
+  it("serves uploaded bytes only to current project members after catalog reload", async () => {
+    const upload = await staged(editor);
+    const result = await finalize(upload.uploadId, editor);
+    const asset = (await result.json()).data.asset;
+    const getRequest = (subject: string) => new Request(`http://localhost:3000${asset.contentUrl}`, { headers: { Authorization: `Bearer ${sessionJWT(subject)}` } });
+    const catalog = await CATALOG(getRequest(owner), { params: Promise.resolve({ projectId }) });
+    expect((await catalog.json()).data.assets.map((item: { id: string }) => item.id)).toEqual([asset.id]);
+    const preview = (subject: string) => PREVIEW(getRequest(subject), { params: Promise.resolve({ assetId: asset.id }) });
+    const content = await preview(client);
+    expect(content.status).toBe(200);
+    expect(content.headers.get("cache-control")).toContain("no-store");
+    expect(new Uint8Array(await content.arrayBuffer())).toEqual(bytes);
+    storage.send.mockClear();
+    expect((await preview(outsider)).status).toBe(403);
+    expect(storage.send).not.toHaveBeenCalled();
+    await postgres.query("DELETE FROM project_members WHERE clerk_user_id=$1", [editor]);
+    expect((await preview(editor)).status).toBe(403);
+  });
+  it("rejects changed private bytes that no longer match an uploaded image checksum", async () => {
+    const upload = await staged();
+    const asset = (await (await finalize(upload.uploadId)).json()).data.asset;
+    const [stored] = await database.select().from(schema.assets);
+    const changed = bytes.slice(); changed[45] ^= 1;
+    objects.set(stored.objectKey, { bytes: changed, mimeType: "image/png" });
+    const response = await PREVIEW(new Request(`http://localhost:3000${asset.contentUrl}`, { headers: { Authorization: `Bearer ${sessionJWT(owner)}` } }), { params: Promise.resolve({ assetId: asset.id }) });
+    expect(response.status).toBe(503);
+    expect(JSON.stringify(await response.json())).not.toMatch(/private\/|staging\/|checksumSha256|test-secret/);
+  });
   it("publishes validated bytes under an immutable server key and returns the same asset on retry", async () => {
     const upload = await staged();
     const first = await finalize(upload.uploadId); expect(first.status).toBe(200);
@@ -91,7 +149,7 @@ describe("private image ingestion", () => {
   it("denies foreign projects, read-only clients and untrusted reservation fields", async () => {
     expect((await reserve(outsider)).status).toBe(403); expect((await reserve(client)).status).toBe(403);
     expect((await reserve(owner, { projectId: otherProjectId })).status).toBe(403);
-    for (const override of [{ objectKey: "attacker/key" }, { uploadUrl: "https://attacker.example" }, { mimeType: "image/svg+xml" }, { byteSize: 0 }, { checksumSha256: "invalid" }]) expect((await reserve(owner, override)).status).toBe(400);
+    for (const override of [{ objectKey: "attacker/key" }, { uploadUrl: "https://attacker.example" }, { mimeType: "image/svg+xml" }, { mimeType: "text/html" }, { byteSize: 0 }, { byteSize: 20 * 1024 * 1024 + 1 }, { checksumSha256: "invalid" }]) expect((await reserve(owner, override)).status).toBe(400);
     expect(storage.send).not.toHaveBeenCalled();
   });
   it("rejects untrusted browser origins, missing identities and malformed upload IDs", async () => {

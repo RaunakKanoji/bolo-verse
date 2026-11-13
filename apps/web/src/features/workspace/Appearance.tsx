@@ -5,11 +5,11 @@ import { useEffect, useSyncExternalStore } from "react";
 const key = "shape-studio-appearance";
 const event = "shape-appearance-change";
 type Appearance = "system" | "light" | "dark";
-let memoryPreference: Appearance = "system";
+let memoryPreference: Appearance = "dark";
 function read(): Appearance {
   try {
     const value = localStorage.getItem(key);
-    return value === "light" || value === "dark" ? value : "system";
+    return value === "light" || value === "dark" || value === "system" ? value : "dark";
   } catch {
     return memoryPreference;
   }
@@ -23,7 +23,7 @@ function subscribe(callback: () => void) {
   };
 }
 function useAppearance() {
-  return useSyncExternalStore(subscribe, read, () => "system" as const);
+  return useSyncExternalStore(subscribe, read, () => "dark" as const);
 }
 export function AppearanceSync() {
   const appearance = useAppearance();

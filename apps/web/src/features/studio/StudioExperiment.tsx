@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CAPTURE_FPS, CAPTURE_HEIGHT, CAPTURE_WIDTH, createMonoStage, type MonoStage } from "./engine/mono-stage";
 import { beginLocalRecording, chooseRecordingMime, type LocalRecording, type RecordingTake } from "./recording/local-recording";
+import { claimMicrophone } from "@/lib/media/microphone-owner";
 import styles from "./studio.module.css";
 
 type Phase = "loading" | "idle" | "permission" | "recording" | "stopping" | "ready" | "error";
@@ -171,6 +172,7 @@ export default function StudioExperiment() {
     let take: RecordingTake | null = null;
     let progressTimer: ReturnType<typeof setInterval> | undefined;
     let removeListeners = () => {};
+    let releaseMicrophone = () => {};
     const permissionTimer = setTimeout(() => {
       if (owner.alive && owner.pending && requestId === owner.requestId) {
         interrupt("Microphone permission timed out. Dismiss the browser prompt and try again.");
@@ -181,9 +183,11 @@ export default function StudioExperiment() {
       clearInterval(progressTimer);
       removeListeners();
       ownedTracks.forEach((track) => track.stop());
+      releaseMicrophone();
     }
     owner.cleanupTake = cleanupTake;
     try {
+      releaseMicrophone = claimMicrophone(owner);
       const microphone = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true }, video: false });
       ownedTracks.push(...microphone.getTracks());
       clearTimeout(permissionTimer);

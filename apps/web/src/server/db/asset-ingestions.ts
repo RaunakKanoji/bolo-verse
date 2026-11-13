@@ -6,13 +6,13 @@ import { AssetSummarySchema } from "@/lib/contracts/shape";
 import { BoundaryError } from "@/server/auth/errors";
 import { withDatabase, type Database } from "./client";
 import { assetUploadSessions } from "./creation-schema";
-import { projectEditability } from "./projects";
+import { projectUploadability } from "./projects";
 import { assets, projects, rateLimitBuckets } from "./schema";
 
 type Upload = typeof assetUploadSessions.$inferSelect;
 function forbidden() { return new BoundaryError(403, "FORBIDDEN", "This image upload is unavailable or you do not have permission to use it."); }
-function editable(database: Database, subject: string, projectId: string) {
-  return exists(database.select({ one: sql`1` }).from(projects).where(and(eq(projects.id, projectId), projectEditability(database, subject))));
+function uploadable(database: Database, subject: string, projectId: string) {
+  return exists(database.select({ one: sql`1` }).from(projects).where(and(eq(projects.id, projectId), projectUploadability(database, subject))));
 }
 function sameReservation(row: Upload, input: CreateImageUpload) {
   return row.fileName === input.fileName && row.mimeType === input.mimeType && row.byteSize === input.byteSize && row.checksumSha256 === input.checksumSha256;
@@ -27,13 +27,13 @@ async function consumeUploadBudget(database: Database, subject: string) {
     }, setWhere: or(sql`${rateLimitBuckets.expiresAt} <= now()`, sql`${rateLimitBuckets.count} < 20`) }).returning({ keyHash: rateLimitBuckets.keyHash });
   if (!allowed) throw new BoundaryError(429, "RATE_LIMITED", "Create up to 20 image upload sessions per minute. Try again shortly.");
 }
-/** Resolve identity + project editability inside the same SQL statement as every private read. */
+/** Resolve identity + project upload permission inside the same SQL statement as every private read. */
 async function readOwnedUpload(database: Database, subject: string, uploadId: string) {
   const [row] = await database.select({ upload: assetUploadSessions, asset: assets,
     unexpired: sql<boolean>`${assetUploadSessions.expiresAt} > now()` }).from(assetUploadSessions)
     .innerJoin(projects, eq(projects.id, assetUploadSessions.projectId))
     .innerJoin(assets, and(eq(assets.id, assetUploadSessions.assetId), eq(assets.projectId, assetUploadSessions.projectId)))
-    .where(and(eq(assetUploadSessions.id, uploadId), eq(assetUploadSessions.ownerClerkId, subject), projectEditability(database, subject))).limit(1);
+    .where(and(eq(assetUploadSessions.id, uploadId), eq(assetUploadSessions.ownerClerkId, subject), projectUploadability(database, subject))).limit(1);
   if (!row) throw forbidden();
   if (row.upload.status === "ready" && row.asset.status === "ready") return row;
   if (!row.unexpired || !["pending", "verifying"].includes(row.upload.status) || !["staging", "verifying"].includes(row.asset.status)) {
@@ -47,12 +47,12 @@ export function readOwnedImageUpload(subject: string, uploadId: string) {
 /** Reserve an asset identity first; staging URLs can never replace the final object. */
 export async function createAssetUploadSession(subject: string, input: CreateImageUpload): Promise<Upload> {
   return withDatabase((database) => database.transaction(async (transaction) => {
-    const [project] = await transaction.select({ id: projects.id }).from(projects).where(and(eq(projects.id, input.projectId), projectEditability(transaction, subject))).limit(1);
+    const [project] = await transaction.select({ id: projects.id }).from(projects).where(and(eq(projects.id, input.projectId), projectUploadability(transaction, subject))).limit(1);
     if (!project) throw forbidden();
     // Serialize this actor/idempotency scope before allocating either persistent identity.
     await transaction.execute(sql`SELECT pg_advisory_xact_lock(hashtextextended(${`image-upload:${input.projectId}:${subject}:${input.idempotencyKey}`}, 0))`);
     const [existing] = await transaction.select().from(assetUploadSessions).where(and(
-      eq(assetUploadSessions.projectId, input.projectId), eq(assetUploadSessions.ownerClerkId, subject), eq(assetUploadSessions.idempotencyKey, input.idempotencyKey), editable(transaction, subject, input.projectId),
+      eq(assetUploadSessions.projectId, input.projectId), eq(assetUploadSessions.ownerClerkId, subject), eq(assetUploadSessions.idempotencyKey, input.idempotencyKey), uploadable(transaction, subject, input.projectId),
     )).limit(1);
     if (existing) {
       if (!sameReservation(existing, input)) throw new BoundaryError(409, "CONFLICT", "This upload request key has already been used for a different image.");
@@ -71,7 +71,7 @@ export async function createAssetUploadSession(subject: string, input: CreateIma
       byteSize: sql<number>`${input.byteSize}::bigint`.as("byte_size"), width: sql<null>`NULL::integer`.as("width"), height: sql<null>`NULL::integer`.as("height"),
       durationSeconds: sql<null>`NULL::double precision`.as("duration_seconds"), checksumSha256: sql<string>`${input.checksumSha256}`.as("checksum_sha256"),
       status: sql<"staging">`'staging'::asset_status`.as("status"), createdAt: sql<Date>`now()`.as("created_at"),
-    }).from(projects).where(and(eq(projects.id, input.projectId), projectEditability(transaction, subject)))).returning();
+    }).from(projects).where(and(eq(projects.id, input.projectId), projectUploadability(transaction, subject)))).returning();
     if (!asset) throw forbidden();
     // The insert-select repeats authorization after the asset reservation await.
     const [upload] = await transaction.insert(assetUploadSessions).select(transaction.select({
@@ -82,7 +82,7 @@ export async function createAssetUploadSession(subject: string, input: CreateIma
       byteSize: sql<number>`${input.byteSize}::bigint`.as("byte_size"), checksumSha256: sql<string>`${input.checksumSha256}`.as("checksum_sha256"),
       status: sql<"pending">`'pending'`.as("status"), expiresAt: sql<Date>`now() + interval '10 minutes'`.as("expires_at"),
       createdAt: sql<Date>`now()`.as("created_at"), updatedAt: sql<Date>`now()`.as("updated_at"), finalizedAt: sql<null>`NULL::timestamptz`.as("finalized_at"), stagingDeletedAt: sql<null>`NULL::timestamptz`.as("staging_deleted_at"), finalDeletedAt: sql<null>`NULL::timestamptz`.as("final_deleted_at"),
-    }).from(projects).where(and(eq(projects.id, input.projectId), projectEditability(transaction, subject)))).returning();
+    }).from(projects).where(and(eq(projects.id, input.projectId), projectUploadability(transaction, subject)))).returning();
     if (!upload) throw forbidden();
     return upload;
   }));
@@ -98,7 +98,7 @@ export async function completeImageUpload(subject: string, uploadId: string, dim
     const { upload, asset } = await readOwnedUpload(transaction, subject, uploadId);
     if (upload.status === "ready") return imageAssetSummary(asset);
     const sessionPredicate = and(eq(assetUploadSessions.id, uploadId), eq(assetUploadSessions.ownerClerkId, subject),
-      inArray(assetUploadSessions.status, ["pending", "verifying"]), sql`${assetUploadSessions.expiresAt} > now()`, editable(transaction, subject, upload.projectId));
+      inArray(assetUploadSessions.status, ["pending", "verifying"]), sql`${assetUploadSessions.expiresAt} > now()`, uploadable(transaction, subject, upload.projectId));
     const [readyAsset] = await transaction.update(assets).set({ ...dimensions, status: "ready" }).where(and(
       eq(assets.id, upload.assetId), eq(assets.projectId, upload.projectId), eq(assets.ownerClerkId, subject),
       eq(assets.objectKey, upload.finalObjectKey), inArray(assets.status, ["staging", "verifying"]),

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Clapperboard, FlaskConical, FolderOpen, Glasses, House } from "lucide-react";
 import { AppearanceSync } from "@/features/workspace/Appearance";
+import { WorkspaceSessionProvider } from "@/features/platform/WorkspaceSession";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -22,8 +23,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <nav aria-label="Main navigation">
         <Link href="/" aria-label="Home"><House size={17} aria-hidden="true" /><span>Home</span></Link>
         <Link href="/app/projects" aria-label="Projects"><FolderOpen size={17} aria-hidden="true" /><span>Projects</span></Link>
+        <Link href="/reviews" aria-label="Reviews"><FolderOpen size={17} aria-hidden="true" /><span>Reviews</span></Link>
         <a href="/workspace" aria-label="3D workspace"><Glasses size={17} aria-hidden="true" /><span>3D workspace</span></a>
-        <Link href="/xr/preview" aria-label="XR preview"><Glasses size={17} aria-hidden="true" /><span>XR preview</span></Link>
+        <Link href="/xr/hud" aria-label="Spatial workspace"><Glasses size={17} aria-hidden="true" /><span>Spatial workspace</span></Link>
         <Link href="/studio/feasibility" aria-label="Recording lab"><FlaskConical size={17} aria-hidden="true" /><span>Recording lab</span></Link>
       </nav>
     </header>
@@ -31,5 +33,5 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <footer className="footer"><span>Made for the stories behind small businesses.</span><span>Browser-based Spatial Studio</span></footer>
   </>;
   const authConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && process.env.CLERK_SECRET_KEY);
-  return <html lang="en"><body>{authConfigured ? <ClerkProvider>{content}</ClerkProvider> : content}</body></html>;
+  return <html lang="en" data-shape-theme="dark"><body>{authConfigured ? <ClerkProvider><WorkspaceSessionProvider configured>{content}</WorkspaceSessionProvider></ClerkProvider> : <WorkspaceSessionProvider configured={false}>{content}</WorkspaceSessionProvider>}</body></html>;
 }

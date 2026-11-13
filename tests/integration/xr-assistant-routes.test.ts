@@ -273,3 +273,37 @@ describe("authorized assistant routes with real PostgreSQL context and budgets",
     expect(new Uint8Array(await response.arrayBuffer())).toEqual(wave);
   });
 });
+
+function voiceRequest() {
+  return new Request("http://localhost:3000/transcribe", { method: "POST", headers: { Origin: "http://localhost:3000", "Content-Type": "audio/wav", "X-Speech-Language": "en-IN", "X-Speech-Consent": "xr-voice-v1" }, body: wave.buffer });
+}
+it("does not invoke Sarvam without configuration or for read-only/foreign projects", async () => {
+  vi.stubEnv("SARVAM_API_KEY", "");
+  expect((await transcribe(voiceRequest(), context)).status).toBe(503);
+  expect((await postgres.query("SELECT key_hash FROM rate_limit_buckets")).rows).toHaveLength(0);
+  vi.stubEnv("SARVAM_API_KEY", "private-sarvam-key");
+  identity.subject = "user_client";
+  expect((await transcribe(voiceRequest(), context)).status).toBe(403);
+  identity.subject = owner;
+  expect((await transcribe(voiceRequest(), { params: Promise.resolve({ projectId: otherProjectId }) })).status).toBe(403);
+  expect(fetcher).not.toHaveBeenCalled();
+});
+it("rejects no-speech output honestly without persisting audio or fabricating a transcript", async () => {
+  fetcher.mockImplementation(async () => Response.json({ transcript: "  ", language_code: "en-IN" }));
+  const response = await transcribe(voiceRequest(), context);
+  expect(response.status).toBe(400);
+  const data = await response.json();
+  expect(data).toMatchObject({ ok: false, error: { code: "INVALID_INPUT", message: expect.stringContaining("type a command") } });
+  expect(data.data).toBeUndefined();
+  expect((await postgres.query("SELECT id FROM processing_jobs")).rows).toHaveLength(0);
+});
+it("discards a transcription after project edit permission is revoked during provider latency", async () => {
+  identity.subject = "user_editor";
+  fetcher.mockImplementation(async () => {
+    await postgres.query("DELETE FROM project_members WHERE project_id=$1 AND clerk_user_id=$2", [projectId, "user_editor"]);
+    return Response.json({ transcript: "Private late transcript", language_code: "en-IN" });
+  });
+  const response = await transcribe(voiceRequest(), context);
+  expect(response.status).toBe(403);
+  expect(await response.text()).not.toContain("Private late transcript");
+});

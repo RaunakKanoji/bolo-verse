@@ -43,7 +43,7 @@ export function createXRSpeechProvider(
         });
         const parsed = z
           .object({
-            transcript: z.string().trim().min(1).max(2000),
+            transcript: z.string().trim().max(2000),
             language_code: LanguageSchema.nullable(),
           })
           .safeParse(result);
@@ -53,6 +53,9 @@ export function createXRSpeechProvider(
             "SERVICE_UNAVAILABLE",
             "Speech recognition did not return a supported transcript. Try a shorter recording.",
           );
+        if (!parsed.data.transcript) throw new BoundaryError(
+          400, "INVALID_INPUT", "No speech was recognized. Try again or type a command.",
+        );
         return {
           text: parsed.data.transcript,
           language: parsed.data.language_code ?? language,

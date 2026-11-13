@@ -15,6 +15,8 @@
     "DATABASE_MIGRATION_URL",
     "ALLOWED_ORIGINS",
     "R2_*",
+    "STORAGE_PROVIDER",
+    "S3_*",
     "GEMINI_*",
     "SARVAM_*",
     "SHOTSTACK_*",

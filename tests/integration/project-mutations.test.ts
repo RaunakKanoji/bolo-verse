@@ -77,10 +77,11 @@ describe("project mutations through the real PostgreSQL repositories", () => {
     expect(response.headers.get("cache-control")).toBe("no-store");
     const body = await response.json();
     expect(body).toMatchObject({ ok: true, data: { project: {
-      name: "Saree campaign", objective: "Introduce the collection.", createdByClerkId: "user_project_owner", sample: false,
+      name: "Saree campaign", objective: "Introduce the collection.", sample: false,
     } }, requestId: expect.any(String) });
-    const persisted = await postgres.query("SELECT p.name, w.personal_owner_clerk_id, m.role FROM projects p JOIN workspaces w ON w.id = p.workspace_id JOIN project_members m ON m.project_id = p.id WHERE p.id = $1 AND m.clerk_user_id = $2", [body.data.project.id, "user_project_owner"]);
-    expect(persisted.rows).toEqual([{ name: "Saree campaign", personal_owner_clerk_id: "user_project_owner", role: "creator" }]);
+    expect(Object.keys(body.data.project).sort()).toEqual(["createdAt", "id", "name", "objective", "sample"]);
+    const persisted = await postgres.query("SELECT p.name, p.created_by_clerk_id, w.personal_owner_clerk_id, m.role FROM projects p JOIN workspaces w ON w.id = p.workspace_id JOIN project_members m ON m.project_id = p.id WHERE p.id = $1 AND m.clerk_user_id = $2", [body.data.project.id, "user_project_owner"]);
+    expect(persisted.rows).toEqual([{ name: "Saree campaign", created_by_clerk_id: owner, personal_owner_clerk_id: "user_project_owner", role: "creator" }]);
     const listed = await (await collection.GET()).json();
     expect(listed.data.projects.map((project: { id: string }) => project.id)).toContain(body.data.project.id);
     expect(await readProjectAccess(owner, body.data.project.id)).toMatchObject({ project: { id: body.data.project.id }, canEdit: true });
@@ -91,7 +92,8 @@ describe("project mutations through the real PostgreSQL repositories", () => {
     const response = await collection.POST(mutation());
     expect(response.status).toBe(201);
     const body = await response.json();
-    const result = await postgres.query("SELECT w.personal_owner_clerk_id, m.role FROM workspaces w JOIN workspace_members m ON m.workspace_id = w.id WHERE w.id = $1", [body.data.project.workspaceId]);
+    expect(body.data.project).not.toHaveProperty("workspaceId");
+    const result = await postgres.query("SELECT w.personal_owner_clerk_id, m.role FROM projects p JOIN workspaces w ON w.id = p.workspace_id JOIN workspace_members m ON m.workspace_id = w.id WHERE p.id = $1", [body.data.project.id]);
     expect(result.rows).toEqual([{ personal_owner_clerk_id: editor, role: "owner" }]);
   });
 
@@ -123,10 +125,10 @@ describe("project mutations through the real PostgreSQL repositories", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("cache-control")).toBe("no-store");
     expect(await response.json()).toMatchObject({ ok: true, data: { project: {
-      id: projectId, name: "Renamed project", objective: "Original objective", createdByClerkId: owner,
+      id: projectId, name: "Renamed project", objective: "Original objective",
     } } });
-    const persisted = await postgres.query("SELECT name, objective FROM projects WHERE id = $1", [projectId]);
-    expect(persisted.rows).toEqual([{ name: "Renamed project", objective: "Original objective" }]);
+    const persisted = await postgres.query("SELECT name, objective, created_by_clerk_id FROM projects WHERE id = $1", [projectId]);
+    expect(persisted.rows).toEqual([{ name: "Renamed project", objective: "Original objective", created_by_clerk_id: owner }]);
   });
 
   it.each([client, outsider, workspaceMember])("denies metadata mutation by %s", async (subject) => {

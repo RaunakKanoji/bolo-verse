@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   bigint, boolean, check, doublePrecision, foreignKey, index, integer,
-  jsonb, pgEnum, pgTable, primaryKey, text, timestamp, unique, uuid,
+  jsonb, pgEnum, pgTable, primaryKey, text, timestamp, unique, uniqueIndex, uuid,
   type PgTableExtraConfigValue,
 } from "drizzle-orm/pg-core";
 import type {
@@ -11,6 +11,7 @@ import type {
 import type { XRLayout } from "@/lib/contracts/xr-workspace";
 import type { CreativeDraftDocument } from "@/lib/contracts/shape";
 import type { CanonicalSpatialScene } from "@/lib/contracts/spatial-scene";
+import type { UploadedImageProvenance } from "@/lib/contracts/deliverables";
 
 // UUIDs identify application resources; Clerk subjects deliberately remain text.
 const id = () => uuid("id").defaultRandom().primaryKey();
@@ -51,6 +52,9 @@ export const projects = pgTable("projects", {
   objective: text("objective").notNull(),
   createdByClerkId: text("created_by_clerk_id").notNull(),
   sample: boolean("sample").default(false).notNull(),
+  studioMetadata: jsonb("studio_metadata").$type<{ clientId?: string | null; type?: string; status?: "active" | "in_review" | "completed" | "archived"; priority?: "low" | "normal" | "high"; startDate?: string | null; dueDate?: string | null; creationFingerprint?: string; intakeVersion?: 1 }>().notNull().default({}),
+  revision: integer("revision").notNull().default(1),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
   createdAt: createdAt(),
 }, (table) => [index("projects_workspace_idx").on(table.workspaceId)]);
 
@@ -211,7 +215,7 @@ export const contentVersions = pgTable("content_versions", {
   id: id(),
   projectId: uuid("project_id").notNull().references(() => projects.id, { onDelete: "restrict" }),
   version: integer("version").notNull(),
-  sourceSnapshot: jsonb("source_snapshot").$type<OutputSourceSnapshot>().notNull(),
+  sourceSnapshot: jsonb("source_snapshot").$type<OutputSourceSnapshot | UploadedImageProvenance>().notNull(),
   sourceSessionId: uuid("source_session_id"),
   sourceSceneRevision: integer("source_scene_revision"),
   sourceArtifactVersionId: uuid("source_artifact_version_id"),
@@ -237,10 +241,12 @@ export const reviewComments = pgTable("review_comments", {
   projectId: uuid("project_id").notNull(),
   contentVersionId: uuid("content_version_id").notNull(),
   reviewerClerkId: text("reviewer_clerk_id").notNull(),
+  reviewGrantId: uuid("review_grant_id"),
   timecodeSeconds: doublePrecision("timecode_seconds"),
   comment: text("comment").notNull(),
   createdAt: createdAt(),
-}, (table) => [
+}, (table): PgTableExtraConfigValue[] => [
+  foreignKey({ columns: [table.reviewGrantId, table.projectId], foreignColumns: [accessGrants.id, accessGrants.projectId] }),
   foreignKey({ columns: [table.contentVersionId, table.projectId], foreignColumns: [contentVersions.id, contentVersions.projectId] }),
   index("review_comments_content_idx").on(table.contentVersionId),
   check("comment_timecode_nonnegative", sql`${table.timecodeSeconds} IS NULL OR ${table.timecodeSeconds} >= 0`),
@@ -252,10 +258,13 @@ export const reviewDecisions = pgTable("review_decisions", {
   contentVersionId: uuid("content_version_id").notNull(),
   briefVersionId: uuid("brief_version_id"),
   reviewerClerkId: text("reviewer_clerk_id").notNull(),
+  reviewGrantId: uuid("review_grant_id"),
   decision: text("decision", { enum: ["approved", "changes_requested"] }).notNull(),
   reason: text("reason"),
   createdAt: createdAt(),
-}, (table) => [
+}, (table): PgTableExtraConfigValue[] => [
+  foreignKey({ columns: [table.reviewGrantId, table.projectId], foreignColumns: [accessGrants.id, accessGrants.projectId] }),
+  uniqueIndex("review_terminal_decision_uq").on(table.contentVersionId, table.reviewerClerkId).where(sql`${table.reviewGrantId} IS NOT NULL`),
   foreignKey({ columns: [table.contentVersionId, table.projectId], foreignColumns: [contentVersions.id, contentVersions.projectId] }),
   foreignKey({ columns: [table.briefVersionId, table.projectId], foreignColumns: [briefVersions.id, briefVersions.projectId] }),
   index("review_decisions_content_idx").on(table.contentVersionId),
@@ -270,6 +279,7 @@ export const accessGrants = pgTable("access_grants", {
   sessionId: uuid("session_id"),
   contentVersionId: uuid("content_version_id"),
   issuerClerkId: text("issuer_clerk_id").notNull(),
+  reviewerClerkId: text("reviewer_clerk_id"),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   revokedAt: timestamp("revoked_at", { withTimezone: true }),
   maxUses: integer("max_uses").default(1).notNull(),
@@ -277,6 +287,8 @@ export const accessGrants = pgTable("access_grants", {
   createdAt: createdAt(),
 }, (table) => [
   unique("access_grants_id_project_uq").on(table.id, table.projectId),
+  uniqueIndex("review_active_version_grant_uq").on(table.contentVersionId).where(sql`${table.scope} = 'review' AND ${table.reviewerClerkId} IS NOT NULL AND ${table.revokedAt} IS NULL`),
+  check("review_recipient_scope", sql`${table.reviewerClerkId} IS NULL OR ${table.scope} = 'review'`),
   index("access_grants_project_idx").on(table.projectId),
   foreignKey({ columns: [table.sessionId, table.projectId], foreignColumns: [studioSessions.id, studioSessions.projectId] }),
   foreignKey({ columns: [table.contentVersionId, table.projectId], foreignColumns: [contentVersions.id, contentVersions.projectId] }),

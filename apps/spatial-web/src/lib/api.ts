@@ -47,6 +47,18 @@ const assetResponse = envelope(
   z.strictObject({ assets: z.array(assetSchema).max(100), hasMore: z.boolean() }),
 );
 const sceneResponse = envelope(SpatialSceneResultSchema);
+function parseAssets(projectId: string, input: unknown) {
+  const result = assetResponse.parse(input).data;
+  if (
+    result.assets.some(
+      (asset) =>
+        asset.projectId !== projectId ||
+        (asset.contentUrl !== null && asset.contentUrl !== `/api/v1/assets/${asset.id}/content`),
+    )
+  )
+    throw new Error("Project assets did not match.");
+  return result;
+}
 export type WorkspaceBootstrap = {
   project: ProjectSummary;
   assets: AssetSummary[];
@@ -61,17 +73,9 @@ export function parseBootstrap(
   sceneInput: unknown,
 ): WorkspaceBootstrap {
   const { project } = projectResponse.parse(projectInput).data;
-  const { assets, hasMore } = assetResponse.parse(assetsInput).data;
+  const { assets, hasMore } = parseAssets(projectId, assetsInput);
   const snapshot = validateSnapshot(sceneResponse.parse(sceneInput).data.scene, projectId);
-  if (
-    project.id !== projectId ||
-    assets.some(
-      (asset) =>
-        asset.projectId !== projectId ||
-        (asset.contentUrl !== null && asset.contentUrl !== `/api/v1/assets/${asset.id}/content`),
-    )
-  )
-    throw new Error("Project data did not match.");
+  if (project.id !== projectId) throw new Error("Project data did not match.");
   return { project, assets, hasMoreAssets: hasMore, snapshot };
 }
 
@@ -99,6 +103,12 @@ export function createSpatialApi(fetcher: typeof fetch = fetch) {
     fetcher(path, { ...init, cache: "no-store", redirect: "error" }),
   );
   return {
+    async listAssets(projectId: string, signal?: AbortSignal) {
+      z.uuid().parse(projectId);
+      const response = await client.listProjectAssets(projectId, signal);
+      signal?.throwIfAborted();
+      return parseAssets(projectId, response);
+    },
     async bootstrap(projectId: string, signal?: AbortSignal): Promise<WorkspaceBootstrap> {
       z.uuid().parse(projectId);
       const [project, assets, scene] = await Promise.all([

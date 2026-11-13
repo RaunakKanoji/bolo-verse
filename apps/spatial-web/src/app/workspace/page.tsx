@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function WorkspaceLanding() {
   return (
     <main className="workspace-landing">
@@ -24,6 +26,7 @@ export default function WorkspaceLanding() {
           <p className="landing-note">
             Open a project and choose Spatial workspace. Your project permissions apply here too.
           </p>
+          <Link href="/workspace/demo">Try the local procedural demo</Link>
         </div>
         <div className="landing-sculpture" aria-hidden="true">
           <div className="sculpture-grid" />

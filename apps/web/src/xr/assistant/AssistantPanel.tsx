@@ -1,12 +1,20 @@
 "use client";
 
 import { Mic, Send, Square, Volume2 } from "lucide-react";
+import { useAuth } from "@clerk/nextjs";
 import type { Language } from "@/lib/contracts";
 import { XRCommandSchema, type XRCommand } from "@/lib/contracts/xr-assistant";
 import { useAssistantClient } from "./use-assistant-client";
 import styles from "./assistant.module.css";
 
-type Props = { projectId: string; disabled?: boolean; onCommand(command: XRCommand): void };
+type Props = {
+  projectId: string;
+  disabled?: boolean;
+  contextKey?: string;
+  workspaceVersion?: number;
+  sessionAware?: boolean;
+  onCommand(command: XRCommand): void;
+};
 const labels: Record<XRCommand["type"], string> = {
   OPEN_ASSET: "Open asset",
   FOCUS_PANEL: "Focus panel",
@@ -15,14 +23,44 @@ const labels: Record<XRCommand["type"], string> = {
 };
 
 export default function AssistantPanel(props: Props) {
-  return <AssistantPanelContent key={props.projectId} {...props} />;
+  return props.sessionAware ? (
+    <SessionAssistantPanel {...props} />
+  ) : (
+    <ScopedAssistantPanel {...props} />
+  );
 }
 
-function AssistantPanelContent({ projectId, disabled = false, onCommand }: Props) {
+function SessionAssistantPanel(props: Props) {
+  const { isLoaded, sessionId } = useAuth();
+  if (!isLoaded) return <p role="status">Checking your assistant session…</p>;
+  if (!sessionId) return <p role="status">Sign in to use the creative assistant.</p>;
+  return <ScopedAssistantPanel key={sessionId} {...props} />;
+}
+
+function ScopedAssistantPanel(props: Props) {
+  // A changed workspace or permission scope starts a fresh, consent-gated
+  // assistant session; React discards its private state during the commit.
+  return (
+    <AssistantPanelContent
+      key={`${props.projectId}:${props.contextKey ?? ""}:${Boolean(props.disabled)}`}
+      {...props}
+    />
+  );
+}
+
+function AssistantPanelContent({
+  projectId,
+  disabled = false,
+  contextKey,
+  workspaceVersion,
+  onCommand,
+}: Props) {
   const {
     readiness,
+    retryReadiness,
     reply,
     message,
+    transcript,
     setMessage,
     language,
     setLanguage,
@@ -40,7 +78,11 @@ function AssistantPanelContent({ projectId, disabled = false, onCommand }: Props
     speak,
     stopRecording,
     cancelRecording,
-  } = useAssistantClient(projectId, disabled);
+    cancelRequest,
+    reviewCommand,
+    setReviewCommand,
+    verifyCommand,
+  } = useAssistantClient(projectId, disabled, contextKey, workspaceVersion);
   function choose(command: XRCommand) {
     const validated = XRCommandSchema.parse(command);
     if (validated.type === "RESET_WORKSPACE") {
@@ -53,12 +95,15 @@ function AssistantPanelContent({ projectId, disabled = false, onCommand }: Props
       );
       return;
     }
-    onCommand(validated);
+    setReviewCommand(validated);
   }
 
   return (
     <section className={styles.panel} aria-label="Creative assistant">
       <h3>Creative assistant</h3>
+      <p className={styles.note}>
+        Legacy A-Frame actions only. Canonical R3F voice commands are not implemented.
+      </p>
       <p className={styles.note}>
         {disabled
           ? "Open an editable, connected project to use the assistant."
@@ -139,16 +184,26 @@ function AssistantPanelContent({ projectId, disabled = false, onCommand }: Props
               Record voice message
             </button>
           )}
-          {(busy === "recording" || busy === "permission") && (
-            <button type="button" onClick={() => cancelRecording()}>
-              Cancel recording
-            </button>
-          )}
         </div>
         {!readiness?.sttAvailable && (
           <p className={styles.note}>Sarvam speech recognition is not configured.</p>
         )}
       </details>
+      {(busy === "recording" || busy === "permission") && (
+        <button type="button" onClick={cancelRecording}>
+          Cancel recording
+        </button>
+      )}
+      {["transcribing", "thinking", "approving", "speech"].includes(busy) && (
+        <button type="button" onClick={cancelRequest}>
+          Cancel request
+        </button>
+      )}
+      {!readiness && error && !disabled && (
+        <button type="button" onClick={retryReadiness}>
+          Retry assistant status
+        </button>
+      )}
       <p role="status" className={styles.status}>
         {busy === "thinking"
           ? "Thinking…"
@@ -160,14 +215,26 @@ function AssistantPanelContent({ projectId, disabled = false, onCommand }: Props
                 ? "Transcribing with Sarvam…"
                 : busy === "speech"
                   ? "Preparing speech…"
-                  : ""}
+                  : busy === "approving"
+                    ? "Checking current project access…"
+                    : ""}
       </p>
       {error && (
         <p role="alert" className={styles.error}>
           {error}
         </p>
       )}
-      {reply && (
+      {transcript && !disabled && (
+        <div className={styles.transcript}>
+          <strong>Voice transcript</strong>
+          <output aria-label="Voice transcript">{transcript}</output>
+          <p className={styles.note}>
+            Edit the message above to correct recognition, then send it again. No action runs until
+            you approve a proposal.
+          </p>
+        </div>
+      )}
+      {reply && !disabled && (
         <div className={styles.reply}>
           <strong>
             {reply.mode === "development-mock" ? "Development mock response" : "Assistant response"}
@@ -188,22 +255,51 @@ function AssistantPanelContent({ projectId, disabled = false, onCommand }: Props
               </button>
             ))}
           </div>
-          {confirmReset && (
-            <div className={styles.confirm} role="alert">
+          {reviewCommand && (
+            <div className={styles.confirm} role="region" aria-label="Review action proposal">
+              <strong>Review legacy action</strong>
               <p>
-                Reset this workspace to its default layout? Your current unsaved arrangement will be
-                replaced.
+                {reviewCommand.type === "FOCUS_PANEL"
+                  ? `Focus panel ${reviewCommand.panelId}. Desktop view frames this panel; headset pose is unchanged. Does not change or save the layout.`
+                  : reviewCommand.type === "OPEN_ASSET"
+                    ? `Open the authorized preview for asset ${reviewCommand.assetId}. Does not change or save the layout.`
+                    : "Review this action before applying."}
               </p>
               <button
                 type="button"
+                disabled={disabled || busy !== "idle"}
+                onClick={() => void verifyCommand(reviewCommand, onCommand)}
+              >
+                Apply proposal
+              </button>
+              <button
+                type="button"
+                disabled={busy !== "idle"}
+                onClick={() => setReviewCommand(null)}
+              >
+                Discard proposal
+              </button>
+            </div>
+          )}
+          {confirmReset && (
+            <div className={styles.confirm} role="alert">
+              <p>
+                Reset and save the default workspace layout? This replaces your saved layout and
+                current unsaved arrangement.
+              </p>
+              <button
+                type="button"
+                disabled={disabled || busy !== "idle"}
                 onClick={() => {
-                  setConfirmReset(false);
-                  onCommand({ type: "RESET_WORKSPACE" });
+                  void verifyCommand({ type: "RESET_WORKSPACE" }, onCommand);
                 }}
               >
                 Confirm reset
               </button>
-              <button type="button" onClick={() => setConfirmReset(false)}>
+              <button
+                type="button"
+                onClick={() => (busy === "approving" ? cancelRequest() : setConfirmReset(false))}
+              >
                 Keep layout
               </button>
             </div>

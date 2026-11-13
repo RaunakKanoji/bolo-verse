@@ -4,7 +4,7 @@ import { or, sql } from "drizzle-orm";
 import type { XRAssistantContext } from "@/lib/contracts/xr-assistant";
 import type { XRWorkspaceData } from "@/lib/contracts/xr-workspace";
 import { BoundaryError } from "@/server/auth/errors";
-import { withDatabase } from "@/server/db/client";
+import { withDatabase, type Database } from "@/server/db/client";
 import { rateLimitBuckets } from "@/server/db/schema";
 import { readXRWorkspace } from "@/server/db/xr-workspaces";
 
@@ -35,9 +35,9 @@ export async function authorizedAssistantContext(subject: string, projectId: str
 }
 
 /** One durable shared text/STT/TTS budget per account, checked before every provider call. */
-export async function consumeAssistantBudget(subject: string) {
+export async function consumeAssistantBudget(subject: string, database?: Database) {
   const keyHash = createHash("sha256").update(`xr-assistant:${subject}`).digest("hex");
-  return withDatabase(async (database) => {
+  const consume = async (database: Database) => {
     const [allowed] = await database
       .insert(rateLimitBuckets)
       .values({
@@ -65,5 +65,6 @@ export async function consumeAssistantBudget(subject: string) {
         "RATE_LIMITED",
         "Assistant text and speech requests are limited to 20 per hour. Try again later.",
       );
-  });
+  };
+  return database ? consume(database) : withDatabase(consume);
 }

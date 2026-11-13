@@ -1,20 +1,11 @@
 .shell {
-  --studio-ink: var(--text-primary);
-  --studio-muted: var(--text-secondary);
-  --studio-violet: var(--accent-text);
-  color: var(--text-primary);
   min-height: 100dvh;
-  padding: 18px;
   display: grid;
-  grid-template-columns: 88px minmax(0, 1fr);
-  gap: 24px;
-  background:
-    radial-gradient(
-      ellipse at 85% 0%,
-      color-mix(in srgb, var(--accent-soft) 65%, transparent),
-      transparent 50%
-    ),
-    var(--canvas);
+  grid-template-columns: 100px minmax(0, 1fr);
+  background: var(--canvas);
+  color: var(--text-primary);
+  padding: 20px;
+  gap: 30px;
   font-family:
     ui-sans-serif,
     system-ui,
@@ -24,79 +15,75 @@
     sans-serif;
 }
 .sidebar {
-  position: sticky;
-  top: 18px;
-  height: calc(100dvh - 36px);
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  padding: 18px 8px;
-  border-radius: var(--radius-panel);
-  border: 1px solid var(--glass-border);
-  background: var(--glass-fill);
-  box-shadow: 0 12px 45px #24233f08;
+  padding: 20px 8px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  background: var(--surface);
+  position: sticky;
+  top: 20px;
+  height: calc(100dvh - 40px);
+  overflow-y: auto;
 }
 .brand {
   display: flex;
   flex-direction: column;
+  gap: 12px;
   align-items: center;
-  gap: 10px;
-  text-align: center;
+  padding: 4px 0 20px;
   color: var(--text-primary);
 }
 .brandText {
+  text-align: center;
   font-size: 11px;
   font-weight: 650;
-  line-height: 1.3;
 }
 .logo {
-  width: 31px;
-  height: 33px;
-  position: relative;
   display: block;
-  flex-shrink: 0;
+  position: relative;
+  width: 32px;
+  height: 31px;
 }
 .logo i {
   position: absolute;
-  height: 17px;
-  width: 17px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  background: linear-gradient(150deg, var(--accent-primary), var(--accent-secondary));
-  box-shadow: inset 0 1px 2px #ffffff60;
+  background: var(--accent-primary);
 }
 .logo i:nth-child(1) {
   left: 7px;
   top: 0;
 }
 .logo i:nth-child(2) {
-  left: 0;
   bottom: 0;
+  left: 0;
 }
 .logo i:nth-child(3) {
-  right: 0;
   bottom: 0;
+  right: 0;
 }
 .sidebar nav {
   display: grid;
-  gap: 4px;
-  margin-top: 28px;
+  gap: 5px;
 }
-.sidebar nav a,
-.sidebar nav button {
+.sidebar nav a {
+  min-height: 58px;
+  padding: 10px 4px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
-  padding: 10px 4px;
-  border: 0;
-  border-radius: 14px;
-  font-size: 10px;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 12px;
+  color: var(--text-secondary);
+  font-size: 11px;
   line-height: 1.3;
   text-align: center;
-  color: var(--text-secondary);
-  background: transparent;
-  min-height: 50px;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 .sidebar nav a:hover {
   background: var(--surface-secondary);
@@ -106,211 +93,261 @@
   background: var(--accent-soft);
   color: var(--accent-text);
 }
-.sidebar nav button:disabled {
-  opacity: 0.6;
-}
 .network {
-  display: grid;
-  place-items: center;
   margin-top: auto;
-  padding: 16px 8px 0;
-  color: var(--accent-text);
+  padding: 20px 5px 8px;
+  font-size: 10px;
+  color: var(--text-secondary);
+  text-align: center;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
 }
-.network span,
-.network > svg:last-child {
+.network small {
   display: none;
 }
 .content {
   min-width: 0;
+  padding: 0 12px 28px 0;
 }
 .header {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  margin: 0 0 24px;
-  min-height: 60px;
-}
-.header > div {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  gap: 18px;
+  min-height: 62px;
+  margin-bottom: 28px;
 }
 .topNav {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px;
-  background: var(--glass-fill);
-  border: 1px solid var(--glass-border);
-  border-radius: 50px;
-  box-shadow: 0 6px 25px #24233f08;
+  gap: 3px;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 5px;
   max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
 }
-.topNav a,
-.topNav button {
+.topNav a {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
-  min-height: 42px;
-  padding: 10px 16px;
-  color: var(--text-secondary);
-  border: 0;
-  background: transparent;
-  border-radius: 40px;
-  font-size: 13px;
   white-space: nowrap;
+  padding: 11px 16px;
+  min-height: 44px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  border-radius: 999px;
+  transition:
+    color 0.15s,
+    background 0.15s;
 }
 .topNav a:hover {
+  color: var(--text-primary);
   background: var(--surface-secondary);
 }
 .topNav .active {
   background: var(--accent-soft);
   color: var(--accent-text);
 }
-.topNav button:disabled {
-  opacity: 0.65;
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 }
 .spatialLink {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  padding: 12px 17px;
-  border: 1px solid var(--glass-border);
-  background: var(--glass-fill);
-  border-radius: 30px;
-  font-size: 12px;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: var(--surface);
   color: var(--text-primary);
+  font-size: 12px;
+}
+.iconButton,
+.menuButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  background: var(--surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+}
+.menuButton {
+  display: none;
+}
+.signIn {
+  min-height: 44px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--accent-primary);
+  color: var(--accent-foreground);
+  padding: 8px 15px;
+  font: inherit;
+}
+.accountLoading {
+  display: inline-flex;
+  width: 32px;
+  text-align: center;
 }
 .breadcrumb {
+  margin: 0 0 20px;
   color: var(--text-secondary);
   font-size: 12px;
-  margin: 0 0 12px;
 }
 .shell :is(button, a, input, textarea, select):focus-visible {
   outline: 3px solid var(--accent-strong);
   outline-offset: 3px;
 }
-.content :global(.setup-panel),
-.content :global(.project-card) {
-  background: var(--glass-fill);
-  border-color: var(--glass-border);
-  border-radius: var(--radius-card);
-}
 .content :global(.page-heading) h1 {
-  font-size: 36px;
-  letter-spacing: -1.4px;
+  font-size: 34px;
+  letter-spacing: -1.2px;
 }
-.content :global(.empty-state) {
-  padding: 30px 12px;
+.content :global(.setup-panel) {
+  background: var(--surface);
+  border-color: var(--border-subtle);
+  border-radius: 18px;
 }
 .content :global(.page-heading) p,
-.content :global(.setup-panel) p,
-.content :global(.empty-state) p,
 .content :global(.muted) {
   color: var(--text-secondary);
 }
-@media (max-width: 1100px) {
+.drawerLinks nav {
+  display: grid;
+  gap: 5px;
+}
+.drawerLinks a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 48px;
+  padding: 12px;
+  border-radius: 12px;
+  color: var(--text-secondary);
+}
+.drawerLinks .active {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+.notificationList {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+}
+.notificationList li {
+  display: grid;
+  gap: 6px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.notificationList a {
+  color: var(--text-primary);
+  font-size: 14px;
+}
+.notificationList small {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+@media (min-width: 1600px) {
   .shell {
-    gap: 16px;
-    padding: 14px;
-    grid-template-columns: 72px minmax(0, 1fr);
+    grid-template-columns: 116px minmax(0, 1fr);
+    gap: 36px;
+  }
+  .content {
+    padding-right: 24px;
+  }
+}
+@media (max-width: 1200px) {
+  .shell {
+    gap: 20px;
+    grid-template-columns: 86px minmax(0, 1fr);
+    padding: 16px;
   }
   .sidebar {
-    top: 14px;
-    height: calc(100dvh - 28px);
+    top: 16px;
+    height: calc(100dvh - 32px);
   }
-  .topNav a,
-  .topNav button {
+  .topNav a {
     padding: 10px 12px;
   }
-  .spatialLink {
-    padding: 10px;
-    font-size: 11px;
-  }
-}
-@media (max-width: 800px) {
-  .header {
-    gap: 10px;
-  }
-  .header > div {
-    margin-left: auto;
-  }
-  .topNav {
-    width: 100%;
-    justify-content: space-around;
-  }
-  .topNav a,
-  .topNav button {
-    padding: 10px 8px;
-    font-size: 12px;
-    gap: 5px;
-  }
-}
-@media (max-width: 600px) {
-  .shell {
-    display: block;
-    padding: 12px;
-  }
-  .sidebar {
-    position: static;
-    height: auto;
-    width: 100%;
-    flex-direction: row;
-    align-items: center;
-    padding: 8px 12px;
-    gap: 12px;
-    margin-bottom: 16px;
-    overflow: visible;
-  }
-  .brand {
-    flex-direction: row;
-    gap: 8px;
-  }
-  .brandText {
-    max-width: 42px;
-  }
-  .logo {
-    transform: scale(0.8);
-  }
-  .sidebar nav {
-    display: flex;
-    margin: 0 0 0 auto;
-    gap: 4px;
-  }
-  .sidebar nav button,
-  .sidebar nav a span,
-  .network {
+  .spatialLink span {
     display: none;
   }
-  .sidebar nav a {
-    min-height: 44px;
-    min-width: 36px;
-    padding: 10px 7px;
+  .spatialLink {
+    min-width: 44px;
+    padding: 10px;
   }
-  .topNav a,
-  .topNav button {
-    flex-direction: column;
-    gap: 4px;
-    padding: 8px 9px;
-    font-size: 10px;
-    line-height: 1.3;
+  .content {
+    padding-right: 0;
   }
-  .topNav {
-    border-radius: 22px;
-    gap: 0;
-    padding: 4px;
+}
+@media (max-width: 850px) {
+  .shell {
+    display: block;
+    padding: 18px;
   }
-  .topNav a,
-  .topNav button {
-    border-radius: 17px;
+  .sidebar {
+    display: none;
+  }
+  .menuButton {
+    display: inline-flex;
   }
   .header {
-    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+  .topNav {
+    order: 3;
+    width: 100%;
+  }
+  .headerActions {
+    margin-left: auto;
+  }
+  .topNav a {
+    flex: 1;
+    justify-content: center;
+  }
+  .content {
+    padding: 0 0 20px;
+  }
+}
+@media (max-width: 520px) {
+  .shell {
+    padding: 16px;
+  }
+  .topNav a {
+    min-width: 48px;
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  .topNav a svg {
+    display: none;
+  }
+  .headerActions {
+    gap: 7px;
   }
   .breadcrumb {
-    font-size: 11px;
+    margin-bottom: 14px;
+  }
+  .content :global(.page-heading) h1 {
+    font-size: 29px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sidebar nav a,
+  .topNav a {
+    transition: none;
   }
 }

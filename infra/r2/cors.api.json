@@ -1,0 +1,21 @@
+[
+  {
+    "allowed": {
+      "origins": [
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3180"
+      ],
+      "methods": [
+        "PUT"
+      ],
+      "headers": [
+        "Content-Type",
+        "If-None-Match"
+      ]
+    },
+    "exposeHeaders": [
+      "ETag"
+    ],
+    "maxAgeSeconds": 600
+  }
+]

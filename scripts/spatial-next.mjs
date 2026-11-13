@@ -9,7 +9,7 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 nextEnv.loadEnvConfig(root, process.argv[2] === "dev");
 const env = { ...process.env };
 for (const key of Object.keys(env)) {
-  if (/^(?:CLERK_|DATABASE_|R2_|GEMINI_|SARVAM_|SHOTSTACK_)/.test(key)) delete env[key];
+  if (/^(?:CLERK_|DATABASE_|R2_|S3_|STORAGE_|GEMINI_|SARVAM_|SHOTSTACK_)/.test(key)) delete env[key];
 }
 const require = createRequire(new URL("../apps/spatial-web/package.json", import.meta.url));
 const child = spawn(process.execPath, [require.resolve("next/dist/bin/next"), ...process.argv.slice(2)], {

@@ -62,7 +62,7 @@ const spatialEnv = { ...common, WEB_INTERNAL_ORIGIN: webOrigin };
 // The spatial shell needs only session transport to the web API, no provider,
 // database, storage or Clerk server credentials.
 for (const key of Object.keys(spatialEnv)) {
-  if (/^(?:CLERK_|DATABASE_|R2_|GEMINI_|SARVAM_|SHOTSTACK_)/.test(key)) delete spatialEnv[key];
+  if (/^(?:CLERK_|DATABASE_|R2_|S3_|STORAGE_|GEMINI_|SARVAM_|SHOTSTACK_)/.test(key)) delete spatialEnv[key];
 }
 try {
   launch("spatial-web", "127.0.0.1", spatialPort, spatialEnv);

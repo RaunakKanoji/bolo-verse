@@ -26,7 +26,8 @@ import type { SceneObject } from "./state";
 import type { TransformMode } from "./SpatialEditor";
 
 type Props = {
-  document: CanonicalSpatialScene;
+  document: CanonicalSpatialScene | null;
+  proceduralObject?: PreviewObject;
   assets: AssetSummary[];
   selectedId: string | null;
   mode: TransformMode;
@@ -35,9 +36,23 @@ type Props = {
   onSelect: (id: string | null) => void;
   onTransform: (id: string, patch: Partial<SceneObject>) => void;
 };
+// Procedural local demos have no project or fabricated asset identity.
+type PreviewObject = Omit<SceneObject, "assetId">;
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 export default function SpatialCanvas(props: Props) {
+  const [hasWebGL] = useState(() => {
+    // R3F's canvas children are HTML canvas fallback, hidden in WebGL-disabled
+    // browsers that still support <canvas>. Detect before mounting the renderer.
+    const canvas = document.createElement("canvas");
+    try {
+      const context = canvas.getContext("webgl2");
+      context?.getExtension("WEBGL_lose_context")?.loseContext();
+      return Boolean(context);
+    } catch {
+      return false;
+    }
+  });
   const [dragging, setDragging] = useState(false);
   const [failures, setFailures] = useState<Record<string, string>>({});
   const status = useCallback(
@@ -47,7 +62,7 @@ export default function SpatialCanvas(props: Props) {
   );
   let count = 0,
     bytes = 0;
-  const visible = props.document.objects.filter((object) => object.visible);
+  const visible = props.document?.objects.filter((object) => object.visible) ?? [];
   const entries: { object: SceneObject; asset: AssetSummary | undefined; reason: string | null }[] =
     [];
   for (const object of visible) {
@@ -72,6 +87,12 @@ export default function SpatialCanvas(props: Props) {
     const message = reason ?? failures[object.id];
     return message ? [{ id: object.id, message }] : [];
   });
+  if (!hasWebGL)
+    return (
+      <div className="canvas-message" role="status">
+        3D preview requires WebGL. Use the object list and numeric controls to edit this scene.
+      </div>
+    );
   return (
     <>
       <CanvasBoundary>
@@ -108,13 +129,28 @@ export default function SpatialCanvas(props: Props) {
               onStatus={status}
             />
           ))}
+          {props.proceduralObject && (
+            <SceneEntry
+              object={props.proceduralObject}
+              procedural
+              selected={props.selectedId === props.proceduralObject.id}
+              mode={props.mode}
+              canEdit={props.canEdit}
+              fetcher={props.fetcher ?? fetch}
+              onSelect={props.onSelect}
+              onTransform={props.onTransform}
+              onDragging={setDragging}
+              onStatus={status}
+            />
+          )}
         </Canvas>
       </CanvasBoundary>
       {limitations.length > 0 && (
         <ul className="preview-limitations" aria-label="Preview limitations">
           {limitations.map(({ id, message }) => (
             <li key={id}>
-              Object {props.document.objects.findIndex((object) => object.id === id) + 1}: {message}
+              Object {(props.document?.objects.findIndex((object) => object.id === id) ?? -1) + 1}:{" "}
+              {message}
             </li>
           ))}
         </ul>
@@ -154,13 +190,14 @@ type Drag = {
   id: number;
   x: number;
   y: number;
-  original: SceneObject;
+  original: PreviewObject;
   point: Vector3;
-  latest: SceneObject;
+  latest: PreviewObject;
   target: CaptureTarget;
 };
 function SceneEntry({
   object,
+  procedural = false,
   asset,
   selected,
   mode,
@@ -171,7 +208,8 @@ function SceneEntry({
   onDragging,
   onStatus,
 }: {
-  object: SceneObject;
+  object: PreviewObject;
+  procedural?: boolean;
   asset?: AssetSummary;
   selected: boolean;
   mode: TransformMode;
@@ -185,7 +223,7 @@ function SceneEntry({
   const group = useRef<Group>(null);
   const drag = useRef<Drag | null>(null);
   const { invalidate } = useThree();
-  const apply = (next: SceneObject) => {
+  const apply = (next: PreviewObject) => {
     if (!group.current) return;
     group.current.position.fromArray(next.position);
     group.current.quaternion.fromArray(next.rotation);
@@ -285,7 +323,12 @@ function SceneEntry({
       onPointerCancel={() => finish(false)}
       onLostPointerCapture={() => finish(false)}
     >
-      {asset ? (
+      {procedural ? (
+        <mesh>
+          <boxGeometry args={[1, 1, 1]} />
+          <meshStandardMaterial color="#8762d3" roughness={0.35} metalness={0.15} />
+        </mesh>
+      ) : asset ? (
         <AssetContent asset={asset} objectId={object.id} onStatus={onStatus} fetcher={fetcher} />
       ) : (
         <mesh>

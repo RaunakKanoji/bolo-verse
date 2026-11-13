@@ -32,7 +32,11 @@
     "native:test": "swift test --package-path apps/visionos/ShapeStudioCore",
     "check": "turbo run build --filter=@shape/web --filter=@shape/spatial-web",
     "env:check": "node --conditions=react-server --import tsx scripts/check-environment.ts",
-    "workspace:graph": "turbo run build --dry=json"
+    "demo:preflight": "node --conditions=react-server --import tsx scripts/demo-preflight.ts",
+    "workspace:graph": "turbo run build --dry=json",
+    "db:seed:demo": "node --conditions=react-server --import tsx scripts/seed-demo.ts --local",
+    "db:seed:demo:validate": "node --conditions=react-server --import tsx scripts/seed-demo.ts --local --validate",
+    "db:seed:demo:reset": "node --conditions=react-server --import tsx scripts/seed-demo.ts --local --reset"
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "3.1165.0",

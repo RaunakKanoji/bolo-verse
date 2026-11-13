@@ -1,0 +1,245 @@
+.cover {
+  height: 92px;
+  background: var(--surface-secondary);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+  margin-bottom: 16px;
+}
+.cover svg {
+  width: 28px;
+  height: 28px;
+}
+.cardBody {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.cardBody h2,
+.cardBody h3 {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.cardBody p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+.cardActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.listGrid {
+  display: grid;
+  gap: 16px;
+}
+.listGrid > article {
+  display: grid;
+  grid-template-columns: 72px 1fr auto;
+  gap: 20px;
+  align-items: center;
+}
+.listGrid .cover {
+  height: 72px;
+  margin: 0;
+}
+.projectGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr));
+  gap: 20px;
+}
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+}
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.timeline li {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  display: grid;
+  gap: 6px;
+  overflow-wrap: anywhere;
+}
+.task {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.task label {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex: 1;
+  min-width: 170px;
+}
+.task input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+}
+.progress {
+  height: 6px;
+  appearance: none;
+  width: 100%;
+  overflow: hidden;
+  border: 0;
+  border-radius: 99px;
+  background: var(--surface-secondary);
+}
+.progress::-webkit-progress-bar {
+  background: var(--surface-secondary);
+}
+.progress::-webkit-progress-value {
+  background: var(--accent-primary);
+}
+.progress::-moz-progress-bar {
+  background: var(--accent-primary);
+}
+.dialogForm {
+  display: grid;
+  gap: 16px;
+}
+.twoColumns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.dialogHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.dialogHeader h2 {
+  margin: 0;
+}
+.preview {
+  width: 100%;
+  height: 170px;
+  object-fit: contain;
+  background: var(--surface-secondary);
+  border-radius: 12px;
+}
+.assetPreview {
+  padding: 14px;
+  background: var(--surface-secondary);
+  border-radius: 12px;
+  min-height: 150px;
+  display: grid;
+  place-content: center;
+  color: var(--text-secondary);
+}
+.loading {
+  padding: 16px;
+  color: var(--text-secondary);
+}
+.clientMark {
+  width: 52px;
+  height: 52px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  border-radius: 16px;
+  display: grid;
+  place-content: center;
+  font-weight: 700;
+  font-size: 20px;
+}
+.metricsIcon {
+  width: 20px;
+  height: 20px;
+  color: var(--accent-primary);
+}
+.detailText {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.subnav {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.noMargin {
+  margin: 0;
+}
+.inlineForm {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: end;
+}
+.inlineForm > label {
+  flex: 1;
+  min-width: 150px;
+}
+.fullWidth {
+  grid-column: 1/-1;
+}
+.taskTitle {
+  flex: 1;
+  min-width: 120px;
+}
+.assetActions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.archiveText {
+  color: var(--warning);
+}
+@media (max-width: 700px) {
+  .twoColumns {
+    grid-template-columns: 1fr;
+  }
+  .listGrid > article {
+    grid-template-columns: 1fr;
+  }
+  .listGrid .cover {
+    display: none;
+  }
+  .projectGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tabBar [aria-pressed="true"] {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+.accountProfile {
+  max-width: 100%;
+  overflow: auto;
+}
+.profilePortrait {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 24px;
+}
+.identity {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.identity h2 {
+  margin: 0;
+}

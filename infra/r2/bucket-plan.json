@@ -1,0 +1,14 @@
+{
+  "provider": "cloudflare-r2",
+  "bucketName": "shape-studio-dev-assets",
+  "environment": "development",
+  "publicAccess": false,
+  "storageClass": "Standard",
+  "jurisdiction": "default",
+  "corsFile": "infra/r2/cors.development.json",
+  "applicationBucketVariable": "R2_BUCKET",
+  "applicationPermissions": "Object Read & Write scoped to this bucket",
+  "objectPrefixes": ["staging/images/", "private/"],
+  "automaticExpiry": false,
+  "status": "prepared-not-created"
+}

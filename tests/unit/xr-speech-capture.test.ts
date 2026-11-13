@@ -97,9 +97,12 @@ describe("explicit voice capture ownership", () => {
       settled = true;
     });
     capture.cancel();
-    await Promise.resolve();
-    await Promise.resolve();
-    const beforePermissionReturns = settled;
+    // Cancellation must settle before the next browser task, without depending
+    // on a particular number of internal promise continuations.
+    const beforePermissionReturns = await Promise.race([
+      pending.then(() => settled),
+      new Promise<boolean>((done) => setTimeout(() => done(false), 0)),
+    ]);
     resolve(stream);
     await pending;
     expect(beforePermissionReturns).toBe(true);
@@ -139,4 +142,23 @@ describe("explicit voice capture ownership", () => {
     expect((await pending).size).toBeGreaterThan(0);
     expect(track.stop).toHaveBeenCalledOnce();
   });
+});
+
+it("allows only one microphone owner and releases its lease after permission denial", async () => {
+  let rejectPermission!: (error: Error) => void;
+  const first = new VoiceCapture({ getUserMedia: () => new Promise((_resolve, reject) => { rejectPermission = reject; }), createRecorder: () => new Recorder() });
+  const pending = first.start(); const rejected = expect(pending).rejects.toMatchObject({ name: "NotAllowedError" });
+  const secondGetUserMedia = vi.fn().mockRejectedValue(new Error("Unexpected second microphone request"));
+  const second = new VoiceCapture({ getUserMedia: secondGetUserMedia, createRecorder: () => new Recorder() });
+  const competing = second.start();
+  // Attach before settling first permission, so both failures remain observable.
+  const competition = expect(competing).rejects.toThrow(/microphone.*in use|another.*recording/i);
+  rejectPermission(new DOMException("denied", "NotAllowedError"));
+  await rejected; await competition;
+  expect(secondGetUserMedia).not.toHaveBeenCalled();
+  const { stream, track } = streamHarness();
+  let ready!: () => void; const started = new Promise<void>((resolve) => { ready = resolve; });
+  const next = new VoiceCapture({ getUserMedia: async () => stream, createRecorder: () => new Recorder() }, ready);
+  const take = next.start(); await started; next.stop(); await take;
+  expect(track.stop).toHaveBeenCalledOnce();
 });

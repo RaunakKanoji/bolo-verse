@@ -64,6 +64,27 @@
       "when": 1794508069409,
       "tag": "0008_lonely_king_cobra",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794520766214,
+      "tag": "0009_client_review",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794532301283,
+      "tag": "0010_strange_sleeper",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794542524789,
+      "tag": "0011_video_editor",
+      "breakpoints": true
     }
   ]
 }

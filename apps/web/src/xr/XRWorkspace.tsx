@@ -9,6 +9,7 @@ export type XRWorkspaceProps = {
   project: WorkspaceProject;
   preview?: boolean;
   initialData?: XRWorkspaceData;
+  assistantSessionAware?: boolean;
 };
 
 const XRWorkspaceClient = dynamic(() => import("./XRWorkspaceClient"), {

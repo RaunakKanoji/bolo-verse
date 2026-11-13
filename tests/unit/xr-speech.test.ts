@@ -65,9 +65,8 @@ describe("bounded speech inputs and outputs", () => {
     expect(init.body.get("language_code")).toBe("en-IN");
     expect(init.body.get("file")).toBeInstanceOf(File);
   });
-  it("rejects empty and unsupported-language transcription results", async () => {
+  it("rejects unsupported-language transcription results", async () => {
     for (const data of [
-      { transcript: "", language_code: "en-IN" },
       { transcript: "Unrecognized locale", language_code: "xx-XX" },
     ]) {
       await expect(
@@ -129,4 +128,9 @@ describe("bounded speech inputs and outputs", () => {
       createXRSpeechProvider(env, fetcher).tts.synthesize({ text: "Hello", language: "en-IN" }),
     ).rejects.toMatchObject({ code: "SERVICE_UNAVAILABLE" });
   });
+});
+
+it("reports silence as a recoverable input problem with typed-command fallback", async () => {
+  const fetcher = vi.fn().mockResolvedValue(Response.json({ transcript: "  ", language_code: "en-IN" }));
+  await expect(createXRSpeechProvider(env, fetcher).stt.transcribe({ audio: wav, mimeType: "audio/wav", language: "en-IN" })).rejects.toMatchObject({ status: 400, code: "INVALID_INPUT", message: expect.stringMatching(/no speech.*type/i) });
 });

@@ -15,6 +15,19 @@ export const BriefPayloadSchema = z.strictObject({
   facts: z.array(z.strictObject({ id: ResourceIdSchema, text: text(300) })).max(20),
   prohibitedClaims: z.array(text(300)).max(20),
   constraints: z.array(text(300)).max(20),
+  // Additive authoring metadata; existing rich v1 brief documents remain valid.
+  title: text(120).optional(),
+  brandRequirements: z.string().trim().max(2000).optional(),
+  keyMessage: z.string().trim().max(1000).optional(),
+  channels: z.array(text(120)).max(20).optional(),
+  references: z.array(z.url().max(2000).refine((value) => {
+    try {
+      const url = new URL(value);
+      return url.protocol === "https:" && !url.username && !url.password;
+    } catch { return false; }
+  }, "Use HTTPS reference URLs without credentials.")).max(10).optional(),
+  deadline: z.iso.date().optional(),
+  notes: z.string().trim().max(5000).optional(),
 });
 export type BriefPayload = z.infer<typeof BriefPayloadSchema>;
 

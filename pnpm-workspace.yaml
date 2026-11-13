@@ -16,7 +16,11 @@ overrides:
   "aframe@1.8.0>three-bmfont-text": "-"
 
 allowBuilds:
+  # Only the browser SDK is bundled; its native canvas probe and ffmpeg
+  # binary download are unnecessary for server-side HTTP cloud rendering.
+  '@shotstack/shotstack-canvas': false
   esbuild: true
+  ffmpeg-static: false
   sharp: true
 
 minimumReleaseAgeExclude:

@@ -122,3 +122,17 @@
   display: grid;
   gap: 8px;
 }
+.confirm p {
+  overflow-wrap: anywhere;
+}
+.transcript {
+  display: grid;
+  gap: 8px;
+  border: 1px solid #dfe4ec;
+  border-radius: 8px;
+  padding: 12px;
+}
+.transcript output {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

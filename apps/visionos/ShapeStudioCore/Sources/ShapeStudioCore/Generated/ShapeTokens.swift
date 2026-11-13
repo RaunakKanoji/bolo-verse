@@ -20,28 +20,28 @@ public enum ShapeTokens {
     public static let destructive = "#B02A43"
   }
   public enum Dark {
-    public static let canvas = "#11131D"
-    public static let surface = "#1B1E2B"
-    public static let surfaceSecondary = "#252938"
-    public static let textPrimary = "#F0F1F8"
-    public static let textSecondary = "#B6BDCE"
-    public static let accentPrimary = "#A4AAFF"
+    public static let canvas = "#101118"
+    public static let surface = "#1D1E2B"
+    public static let surfaceSecondary = "#252638"
+    public static let textPrimary = "#F3F2FA"
+    public static let textSecondary = "#B7B9C9"
+    public static let accentPrimary = "#A99BFF"
     public static let accentSecondary = "#D0A2FF"
-    public static let accentSoft = "#302C50"
-    public static let accentStrong = "#ADA3FF"
-    public static let accentText = "#C4BBFF"
+    public static let accentSoft = "#302B47"
+    public static let accentStrong = "#C0B5FF"
+    public static let accentText = "#C0B5FF"
     public static let accentForeground = "#171923"
-    public static let borderSubtle = "#A5AED633"
+    public static let borderSubtle = "#37394C"
     public static let glassFill = "#1B1E2BEF"
     public static let glassBorder = "#A5AED63D"
-    public static let success = "#8CD9AB"
-    public static let warning = "#F3CA79"
-    public static let destructive = "#FFADBC"
+    public static let success = "#58C59B"
+    public static let warning = "#E7B66D"
+    public static let destructive = "#EFA0AC"
   }
   public enum Radii {
-    public static let card: Double = 24
-    public static let panel: Double = 28
-    public static let control: Double = 14
+    public static let card: Double = 20
+    public static let panel: Double = 20
+    public static let control: Double = 12
   }
   public enum Spacing {
     public static let xs: Double = 4

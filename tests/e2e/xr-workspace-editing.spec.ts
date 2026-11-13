@@ -1,5 +1,6 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { expect, test, type Page } from "@playwright/test";
+import { instrumentVoice, waitForVoiceData } from "../helpers/voice-browser";
 import { createDefaultXRLayout, SaveXRWorkspaceSchema, type XRWorkspaceData } from "../../apps/web/src/lib/contracts/xr-workspace";
 import { createMediaWorkspaceFixture, createTestGLB, createWorkspaceFixture, TEST_ASSET_IDS, TEST_GLTF, TEST_PNG_BASE64 } from "../browser-fixtures/xr-workspace-data";
 
@@ -176,6 +177,46 @@ test("component harness requires reset confirmation and then reloads the saved d
   await expect.poll(() => positionX(page)).toBe(0);
 });
 
+test("assistant reset discloses saved persistence, cancels without a write and reloads the confirmed default", async ({ page }) => {
+  let resetPosts = 0;
+  page.on("request", request => {
+    if (request.method() === "POST" && new URL(request.url()).pathname.endsWith("/reset")) resetPosts++;
+  });
+  const store = await backend(page);
+  await page.route(`${origin}/api/xr/assistant/**`, route => route.fulfill({ json: {
+    ok: true, requestId: "assistant-reset-fixture", data: route.request().method() === "GET"
+      ? { mode: "development-mock", textAvailable: true, sttAvailable: false, ttsAvailable: false, message: "HTTP fixture only; no provider called." }
+      : { mode: "development-mock", reply: "Fixture proposal: reset the workspace.", commands: [{ type: "RESET_WORKSPACE" }] },
+  } }));
+  await open(page);
+  await page.getByRole("button", { name: "Move x positive", exact: true }).click();
+  await page.getByRole("button", { name: "Save workspace", exact: true }).click();
+  await expect(page.getByTestId("xr-save-status")).toContainText("Workspace saved · version 2");
+  const saved = store.saved();
+  await page.getByRole("button", { name: "Move x positive", exact: true }).click();
+  await expect.poll(() => positionX(page)).toBe(0.5);
+  await page.getByRole("textbox", { name: "Ask about this project" }).fill("Reset the layout");
+  await page.getByRole("button", { name: "Send to assistant", exact: true }).click();
+  await page.getByRole("button", { name: "Reset workspace…", exact: true }).click();
+  await expect(page.getByRole("alert")).toContainText("Reset and save the default workspace layout? This replaces your saved layout and current unsaved arrangement.");
+  await page.getByRole("button", { name: "Keep layout", exact: true }).click();
+  expect(store.resets()).toBe(0);
+  expect(resetPosts).toBe(0);
+  expect(store.writes).toHaveLength(1);
+  expect(store.saved()).toEqual(saved);
+  await expect.poll(() => positionX(page)).toBe(0.5);
+  await page.getByRole("button", { name: "Reset workspace…", exact: true }).click();
+  await page.getByRole("button", { name: "Confirm reset", exact: true }).click();
+  await expect(page.getByTestId("xr-save-status")).toContainText("Default layout saved");
+  expect(store.resets()).toBe(1);
+  expect(resetPosts).toBe(1);
+  expect(store.saved().workspace.version).toBe(saved.workspace.version + 1);
+  await expect.poll(() => positionX(page)).toBe(0);
+  await page.reload();
+  await expect.poll(() => positionX(page)).toBe(0);
+  expect(store.saved().workspace.version).toBe(saved.workspace.version + 1);
+});
+
 for (const failure of [
   { status: 401, code: "UNAUTHORIZED", message: "Sign in again to save your workspace." },
   { status: 503, code: "SERVICE_UNAVAILABLE", message: "The workspace service is temporarily unavailable." },
@@ -325,4 +366,52 @@ test("component harness handles a simulated headset rejection without losing dir
   await expect(page.getByTestId("xr-runtime-status")).toHaveText("Desktop preview");
   await expect(page.getByLabel("Position x", { exact: true })).toHaveText("0.25");
   await expect(page.getByRole("button", { name: "Save workspace", exact: true })).toBeEnabled();
+});
+
+test("speech proposal frames a real legacy panel only after Apply and layout changes still require CAS Save", async ({ page }) => {
+  const store = await backend(page);
+  await instrumentVoice(page);
+  const target = `asset-${TEST_ASSET_IDS[0]}`;
+  await page.route(`${origin}/api/xr/assistant/**`, route => {
+    const path = new URL(route.request().url()).pathname;
+    const data = route.request().method() === "GET"
+      ? { mode: "live", textAvailable: true, sttAvailable: true, ttsAvailable: false, message: "Synthetic microphone and provider fixtures only." }
+      : path.endsWith("/transcribe")
+        ? { text: "Focus the first asset", language: "en-IN", mode: "live" }
+        : { mode: "live", reply: "Proposed: focus the first asset panel.", commands: [{ type: "FOCUS_PANEL", panelId: target }] };
+    return route.fulfill({ json: { ok: true, data, requestId: "legacy-voice-fixture" } });
+  });
+  await open(page);
+  const camera = page.frameLocator('iframe[title="XR studio canvas"]').locator('[camera]');
+  const cameraPosition = () => camera.evaluate(element => {
+    const position = (element as unknown as { object3D: { position: { x: number; y: number; z: number } } }).object3D.position;
+    return [position.x, position.y, position.z];
+  });
+  const before = await cameraPosition();
+  const saved = store.saved();
+  await page.getByText("Voice controls", { exact: true }).click();
+  await page.getByRole("checkbox", { name: "I agree to send this voice message for speech recognition and assistance." }).check();
+  await page.getByRole("button", { name: "Record voice message", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Stop and send", exact: true })).toBeVisible();
+  await waitForVoiceData(page);
+  await page.getByRole("button", { name: "Stop and send", exact: true }).click();
+  await expect(page.getByLabel("Voice transcript")).toHaveText("Focus the first asset");
+  await page.getByRole("button", { name: "Focus panel", exact: true }).click();
+  expect(await cameraPosition()).toEqual(before);
+  expect(store.writes).toHaveLength(0);
+  await page.getByRole("button", { name: "Apply proposal", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "image · c4000001", exact: true })).toBeVisible();
+  await expect.poll(cameraPosition).not.toEqual(before);
+  expect(store.saved()).toEqual(saved);
+  expect(store.writes).toHaveLength(0);
+  const assetX = () => assetPanel(page, TEST_ASSET_IDS[0]).evaluate(element => (element as unknown as { object3D: { position: { x: number } } }).object3D.position.x);
+  const start = await assetX();
+  await page.getByRole("button", { name: "Move x positive", exact: true }).click();
+  await expect.poll(assetX).toBeCloseTo(start + 0.25);
+  expect(store.writes).toHaveLength(0);
+  await page.getByRole("button", { name: "Save workspace", exact: true }).click();
+  await expect(page.getByTestId("xr-save-status")).toContainText("Workspace saved · version 2");
+  expect(store.writes).toHaveLength(1);
+  await page.reload();
+  await expect.poll(assetX).toBeCloseTo(start + 0.25);
 });

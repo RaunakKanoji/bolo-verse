@@ -22,3 +22,9 @@ apps/visionos/Config/Local.xcconfig
 *.xcresult/
 
 .turbo/
+.context/
+/context/
+.local-storage/
+
+# Isolated synthetic seed development database
+.demo/

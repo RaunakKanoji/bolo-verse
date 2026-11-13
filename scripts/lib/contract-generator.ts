@@ -1,7 +1,7 @@
 /** Deliberately small OpenAPI 3.1 DTO generator. Unsupported constructs fail closed. */
 export type Schema = Record<string, unknown>;
 const identifier = /^[A-Za-z][A-Za-z0-9]*$/;
-const keys = new Set(["$ref", "type", "properties", "required", "additionalProperties", "items", "prefixItems", "enum", "const", "anyOf", "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "minLength", "maxLength", "format", "pattern", "minItems", "maxItems", "minProperties", "maxProperties", "description", "$schema"]);
+const keys = new Set(["$ref", "type", "properties", "required", "additionalProperties", "items", "prefixItems", "enum", "const", "anyOf", "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "minLength", "maxLength", "format", "pattern", "minItems", "maxItems", "minProperties", "maxProperties", "description", "$schema", "default"]);
 const upper = (value: string) => value[0].toUpperCase() + value.slice(1);
 const quote = JSON.stringify;
 function object(value: unknown): Schema {
@@ -30,6 +30,7 @@ export function generateModels(schemas: Record<string, Schema>) {
   const ts: string[] = [], swift: string[] = [];
   const declarations = new Map<string, string>();
   const schemaNames = new Set(Object.keys(schemas));
+  let usesNullableField = false;
   function check(schema: Schema) {
     for (const key of Object.keys(schema)) if (!keys.has(key)) throw new Error(`Unsupported schema keyword: ${key}`);
   }
@@ -87,7 +88,11 @@ export function generateModels(schemas: Record<string, Schema>) {
     const fields = Object.entries(properties).map(([key, value]) => {
       name(key);
       const child = object(value), isNullable = !!nullable(child);
-      if (!required.has(key) && isNullable) throw new Error("Optional nullable fields require a three-state representation; unsupported");
+      if (!required.has(key) && isNullable) {
+        usesNullableField = true;
+        const inner = emit(`${typeName}${upper(key)}Value`, nullable(child)!, true);
+        return { key, required: false, ...inner, ts: `(${inner.ts} | null)`, swift: `ShapeNullable<${inner.swift}>` };
+      }
       return { key, required: required.has(key), ...emit(`${typeName}${upper(key)}`, child, true) };
     });
     const members = fields.map((field) => `  public var \`${field.key}\`: ${field.swift}${field.required ? "" : "?"}`).join("\n");
@@ -111,7 +116,7 @@ export function generateModels(schemas: Record<string, Schema>) {
   }
   return {
     typescript: `// Generated from openapi.json. Do not edit.\n// DTO types only; server Zod schemas enforce constraints.\n\n${ts.join("\n\n")}\n`,
-    swift: `// Generated from openapi.json. Do not edit.\n// DTO decoding enforces shapes/enums; server schemas enforce bounds and formats.\nimport Foundation\n\nprivate struct ShapeAnyCodingKey: CodingKey {\n  var stringValue: String\n  var intValue: Int? { nil }\n  init?(stringValue: String) { self.stringValue = stringValue }\n  init?(intValue: Int) { return nil }\n}\n\n${[...declarations.values(), ...swift].join("\n\n")}\n`,
+    swift: `// Generated from openapi.json. Do not edit.\n// DTO decoding enforces shapes/enums; server schemas enforce bounds and formats.\nimport Foundation\n\nprivate struct ShapeAnyCodingKey: CodingKey {\n  var stringValue: String\n  var intValue: Int? { nil }\n  init?(stringValue: String) { self.stringValue = stringValue }\n  init?(intValue: Int) { return nil }\n}\n\n${usesNullableField ? `/// Nil property means omitted; .null explicitly clears a nullable patch field.\npublic enum ShapeNullable<Value: Codable & Sendable>: Codable, Sendable {\n  case null\n  case value(Value)\n  public init(from decoder: any Decoder) throws {\n    let container = try decoder.singleValueContainer()\n    if container.decodeNil() { self = .null } else { self = .value(try container.decode(Value.self)) }\n  }\n  public func encode(to encoder: any Encoder) throws {\n    var container = encoder.singleValueContainer()\n    switch self { case .null: try container.encodeNil(); case .value(let value): try container.encode(value) }\n  }\n}\n\n` : ""}${[...declarations.values(), ...swift].join("\n\n")}\n`,
   };
 }
 

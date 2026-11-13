@@ -42,11 +42,23 @@ export async function providerJson(
   url: string,
   init: RequestInit,
   maxBytes = 65_536,
+  options: { retryTransient?: boolean } = {},
 ): Promise<unknown> {
   try {
     const timeout = AbortSignal.timeout(25_000);
     const signal = init.signal ? AbortSignal.any([init.signal, timeout]) : timeout;
-    const response = await fetcher(url, { ...init, signal, redirect: "error", cache: "no-store" });
+    signal.throwIfAborted();
+    let response = await fetcher(url, { ...init, signal, redirect: "error", cache: "no-store" });
+    // Opt-in only: a single retry after an explicit transient HTTP response.
+    // Network failures/timeouts may already have incurred charges and are never retried.
+    // Both attempts share the original deadline; existing XR/speech callers stay single-shot.
+    if (options.retryTransient && [429, 500, 502, 503, 504].includes(response.status) &&
+      (!response.headers.has("retry-after") || /^0(?:\.\d+)?$|^1$/.test(response.headers.get("retry-after")!))) {
+      await response.body?.cancel();
+      await new Promise((resolve) => setTimeout(resolve, 1000 + Math.floor(Math.random() * 250)));
+      signal.throwIfAborted();
+      response = await fetcher(url, { ...init, signal, redirect: "error", cache: "no-store" });
+    }
     if (!response.ok) {
       await response.body?.cancel();
       if (response.status === 429)

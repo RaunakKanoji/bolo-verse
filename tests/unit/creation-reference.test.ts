@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { uploadReferenceImage } from "@/features/creation/upload-reference-image";
+import { uploadReferenceImage, uploadProjectImage } from "@/features/creation/upload-reference-image";
 const id = "e67ea056-e196-445c-8c9b-55b2058a5d58";
 afterEach(() => vi.unstubAllGlobals());
 it("validates local media before reserving or sending private image bytes", async () => {
@@ -84,4 +84,45 @@ it("rejects references over the provider 10 MiB limit before reading or uploadin
   );
   expect(read).not.toHaveBeenCalled();
   expect(fetcher).not.toHaveBeenCalled();
+});
+
+it("reuses a project upload key and verifies an already-written staging object on retry", async () => {
+  const bytes = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+j7M0AAAAASUVORK5CYII=", "base64");
+  const file = new File([bytes], "poster.png", { type: "image/png" });
+  const assetId = "a046df5a-e5e4-4727-a191-2266e031bba9";
+  const keys: string[] = [], phases: string[] = [];
+  let finalizeCalls = 0;
+  vi.stubGlobal("fetch", async (url: string, options: RequestInit) => {
+    if (url.startsWith("https:")) return new Response(null, { status: 412 });
+    if (url.endsWith("/finalize")) {
+      if (++finalizeCalls === 1) throw new TypeError("connection interrupted");
+      return Response.json({ ok: true, data: { asset: { id: assetId, projectId: id, mimeType: "image/png", byteSize: bytes.length, width: 1, height: 1, durationSeconds: null, createdAt: "2026-11-12T10:00:00.000Z", nativeContentUrl: null, contentUrl: `/api/v1/assets/${assetId}/content` } }, requestId: "test" });
+    }
+    keys.push(JSON.parse(options.body as string).idempotencyKey);
+    return Response.json({ ok: true, data: { upload: { id, assetId, projectId: id, expiresAt: "2026-11-13T10:00:00.000Z", uploadUrl: "https://storage.example.test/scoped", uploadContentType: "image/png" } }, requestId: "test" });
+  });
+  const options = { idempotencyKey: id, onPhase: (phase: string) => phases.push(phase) };
+  await expect(uploadProjectImage(id, file, new AbortController().signal, options)).rejects.toThrow();
+  await expect(uploadProjectImage(id, file, new AbortController().signal, options)).resolves.toMatchObject({ id: assetId, projectId: id });
+  expect(keys).toEqual([id, id]);
+  expect(phases.slice(-4)).toEqual(["preparing", "reserving", "uploading", "verifying"]);
+});
+
+it("bounds project images at 20 MiB before reading bytes", async () => {
+  const fetcher = vi.fn();
+  vi.stubGlobal("fetch", fetcher);
+  const file = new File([new Uint8Array(20 * 1024 * 1024 + 1)], "large.png", { type: "image/png" });
+  await expect(uploadProjectImage(id, file, new AbortController().signal, { idempotencyKey: id })).rejects.toThrow("20 MiB");
+  expect(fetcher).not.toHaveBeenCalled();
+});
+
+it("rejects a foreign finalized asset even when the server response shape is valid", async () => {
+  const bytes = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+j7M0AAAAASUVORK5CYII=", "base64");
+  const assetId = "a046df5a-e5e4-4727-a191-2266e031bba9";
+  vi.stubGlobal("fetch", async (url: string) => {
+    if (url.startsWith("https:")) return new Response(null);
+    const data = url.endsWith("/finalize") ? { asset: { id: assetId, projectId: assetId, mimeType: "image/png", byteSize: bytes.length, width: 1, height: 1, durationSeconds: null, createdAt: "2026-11-12T10:00:00.000Z", nativeContentUrl: null, contentUrl: `/api/v1/assets/${assetId}/content` } } : { upload: { id, projectId: id, assetId, expiresAt: "2026-11-13T10:00:00.000Z", uploadUrl: "https://storage.example.test/scoped", uploadContentType: "image/png" } };
+    return Response.json({ ok: true, data, requestId: "test" });
+  });
+  await expect(uploadProjectImage(id, new File([bytes], "poster.png", { type: "image/png" }), new AbortController().signal, { idempotencyKey: id })).rejects.toThrow(/belong/);
 });

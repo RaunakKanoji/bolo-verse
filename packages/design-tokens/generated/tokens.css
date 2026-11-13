@@ -17,9 +17,9 @@
   --success: #236344;
   --warning: #805300;
   --destructive: #B02A43;
-  --radius-card: 24px;
-  --radius-panel: 28px;
-  --radius-control: 14px;
+  --radius-card: 20px;
+  --radius-panel: 20px;
+  --radius-control: 12px;
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 16px;
@@ -35,43 +35,43 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-shape-theme="light"]) {
-  --canvas: #11131D;
-  --surface: #1B1E2B;
-  --surface-secondary: #252938;
-  --text-primary: #F0F1F8;
-  --text-secondary: #B6BDCE;
-  --accent-primary: #A4AAFF;
+  --canvas: #101118;
+  --surface: #1D1E2B;
+  --surface-secondary: #252638;
+  --text-primary: #F3F2FA;
+  --text-secondary: #B7B9C9;
+  --accent-primary: #A99BFF;
   --accent-secondary: #D0A2FF;
-  --accent-soft: #302C50;
-  --accent-strong: #ADA3FF;
-  --accent-text: #C4BBFF;
+  --accent-soft: #302B47;
+  --accent-strong: #C0B5FF;
+  --accent-text: #C0B5FF;
   --accent-foreground: #171923;
-  --border-subtle: #A5AED633;
+  --border-subtle: #37394C;
   --glass-fill: #1B1E2BEF;
   --glass-border: #A5AED63D;
-  --success: #8CD9AB;
-  --warning: #F3CA79;
-  --destructive: #FFADBC;
+  --success: #58C59B;
+  --warning: #E7B66D;
+  --destructive: #EFA0AC;
     color-scheme: dark;
   }
 }
 :root[data-shape-theme="dark"] {
-  --canvas: #11131D;
-  --surface: #1B1E2B;
-  --surface-secondary: #252938;
-  --text-primary: #F0F1F8;
-  --text-secondary: #B6BDCE;
-  --accent-primary: #A4AAFF;
+  --canvas: #101118;
+  --surface: #1D1E2B;
+  --surface-secondary: #252638;
+  --text-primary: #F3F2FA;
+  --text-secondary: #B7B9C9;
+  --accent-primary: #A99BFF;
   --accent-secondary: #D0A2FF;
-  --accent-soft: #302C50;
-  --accent-strong: #ADA3FF;
-  --accent-text: #C4BBFF;
+  --accent-soft: #302B47;
+  --accent-strong: #C0B5FF;
+  --accent-text: #C0B5FF;
   --accent-foreground: #171923;
-  --border-subtle: #A5AED633;
+  --border-subtle: #37394C;
   --glass-fill: #1B1E2BEF;
   --glass-border: #A5AED63D;
-  --success: #8CD9AB;
-  --warning: #F3CA79;
-  --destructive: #FFADBC;
+  --success: #58C59B;
+  --warning: #E7B66D;
+  --destructive: #EFA0AC;
   color-scheme: dark;
 }

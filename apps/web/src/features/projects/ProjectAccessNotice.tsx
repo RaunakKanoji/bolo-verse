@@ -26,7 +26,7 @@ export default function ProjectAccessNotice({ state }: { state: AccessState }) {
       <h1>{heading}</h1>
       <p>
         {state === "unconfigured"
-          ? "Clerk and Neon setup is needed before private projects can open. The public XR preview lets you test this browser without a connected project."
+          ? "Clerk and Neon setup is needed before private projects can open. The spatial workspace is available without a connected project; private media appears after setup."
           : state === "denied"
             ? "This project is unavailable to your account. Open your project list to select a project you can access."
             : "We could not read your projects. Check the connection and try again."}
@@ -42,8 +42,8 @@ export default function ProjectAccessNotice({ state }: { state: AccessState }) {
       )}
       <div className="actions">
         <Button asChild>
-          <Link href={state === "denied" ? "/app/projects" : "/xr/preview"}>
-            {state === "denied" ? "Open your projects" : "Try XR preview"}
+          <Link href={state === "denied" ? "/app/projects" : "/xr/hud"}>
+            {state === "denied" ? "Open your projects" : "Open spatial workspace"}
           </Link>
         </Button>
         <Button asChild variant="outline">

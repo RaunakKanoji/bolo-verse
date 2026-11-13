@@ -16,6 +16,7 @@ import type { AFrameEntity, AFrameScene } from "./aframe-types";
 import { loadAFrame, type XRRealm } from "./load-aframe";
 import { RuntimeScope } from "./scope";
 import { startSpatialAssetPreview, type SpatialAssetPreview } from "./asset-preview";
+import { HudSurfaces, type HudSnapshot } from "../hud/hud-surfaces";
 
 export type RuntimeStats = {
   fps: number;
@@ -26,6 +27,7 @@ export type RuntimeStats = {
 };
 export type ViewingPosition = "seated" | "standing";
 type Callbacks = {
+  onHUDAction?(action: string): void;
   onSelect(entity: SceneEntity): void;
   onSession(active: boolean): void;
   onStats(stats: RuntimeStats): void;
@@ -49,6 +51,8 @@ export class StudioAdapter {
   private position: ViewingPosition = "standing";
   private session?: XRSession;
   private sessionPending = false;
+  private hud?: HudSurfaces;
+  private hudRoom?: AFrameEntity;
 
   constructor(
     private readonly host: HTMLDivElement,
@@ -113,6 +117,12 @@ export class StudioAdapter {
       this.callbacks.onStats((event as CustomEvent<RuntimeStats>).detail),
     );
     listen(scene, "click", (event) => {
+      const hudAction = (event.target as HTMLElement).closest<HTMLElement>("[data-hud-action]")
+        ?.dataset.hudAction;
+      if (hudAction) {
+        this.callbacks.onHUDAction?.(hudAction);
+        return;
+      }
       const entity = (event.target as HTMLElement).closest<HTMLElement>("[data-studio-id]");
       if (entity?.dataset.studioId) this.select(entity.dataset.studioId);
       const actionId = (event.target as HTMLElement).closest<HTMLElement>("[data-studio-action]")
@@ -132,11 +142,15 @@ export class StudioAdapter {
         );
     });
 
-    this.buildRoom(scene);
+    this.hudRoom = this.entity("a-entity", {});
+    scene.append(this.hudRoom);
+    this.buildRoom(this.hudRoom);
     this.rig = this.entity("a-entity", { id: "studio-camera-rig" });
     this.camera = this.entity("a-entity", {
-      camera: "active: true; fov: 65; near: 0.05; far: 60",
-      position: "0 1.6 1.4",
+      camera: this.callbacks.onHUDAction
+        ? "active: true; fov: 38; near: 0.05; far: 60"
+        : "active: true; fov: 65; near: 0.05; far: 60",
+      position: this.callbacks.onHUDAction ? "0 1.6 0" : "0 1.6 1.4",
       "look-controls":
         "pointerLockEnabled: false; magicWindowTrackingEnabled: false; touchEnabled: true",
       "wasd-controls": "enabled: false; acceleration: 12; fly: false",
@@ -158,8 +172,12 @@ export class StudioAdapter {
       }),
     );
 
-    this.reconcilePanels();
-    this.buildSpatialTools(scene);
+    if (this.callbacks.onHUDAction) {
+      this.hud = new HudSurfaces(realm, scene);
+    } else {
+      this.reconcilePanels();
+      this.buildSpatialTools(scene);
+    }
     const exitPanel = this.entity("a-entity", {
       position: "3.9 1.7 -1.6",
       rotation: "0 -55 0",
@@ -188,6 +206,8 @@ export class StudioAdapter {
       this.assetPreviews.clear();
       this.panels.clear();
       this.spatialTools = [];
+      this.hud?.dispose();
+      this.hud = undefined;
     });
 
     const ready = new Promise<void>((resolve, reject) => {
@@ -271,7 +291,7 @@ export class StudioAdapter {
     return element;
   }
 
-  private buildRoom(scene: AFrameScene): void {
+  private buildRoom(scene: AFrameEntity): void {
     const box = (position: string, width: number, height: number, depth: number, color: string) => {
       scene.append(
         this.entity("a-box", {
@@ -482,7 +502,11 @@ export class StudioAdapter {
     this.rig.object3D.position.set(0, this.session && position === "seated" ? 0.4 : 0, 0);
     this.rig.object3D.rotation.set(0, 0, 0);
     if (!this.session) {
-      this.camera.object3D.position.set(0, position === "seated" ? 1.2 : 1.6, 1.4);
+      this.camera.object3D.position.set(
+        0,
+        position === "seated" ? 1.2 : 1.6,
+        this.callbacks.onHUDAction ? 0 : 1.4,
+      );
       this.camera.object3D.rotation.set(0, 0, 0);
       const look = this.camera.components["look-controls"];
       for (const object of [look?.yawObject, look?.pitchObject] as (Object3D | undefined)[])
@@ -556,6 +580,29 @@ export class StudioAdapter {
 
   serialize(): SceneDocument {
     return serializeSceneDocument(this.document);
+  }
+
+  updateHUD(snapshot: HudSnapshot): void {
+    if (this.scope.signal.aborted || !this.scene) return;
+    this.hud?.update(snapshot);
+    const environment = snapshot.state.preferences.environment;
+    this.scene.dataset.hudEnvironment = environment;
+    this.scene.setAttribute(
+      "background",
+      "color",
+      environment === "Creative Workspace" ? "#252638" : "#101118",
+    );
+    this.hudRoom?.setAttribute("visible", environment !== "Minimal Void");
+    if (this.hudRoom)
+      for (const element of Array.from(this.hudRoom.children)) {
+        if (element.tagName.toLowerCase() === "a-box") {
+          (element as AFrameEntity).setAttribute(
+            "material",
+            "color",
+            environment === "Creative Workspace" ? "#383747" : "#191a25",
+          );
+        }
+      }
   }
 
   dispose(): void {

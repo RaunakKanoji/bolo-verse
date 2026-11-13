@@ -4,12 +4,14 @@ The browser XR implementation has explicit microphone consent, capture ownership
 
 Existing private routes are `/api/xr/assistant/{projectId}`, `/transcribe` and `/speak`. Their [application service](../../apps/web/src/server/xr-assistant/service.ts) authorizes creator/editor access, resolves project context and applies a shared durable request budget before provider calls. Native voice/conversation is not connected to these routes and has no microphone capture implementation yet.
 
-Two command families currently exist:
+The existing command families include:
 
 - `apps/web/src/lib/contracts/commands.ts`: bounded recording/product commands in a versioned envelope with request ID and expected scene revision.
 - `apps/web/src/lib/contracts/xr-assistant.ts`: XR proposals `OPEN_ASSET`, `FOCUS_PANEL`, `RESET_WORKSPACE` and `GENERATE_IDEAS`. Validation checks both shape and the exact authorized project/asset/panel set.
 
-These families are not a completed cross-platform registry. Existing browser proposals require explicit application; destructive reset requires confirmation. No path executes arbitrary model-generated code. Raw command audio is not persisted by the current speech request path.
+- `apps/web/src/lib/contracts/creative-actions.ts`: reviewed production planning actions for `/create`. UUID-only asset navigation is resolved against the authorized project; scene/review actions open existing workflows. Text/duration affect a labeled local planning draft, saves use the existing private creative-draft CAS, captions use persistent Brainstorm/Gemini and review sharing still requires an explicit version/reviewer. Transcription reuses the private Brainstorm Sarvam route.
+
+A shared browser microphone lease coordinates these capture paths with camera recording and the original mono canvas recorder. These families are not a completed cross-platform registry. Existing browser proposals require explicit application; destructive reset requires confirmation. No path executes arbitrary model-generated code. Raw command audio is not persisted by the current speech request path.
 
 ## Planned unified pipeline
 

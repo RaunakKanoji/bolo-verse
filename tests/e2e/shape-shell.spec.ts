@@ -11,13 +11,19 @@ test("Shape navigation stays named on small screens and shortcuts ignore editabl
     page
       .getByRole("navigation", { name: "Workspace tools" })
       .getByRole("link", { name: "Profile", exact: true }),
-  ).toBeVisible();
+  ).toBeHidden();
+  await page.getByRole("button", { name: "Open navigation", exact: true }).click();
+  const drawer = page.getByRole("dialog", { name: "Workspace navigation" });
+  await expect(drawer.getByRole("link", { name: "Profile", exact: true })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(drawer).toHaveCount(0);
+  await page.getByRole("button", { name: "Appearance", exact: true }).click();
   await page.getByLabel("Appearance", { exact: true }).focus();
   await page.keyboard.press("Alt+Digit2");
   await expect(page).toHaveURL(/\/studio\/settings$/);
-  await page.getByRole("heading", { name: "Make space for your work." }).click();
+  await page.getByRole("heading", { name: "Workspace Settings" }).click();
   await page.keyboard.press("Alt+Digit2");
-  await expect(page).toHaveURL(/\/studio\/create$/);
+  await expect(page).toHaveURL(/\/create$/);
   await expect(navigation.getByRole("link", { name: "Create", exact: true })).toHaveAttribute(
     "aria-current",
     "page",
@@ -28,13 +34,14 @@ test("appearance persists across navigation and dark workspace fits narrow viewp
   page,
 }, testInfo) => {
   await page.goto("/studio/settings");
+  await page.getByRole("button", { name: "Appearance", exact: true }).click();
   await page.getByLabel("Appearance", { exact: true }).selectOption("dark");
   await expect(page.locator("html")).toHaveAttribute("data-shape-theme", "dark");
   await page
     .getByRole("navigation", { name: "Studio navigation" })
     .getByRole("link", { name: "Workspace", exact: true })
     .click();
-  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(17, 19, 29)");
+  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(16, 17, 24)");
   for (const width of [1440, 768, 390]) {
     await page.setViewportSize({ width, height: 900 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
@@ -45,7 +52,7 @@ test("appearance persists across navigation and dark workspace fits narrow viewp
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-shape-theme", "dark");
   await page.goto("/studio/create");
-  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(17, 19, 29)");
+  await expect(page.locator("body")).toHaveCSS("background-color", "rgb(16, 17, 24)");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({
     path: testInfo.outputPath("shape-playground-dark-mobile.png"),

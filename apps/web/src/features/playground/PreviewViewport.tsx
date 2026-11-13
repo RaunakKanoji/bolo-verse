@@ -154,7 +154,7 @@ export function PreviewViewport({
             {mode === "video" ? (
               <Link href="/studio/feasibility">Open the recording lab</Link>
             ) : mode === "model3d" ? (
-              <Link href={projectId ? `/studio/xr/${projectId}` : "/xr/preview"}>
+              <Link href={projectId ? `/studio/xr/${projectId}` : "/xr/hud"}>
                 Explore the Spatial Studio
               </Link>
             ) : (

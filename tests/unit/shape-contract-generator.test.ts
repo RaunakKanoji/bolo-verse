@@ -1,26 +1,67 @@
 import { describe, expect, it } from "vitest";
 import { generateModels } from "../../scripts/lib/contract-generator";
 
+it("keeps omitted and explicit-null patch fields distinct in generated Swift and accepts default annotations", () => {
+  const result = generateModels({
+    Patch: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        name: { type: "string", default: "Draft" },
+        clientId: { anyOf: [{ type: "string" }, { type: "null" }] },
+      },
+      required: [],
+    },
+  });
+  expect(result.typescript).toContain("clientId?: (string | null)");
+  expect(result.swift).toContain("ShapeNullable<String>?");
+  expect(result.swift).toContain("container.contains(.`clientId`)");
+});
+
 describe("language-neutral model generation", () => {
   it("represents an empty closed request as an empty record instead of the permissive TypeScript object type", () => {
-    const result = generateModels({ EmptyRequest: { type: "object", properties: {}, additionalProperties: false } });
+    const result = generateModels({
+      EmptyRequest: { type: "object", properties: {}, additionalProperties: false },
+    });
     expect(result.typescript).toContain("export type EmptyRequest = Record<string, never>;");
     expect(result.swift).toContain("public struct EmptyRequest");
   });
   it("refuses unsupported schema shapes rather than widening their types", () => {
-    for (const schema of [{ type: "object", additionalProperties: { type: "string" } }, { oneOf: [{ type: "string" }, { type: "number" }] }, { type: "string", strangeKeyword: true }]) {
+    for (const schema of [
+      { type: "object", additionalProperties: { type: "string" } },
+      { oneOf: [{ type: "string" }, { type: "number" }] },
+      { type: "string", strangeKeyword: true },
+    ]) {
       expect(() => generateModels({ Bad: schema })).toThrow();
     }
   });
   it("generates exact numeric vector tuples and refuses heterogeneous or open tuples", () => {
-    const vector = { type: "array", prefixItems: Array.from({ length: 3 }, () => ({ type: "number", minimum: -30, maximum: 30 })), items: false, minItems: 3, maxItems: 3 };
-    const root = (position: object) => ({ VectorDocument: { type: "object", additionalProperties: false, required: ["position"], properties: { position } } });
+    const vector = {
+      type: "array",
+      prefixItems: Array.from({ length: 3 }, () => ({ type: "number", minimum: -30, maximum: 30 })),
+      items: false,
+      minItems: 3,
+      maxItems: 3,
+    };
+    const root = (position: object) => ({
+      VectorDocument: {
+        type: "object",
+        additionalProperties: false,
+        required: ["position"],
+        properties: { position },
+      },
+    });
     expect(generateModels(root(vector)).typescript).toContain("position: [number, number, number]");
     for (const invalid of [
-      { ...vector, items: { type: "number" } }, { ...vector, maxItems: 4 },
+      { ...vector, items: { type: "number" } },
+      { ...vector, maxItems: 4 },
       { ...vector, prefixItems: [{ type: "number" }, { type: "string" }, { type: "number" }] },
-      { ...vector, prefixItems: Array.from({ length: 3 }, () => ({ type: "number", enum: [1, 2] })) },
-    ]) expect(() => generateModels(root(invalid))).toThrow();
+      {
+        ...vector,
+        prefixItems: Array.from({ length: 3 }, () => ({ type: "number", enum: [1, 2] })),
+      },
+    ])
+      expect(() => generateModels(root(invalid))).toThrow();
     // Tuple decoding constraints cannot be dropped through root/array typealiases.
     expect(() => generateModels({ Vector: vector })).toThrow();
     expect(() => generateModels({ Vectors: { type: "array", items: vector } })).toThrow();
@@ -53,7 +94,11 @@ describe("published transport fixtures", () => {
   });
   it("preserves revision/body and abort signal when saving, and surfaces HTTP errors", async () => {
     const controller = new AbortController();
-    const document = { schemaVersion: 1 as const, mode: "audio" as const, prompts: { image: "", video: "", audio: "नमस्ते", model3d: "" } };
+    const document = {
+      schemaVersion: 1 as const,
+      mode: "audio" as const,
+      prompts: { image: "", video: "", audio: "नमस्ते", model3d: "" },
+    };
     const client = createShapeClient(async (_input, init) => {
       expect(init?.method).toBe("PUT");
       expect(init?.signal).toBe(controller.signal);
@@ -61,7 +106,11 @@ describe("published transport fixtures", () => {
       return Response.json(fixtures[5].value, { status: 409 });
     });
     try {
-      await client.saveCreativeDraft("project", { expectedRevision: 4, document }, controller.signal);
+      await client.saveCreativeDraft(
+        "project",
+        { expectedRevision: 4, document },
+        controller.signal,
+      );
       expect.fail("Conflict must reject");
     } catch (error) {
       expect(error).toBeInstanceOf(ShapeApiError);

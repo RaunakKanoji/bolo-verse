@@ -1,0 +1,30 @@
+# Brief-aware Gemini Brainstorming Implementation Plan
+
+**Goal:** Implement only [Feature 02](../../../context/feature-specs/02-gemini-brainstorming.md): a single-turn creative assistant grounded in a saved project brief.
+
+**Architecture:** Use existing Clerk v1 identity/origin/JSON boundaries, SQL project permissions, immutable brief rows and bounded Gemini HTTP transport. Add a separate brainstorming action, never executable scene commands. No dependencies, migrations, persistence or voice work. Existing Feature 00/01 and other dirty files remain intact.
+
+**Implementation map:** Existing `providers/xr-assistant.ts` makes Gemini generateContent calls and supports a separate explicitly labelled XR mock; brainstorming must never use that mock. `providers/xr-http.ts` bounds JSON streams/timeouts but has no retry. `xr-assistant/service.ts` has a durable 20/hour actor budget. `db/project-briefs.ts` has authorized latest briefs, version checks and stable serialization. There is no brainstorming route/panel/repository. `ProjectBrief.tsx` owns the saved version and dirty notes, so mount the panel there and append copied concepts only to unsaved notes. The project page already keys that component by authenticated actor/project.
+
+**Files:** create `lib/contracts/brainstorm.ts`, `server/brainstorm/service.ts`, `server/providers/gemini-brainstorm.ts`, `app/api/v1/projects/[projectId]/brainstorm/route.ts`, `features/projects/ProjectBrainstorm.tsx`, `features/projects/brainstorm.module.css`; minimally modify `ProjectBrief.tsx`, `providers/xr-http.ts`, `providers/xr-assistant.ts` and `xr-assistant/service.ts`. Add `tests/unit/brainstorm.test.ts`, `tests/integration/brainstorm.test.ts`, a fixture entry/harness and `tests/e2e/brainstorm.spec.ts`, plus `scripts/smoke-brainstorm.ts`. Extend `contracts/shape.ts`, generated OpenAPI/TS/Swift and round-trip fixtures. Update both progress trackers and a delivery report.
+
+**Contract:** POST `/api/v1/projects/{projectId}/brainstorm` with strict `{message, briefVersion?}`. Version, when supplied, must match the latest saved brief. Return existing envelope with `reply`, `directions` (three validated suggestions or empty), `format`, `sourceBriefVersion`, `providerStatus: live`. Each direction: name/concept/visualDirection/proposedDeliverable/productionSuggestion. Plain text is explicitly labelled when JSON/schema parsing fails; truncated, oversized, blocked or invalid provider envelopes fail honestly.
+
+**Bounds and trust:** 2000-character message, 16 KiB request; selected brief fields capped individually and as a whole; oversized context is rejected before quota instead of dropping constraints. Omit notes/references, redact obvious credentials/URLs in prompts and outputs, never log brief or key. No history/client context or tools accepted. Server reads the brief through SQL editor predicates, reauthorizes after provider latency and discards a reply if the latest brief changes. Max 2048 output tokens, 25-second total provider deadline, at most one retry after explicit transient HTTP statuses, no retry for ambiguous network/timeouts. Atomic existing account 20/hour plus actor/project 10/hour quota. Quotas count logical attempts, not successful ideas.
+
+**Review focus:** no-key must not consume quota; role revocation and brief changes during request; plain fallback never becomes executable tools; failed network preserves message and old results are not presented as the new answer; copy requires explicit save and cannot overflow existing notes.
+
+- [x] Write failing transport/contract/provider tests; implement and verify bounded retry, output validation/fallback, redaction and no-key.
+- [x] Write failing PGlite/API tests; implement context, version checks, atomic quotas, route and post-provider reauthorization.
+- [x] Write browser cases; implement ephemeral panel/quick prompts/copy-to-notes and verify success, errors/retry, refresh and access loss.
+- [x] Publish additive API artifacts/fixtures; run focused/full workspace/browser and native checks as applicable. Independent review, diff/secret review and explicit PASS/FAIL/NOT RUN report. No commit/push/live migration/deployment.
+
+**Environment:** Configuration presence checked without printing values: Gemini key/model, Clerk keys and database URL are all absent. Live account/provider acceptance is NOT RUN; implement all unaffected work and stop at this feature boundary.
+
+## Delivery ledger
+
+All authorized Feature 02 implementation and local gates executed. Final evidence: [delivery report](../../development/gemini-brainstorming-status.md). Full workspace: 14 tasks, 577 tests/58 files, both builds PASS. Browser: 71/71 cases in 12 files PASS (including nine new brainstorming cases). Swift: 22 round trips, nine invalid payloads and 48 native core tests PASS; unsigned generic visionOS Simulator app build PASS. No-key live acceptance remains NOT RUN. No commit/push/external migration/deployment.
+
+Ruling: single-turn ephemeral responses satisfy the demo slice; history and standalone saved directions remain optional/out of scope. Copy-to-brief is an explicit local append, persisted only by the existing brief save. Ruling: preserve every selected constraint/prohibition; reject oversized serialized context rather than silently dropping it. Ruling: one retry is allowed only after an explicit transient HTTP response, never an ambiguous timeout/network failure. Existing callers stay single-attempt. Ruling: work in the requested shared checkout and preserve all prior dirty Feature 00/01 files; Feature 02 depends on Feature 01, so any later commit split must account for those shared artifacts.
+
+Independent review found a Unicode-escape redaction bypass; the observed failing regression now passes after decoded keys/values are sanitized before validation, including invalid-schema fallback. Re-review reproduced the original probe successfully and found no remaining scoped blocker. Existing brief browser status compatibility was also reproduced, fixed and verified. No production test-auth path was introduced.

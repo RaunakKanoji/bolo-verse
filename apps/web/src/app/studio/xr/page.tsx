@@ -46,8 +46,8 @@ export default async function SpatialStudioLanding() {
       </section>
       <section className="setup-panel">
         <h2>Explore the studio first</h2>
-        <p>Try an unsaved sample scene to explore selection and desktop 3D navigation.</p>
-        <Link href="/xr/preview">Open public XR preview</Link>
+        <p>Open the spatial dashboard and its desktop or headset controls.</p>
+        <Link href="/xr/hud">Open spatial workspace</Link>
       </section>
     </StudioShell>
   );

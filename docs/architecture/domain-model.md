@@ -1,6 +1,6 @@
 # Domain model
 
-The modular backend now has 24 tables. The original [Drizzle schema](../../apps/web/src/server/db/schema.ts) is extended by [creation tables](../../apps/web/src/server/db/creation-schema.ts), with checked-in migrations `0000–0008`. The initial connected creative milestone adds upload sessions and image request metadata to existing assets/jobs; it does not introduce parallel asset or job tables.
+The modular backend now has 31 tables. The original [Drizzle schema](../../apps/web/src/server/db/schema.ts) is extended by [creation tables](../../apps/web/src/server/db/creation-schema.ts), plus [workspace tables](../../apps/web/src/server/db/workspace-schema.ts) and [private Brainstorm tables](../../apps/web/src/server/db/brainstorm-schema.ts), with checked-in migrations `0000–0010`. The initial connected creative milestone adds upload sessions and image request metadata to existing assets/jobs; it does not introduce parallel asset or job tables.
 
 | Responsibility | Implemented tables |
 | --- | --- |
@@ -19,6 +19,8 @@ The modular backend now has 24 tables. The original [Drizzle schema](../../apps/
 | Private image upload reservations and cleanup state | `asset_upload_sessions` |
 | Private image request provenance and cleanup state | `image_generation_requests` |
 | Durable request budgets | `rate_limit_buckets` |
+| Workspace clients, project tasks and library organization | `workspace_clients`, `project_tasks`, `asset_library_metadata` |
+| Actor-private idea studio | `brainstorm_sessions`, `brainstorm_messages`, `brainstorm_ideas`, `brainstorm_mutations` |
 
 Clerk owns account identity; persisted subjects are text, while application resources generally use UUIDs. There is no local `users` or Clerk Organizations administration table. A personal workspace has one `personal_owner_clerk_id`; it must not be relabelled as a full organization model.
 
@@ -28,8 +30,8 @@ Project-scoped composite foreign keys prevent cross-project references between b
 
 Canonical scenes use revision-checked writes and ready assets from the same project. Their schema version is independent of the database revision. See [scene format](scene-format.md) for the distinction from existing browser and recording layouts.
 
-Schema presence is not feature completion. Image jobs now have a real authorized provider/storage worker and image uploads have verified immutable finalization. These additions do not implement video/audio/3D generation, billing reconciliation, content-version publication or a complete client portal. See the [connected creative status](../development/creative-foundation-status.md). The current functional repositories are under `apps/web/src/server/db`; application orchestration is extracted into focused services where needed, such as `apps/web/src/server/xr-assistant/service.ts`.
+Schema presence is not feature completion. Image jobs now have a real authorized provider/storage worker and image uploads have verified immutable finalization. Video/audio/3D generation and billing reconciliation remain unavailable. Later Features06–08 implement immutable verified-image publication, exact-version identity-bound review grants/comments/decisions and revisions; the creator workspace adds their shared UI entry. This does not constitute organization administration or video review. See the [connected creative status](../development/creative-foundation-status.md). The current functional repositories are under `apps/web/src/server/db`; application orchestration is extracted into focused services where needed, such as `apps/web/src/server/xr-assistant/service.ts`.
 
 The development [seed command](../../scripts/seed.ts) explicitly resolves an existing Clerk account before creating a labelled fictional project, proposed brief and draft artifacts. Normal startup does not insert synthetic client approvals, generated assets or sample projects.
 
-Later domain slices may add organizations/invitations, profile projections, tasks, durable conversations, asset derivatives, scene history, deliverables and notifications. Each addition needs an owner, lifecycle, authorized service, migration and PostgreSQL isolation tests. Do not create duplicate or empty tables merely to match the target architecture's noun list.
+Later domain slices may add organizations/invitations, profile projections, asset derivatives, scene history, expanded deliverable formats and notification preferences. Each addition needs an owner, lifecycle, authorized service, migration and PostgreSQL isolation tests. Do not create duplicate or empty tables merely to match the target architecture's noun list.

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Sparkles, Upload } from "lucide-react";
 import type { CreativeMode } from "@/lib/contracts/shape";
+import { imageGenerationReferenceMaxBytes } from "@/lib/contracts/creation";
 import { CreationAccessError } from "./creation-http";
 import { uploadReferenceImage } from "./upload-reference-image";
 import type { useImageGeneration } from "./use-image-generation";
@@ -43,15 +44,16 @@ export function CreationControls({
     model?.aspectRatios.find((entry) => entry === ratio) ?? model?.aspectRatios[0];
   const configured = catalog?.availability === "configured" && Boolean(model);
   const allowed = mode === "image" && Boolean(projectId) && canEdit && configured;
+  const canUpload = mode === "image" && Boolean(projectId) && canEdit;
   const supportedAssets = generation.assets.data?.assets.filter(
     (asset) =>
       ["image/png", "image/jpeg", "image/webp"].includes(asset.mimeType) &&
       asset.contentUrl &&
-      asset.byteSize <= (catalog?.maxReferenceBytes ?? 0),
+      asset.byteSize <= imageGenerationReferenceMaxBytes,
   );
   async function upload(file: File) {
-    if (!projectId || !allowed || controller.current) return;
-    if (file.size > (catalog?.maxReferenceBytes ?? 0)) {
+    if (!projectId || !canUpload || controller.current) return;
+    if (file.size > imageGenerationReferenceMaxBytes) {
       setError("This image exceeds the configured reference image size limit.");
       return;
     }
@@ -141,6 +143,10 @@ export function CreationControls({
               <option value={reference}>Uploaded reference image</option>
             )}
           </select>
+        </>
+      )}
+      {canUpload && (
+        <>
           <button
             type="button"
             className={styles.secondary}
@@ -163,8 +169,8 @@ export function CreationControls({
             }}
           />
           <small>
-            This action uploads the image to your project and sends it to the image provider when
-            you generate.
+            Uploads a private project image up to 10 MiB. No image provider is called by upload.
+            When generation is available, you can explicitly use it as a reference.
           </small>
         </>
       )}

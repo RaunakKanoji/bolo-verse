@@ -1,7 +1,7 @@
 import { StrictMode, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { _roots } from "../../apps/spatial-web/node_modules/@react-three/fiber";
-import type { Mesh } from "three";
+import { BufferGeometry, Material, Texture, type Mesh } from "three";
 import { SpatialEditor } from "@spatial/editor/SpatialEditor";
 import { SessionWorkspace } from "@spatial/auth/AuthorizedSpatialWorkspace";
 import type { SpatialWorkspaceFixture } from "./spatial-workspace-data";
@@ -9,6 +9,13 @@ import "../../apps/spatial-web/src/app/globals.css";
 
 // Inspect real R3F stores from the test bundle only. Application routes neither
 // import this entry nor publish renderer internals or test fixture controls.
+const disposedResources = { geometries: 0, materials: 0, textures: 0 };
+const geometryDispose = BufferGeometry.prototype.dispose;
+BufferGeometry.prototype.dispose = function () { disposedResources.geometries++; geometryDispose.call(this); };
+const materialDispose = Material.prototype.dispose;
+Material.prototype.dispose = function () { disposedResources.materials++; materialDispose.call(this); };
+const textureDispose = Texture.prototype.dispose;
+Texture.prototype.dispose = function () { disposedResources.textures++; textureDispose.call(this); };
 function inspect() {
   return [..._roots.values()].map(({ store }) => {
     const { scene, gl } = store.getState();
@@ -50,9 +57,9 @@ function projectTriangle(objectId: string) {
   return null;
 }
 declare global {
-  interface Window { __spatialFixture: { inspect: typeof inspect; projectTriangle: typeof projectTriangle; tokenCompletions: { sessionId: string; skipCache: boolean }[] } }
+  interface Window { __spatialFixture: { inspect: typeof inspect; projectTriangle: typeof projectTriangle; disposedResources: typeof disposedResources; tokenCompletions: { sessionId: string; skipCache: boolean }[] } }
 }
-window.__spatialFixture = { inspect, projectTriangle, tokenCompletions: [] };
+window.__spatialFixture = { inspect, projectTriangle, disposedResources, tokenCompletions: [] };
 
 function SessionFixture({ projectId }: { projectId: string }) {
   const [sessionId, setSessionId] = useState<string | null>("fixture-session-a");

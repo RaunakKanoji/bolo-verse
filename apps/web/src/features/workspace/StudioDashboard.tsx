@@ -172,13 +172,13 @@ export default function StudioDashboard({
             </div>
             <ArrowRight size={18} />
           </Link>
-          <Link href="/xr/preview" className={styles.nextItem}>
+          <Link href="/xr/hud" className={styles.nextItem}>
             <span className={styles.nextIcon}>
               <Box />
             </span>
             <div>
               <strong>Step into Spatial Studio</strong>
-              <p>Arrange cards in a real 3D workspace.</p>
+              <p>Open your spatial dashboard, projects and view controls.</p>
             </div>
             <ArrowRight size={18} />
           </Link>

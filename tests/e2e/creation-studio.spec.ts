@@ -1,9 +1,19 @@
 import { expect, test } from "@playwright/test";
 
-test("creation route aliases preserve the working local canvas and honest public generation state", async ({
+test("creation entry links to the preserved canvas aliases and honest public generation state", async ({
   page,
 }) => {
-  for (const route of ["/create", "/studio/image"]) {
+  await page.goto("/create");
+  await expect(
+    page.getByRole("heading", { name: "Create something extraordinary.", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("link", { name: "Start Image Design", exact: true })).toHaveAttribute(
+    "href",
+    "/studio/create",
+  );
+  await page.getByRole("link", { name: "Start Image Design", exact: true }).click();
+  await expect(page).toHaveURL(/\/studio\/create$/);
+  for (const route of ["/studio/create", "/studio/image"]) {
     await page.goto(route);
     await expect(page.getByRole("heading", { name: "Make it your own." })).toBeVisible();
     await expect(page.getByRole("img", { name: "Image adjustment preview" })).toBeVisible();
@@ -56,6 +66,27 @@ const jobId = "d046df5a-e5e4-4727-a191-2266e031bba9";
 const assetId = "a046df5a-e5e4-4727-a191-2266e031bba9";
 const date = "2026-11-12T10:00:00.000Z";
 const ok = (data: unknown) => ({ ok: true, data, requestId: "creation-browser-fixture" });
+test("private reference upload remains available when Gemini generation is unconfigured", async ({
+  page,
+}) => {
+  await fixtureApi(page);
+  await page.route(`${origin}/api/v1/creation/capabilities`, (route) =>
+    route.fulfill({
+      json: ok({
+        availability: "unconfigured",
+        reason: "No image provider configured.",
+        models: [],
+        maxReferenceBytes: 10 * 1024 * 1024,
+        maxPromptCharacters: 4000,
+      }),
+    }),
+  );
+  await page.goto(origin);
+  await expect(page.getByRole("button", { name: "Generate image", exact: true })).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "Upload private reference", exact: true }),
+  ).toBeEnabled();
+});
 async function fixtureApi(page: import("@playwright/test").Page) {
   await page.route(`${origin}/studio/campaign-studies.png`, (route) =>
     route.fulfill({
